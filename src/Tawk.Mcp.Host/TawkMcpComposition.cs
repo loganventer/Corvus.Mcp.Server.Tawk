@@ -46,7 +46,7 @@ public static class TawkMcpComposition
 {
     public static string Version { get; } =
         typeof(TawkMcpComposition).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
-        ?? "0.15.0";
+        ?? "0.15.1";
 
     public static IMcpServerBuilder AddTawkMcp(this IServiceCollection services, TawkMcpOptions options)
     {

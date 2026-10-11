@@ -16,6 +16,7 @@
 - [Knowledge](#knowledge)
 - [The memory workflow](#the-memory-workflow)
 - [Memory sync](#memory-sync)
+- [Moving to another computer](#moving-to-another-computer)
 - [Resources](#resources)
 - [Prompts](#prompts)
 - [The owner's chat](#the-owners-chat)
@@ -431,6 +432,15 @@ The interval is `TAWKMCP_WORKFLOW_EVERY` (0 turns it off). Your own standing ins
 Memory can be kept in step between your machines through a private git repository of your own, using git over SSH with a key on each machine. It is off until you set a repository on a machine; there is no default destination, and there are no tokens. [CONFIGURATION.md](CONFIGURATION.md#memory-sync) has the setup and the merge rules. `tawk-mcp sync` runs one cycle and says what happened.
 
 Sync runs by itself when tawk-mcp starts and then every two hours. To sync at once, ask your agent to sync memory: it calls `sync_memory`, which runs one cycle and says what was merged and pushed. The tool cannot set or change the repository, and in a session started without one it says that sync is off and does nothing. `tawk-mcp sync` does the same from a shell.
+
+## Moving to another computer
+
+tawk moves one account to another computer by itself (`tawk --migrate-out` and `--migrate-in`, tawk 0.23.0 or later; see its manual). That carries your chats and the choices you made for them, and no agent can start it: tawk-mcp has no tool for it. What tawk-mcp remembers about you (your voices, contact profiles, notes and templates) lives on each computer apart from tawk's data, so it is moved on its own:
+
+- **Memory sync** (above) is the simplest: set the same private repository on the new computer, and what it holds is merged in when tawk-mcp starts.
+- **An OKF bundle** works without a repository: run `tawk-mcp export-okf FOLDER` on the old computer and `tawk-mcp import-okf FOLDER` on the new one (see [Memory tools](#memory-tools) for what a bundle holds and what `--include-sensitive` adds).
+
+Memory is kept by chat and contact (their JID), not by the label of an account, so a moved account's contacts are recognised again once the chats are there. Install tawk-mcp on the new computer with its own `install.sh`; its bearer token is made there and is not carried over. When tawk-mcp runs in a container, give `send_file` a path that tawk itself can see, as on the old computer.
 
 ## Resources
 
