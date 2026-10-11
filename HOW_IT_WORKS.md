@@ -282,9 +282,11 @@ sequenceDiagram
     A->>M: set_summary (messageId, text)
     M->>T: set_summary
     T-->>M: {} or tldr_off
+    A-->>M: or decline_summary (messageId, reason)
+    M->>T: decline_summary, only when hello names summary_decline
 ```
 
-tawk chooses the agent and the messages; tawk-mcp only carries the request and the answer. The request needs channel events, so a client without them is never asked. The message is untrusted data like any other: the words telling the agent what to write are tawk-mcp's own and sit outside the fence.
+tawk chooses the agent and the messages; tawk-mcp only carries the request and the answer. An agent that finds nothing worth summarising answers with `decline_summary`, so tawk does not ask again; a tawk from before 0.21.0 is sent nothing, and the agent is told it will be asked again. The request needs channel events, so a client without them is never asked. The message is untrusted data like any other: the words telling the agent what to write are tawk-mcp's own and sit outside the fence.
 
 ## Reconnecting
 
