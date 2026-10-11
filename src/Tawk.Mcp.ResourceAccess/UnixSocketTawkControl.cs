@@ -14,7 +14,7 @@ public sealed class UnixSocketTawkControl : ITawkControl, ITawkApprovals, ITawkC
     // Writes may wait for the user to approve them in tawk, so they have no answer timeout.
     private static readonly HashSet<string> WriteOps = new(StringComparer.Ordinal)
     {
-        "send_message", "react", "schedule_message", "mark_read", "confirm",
+        "send_message", "send_file", "react", "schedule_message", "mark_read", "confirm",
         "edit_message", "delete_message", "forward_message", "retry_message", "download_media",
         "set_chat", "set_chat_theme", "clear_chat", "delete_chat", "export_chat", "block", "unblock",
         "cancel_scheduled", "reschedule", "send_scheduled_now",

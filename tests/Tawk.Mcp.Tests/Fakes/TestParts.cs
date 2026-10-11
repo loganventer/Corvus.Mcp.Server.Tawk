@@ -16,6 +16,7 @@ public sealed class TestParts
         Gate = new ConfirmationGate(Control);
         Reading = new ChatReadingManager(Control, Transcript, Directory, Fence, new CatchUpPlanner(Clock), new DraftReplyPlanner());
         Sending = new MessageSendingManager(Control, Transcript, Jitter);
+        Files = new FileSendingManager(Control, new SentFileDescriber());
         Messages = new MessageManagementManager(Gate);
         Chats = new ChatManagementManager(Gate, Directory, Fence);
         Schedule = new ScheduleManagementManager(Gate, Transcript, Jitter);
@@ -43,6 +44,8 @@ public sealed class TestParts
     public ChatReadingManager Reading { get; }
 
     public MessageSendingManager Sending { get; }
+
+    public FileSendingManager Files { get; }
 
     public MessageManagementManager Messages { get; }
 

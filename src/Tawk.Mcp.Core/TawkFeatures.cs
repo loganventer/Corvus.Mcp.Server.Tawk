@@ -12,6 +12,9 @@ public static class TawkFeatures
     /// <summary>tawk accepts an agent's answer that a message needs no summary: <c>decline_summary</c> is there, and the message is not asked for again.</summary>
     public const string SummaryDecline = "summary_decline";
 
+    /// <summary>tawk can send a file from this computer: <c>send_file</c> is there.</summary>
+    public const string SendFile = "send_file";
+
     /// <summary>tawk has an owner's chat: what the user types there arrives as <c>owner_message</c>, and an answer sent there needs no approval.</summary>
     public const string OwnerChat = "owner_chat";
 
