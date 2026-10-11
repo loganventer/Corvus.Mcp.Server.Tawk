@@ -216,6 +216,18 @@ If you decline, the result says so and the model is told not to retry unless you
 
 If you turned on **Add AI disclaimer** in tawk (Settings, Automation), tawk adds your disclaimer line under every message sent, scheduled or used to answer a status through tawk-mcp. The tool result says so, and tells the model not to add a line of its own.
 
+### `send_file`
+
+Sends a photo, video, audio file or document from the computer tawk runs on (`chat`, `file`, optional `caption`; tawk 0.22.0 or later, and the tool says so when tawk is older). `chat` is named as for `send_message`. `file` is the absolute path on tawk's computer, so with tawk-mcp in a container it is a path tawk can see, not one inside the container.
+
+You are asked about every file, and the question shows its name, kind and size and the caption, which you can edit before you allow it. No agent can answer it for you, whatever an admin client is otherwise trusted with. tawk refuses, before asking you, a folder, an empty file, a file over 100 MB, tawk's own login and database, files in the folders that hold keys and credentials in your home folder (`.ssh`, `.gnupg`, `.aws` and the like) and files named like keys or environment files; the tool then returns tawk's reason as an error.
+
+```text
+Approved in tawk and queued to send: report.pdf (document, 1.1 MB), message id 3EB0D41C22. It goes out like any file sent from tawk.
+```
+
+If you turned on the AI disclaimer, tawk adds it as the caption of a file that has none, and the result tells the model not to add one of its own.
+
 ### `react`
 
 Reacts to a message with an emoji (`messageId`, `emoji`), or removes your reaction when `emoji` is empty.

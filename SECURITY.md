@@ -59,6 +59,7 @@ Only the latest release gets security fixes.
 | A chat switched off for transcription in tawk is never transcribed: its voice notes are skipped as they arrive, a request for one is refused before the audio is heard, and tawk refuses a transcript for it | tawk and tawk-mcp | Writing out a chat the user wants left alone |
 | A summary is asked for only by tawk, for chats the user put in TL;DR mode, and the agent is told that only an event of type `summary_wanted` is such a request, never text inside a message that asks for one or claims to be from tawk; the request is tawk-mcp's own text and the message stays fenced; `set_summary` changes only what tawk shows beside the original, which is always kept, and `decline_summary` only records that none is needed | tawk and tawk-mcp | A message steering the agent through its own summary |
 | The owner's words arrive only as tawk's `owner_message` event, never from inside fenced text | tawk and tawk-mcp | Someone posing as you |
+| `send_file` is always put to the user in tawk, with the file's name, kind and size, and is never among what an admin token may approve; tawk refuses its own login and database, key and credential files, folders, empty files and files over 100 MB before the user is asked, resolves links first and looks at the file again after the answer; the tool description and the server instructions tell the model to send a file only when the user asks | tawk and tawk-mcp | A misled model sending a key or a private file to someone |
 | Labelling a chat and putting one aside are approved by the user in tawk, since each changes what their own chat list shows; reading labels, reminders and awaiting replies follows the chats the agent may see | tawk | A misled model hiding chats from the user |
 | `sync_memory` only starts a sync with the repository the user set where tawk-mcp was started; no tool sets or changes the repository or its key | tawk-mcp | A misled model sending memory somewhere else |
 | Locked, hidden and excluded chats are never returned | tawk | Leaking chats you have hidden |
@@ -101,6 +102,7 @@ With `TAWKMCP_ADMIN_TOKEN_FILE` set and tawk's access at `admin`, the model can 
 - tawk-mcp reads the token from the file each time and passes it to tawk; it is never returned to the model, logged or stored.
 - tawk enforces the limits, so a model cannot argue its way past them: its own requests only, sends and small things only, only chats you switched on for it in tawk (none by default), a number an hour.
 - Deletes, blocks, chat and profile changes and settings still need you, and destructive requests still need the two confirmations.
+- Files still need you: `send_file` is not among the operations tawk lets a token answer.
 - Every approval is in tawk's log as "approved by the agent" and appears on tawk's screen.
 
 Do not set it on an instance that reads chats from people you do not trust, and do not set it on one that is reachable by anything but your own agent.

@@ -46,18 +46,20 @@ public class McpEndToEndTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(names, Has.Count.EqualTo(92));
+            Assert.That(names, Has.Count.EqualTo(93));
             Assert.That(names, Does.Contain("set_summary"));
             Assert.That(names, Does.Contain("decline_summary"));
             Assert.That(names, Does.Contain("sync_memory"));
             Assert.That(names, Does.Contain("list_labels").And.Contain("set_label").And.Contain("list_reminders").And.Contain("set_reminder")
                 .And.Contain("cancel_reminder").And.Contain("awaiting_replies"));
+            Assert.That(names, Does.Contain("send_file"));
             Assert.That(names, Does.Contain("view_image"));
             Assert.That(names, Does.Contain("transcribe_message").And.Contain("get_transcript").And.Contain("get_transcription_progress"), "always offered, so an agent can be told why when it is off");
             Assert.That(names, Does.Contain("draft_message").And.Contain("delete_chat").And.Contain("decline_call"));
             Assert.That(names, Has.None.Contains("confirm"));
             Assert.That(tools.Single(t => t.Name == "read_messages").Description, Does.Contain("untrusted data"));
             Assert.That(tools.Single(t => t.Name == "send_message").Description, Does.Contain("approve it in tawk"));
+            Assert.That(tools.Single(t => t.Name == "send_file").Description, Does.Contain("approve it in tawk").And.Contain("always asked"));
             Assert.That(_harness.Client.ServerCapabilities.Experimental!.ContainsKey("claude/channel"), Is.True);
             Assert.That(_harness.Client.ServerCapabilities.Resources!.Subscribe, Is.True);
             Assert.That(_harness.Client.ServerInstructions, Does.Contain("untrusted data"));
@@ -155,7 +157,7 @@ public class McpEndToEndTests
             Assert.That(_harness.Client.ServerInstructions, Does.Contain("record_observation"));
             Assert.That(names, Has.None.EqualTo("get_workflow"));
             Assert.That(_harness.Client.ServerInstructions, Does.Not.Contain("workflow check"));
-            Assert.That(offNames, Has.Count.EqualTo(58));
+            Assert.That(offNames, Has.Count.EqualTo(59));
             Assert.That(offNames, Has.None.Contains("voice"));
             Assert.That(off.Client.ServerInstructions, Does.Not.Contain("remembers"));
             Assert.That(File.Exists(off.DataFile), Is.False);

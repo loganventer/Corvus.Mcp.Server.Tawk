@@ -201,6 +201,7 @@ public static class TawkMcpComposition
             .WithTools<SummaryTools>()
             .WithTools<ChatListTools>()
             .WithTools<MessageTools>()
+            .WithTools<FileTools>()
             .WithTools<ScheduleTools>()
             .WithTools<StatusTools>()
             .WithTools<ProfileTools>()
