@@ -46,8 +46,9 @@ public class McpEndToEndTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(names, Has.Count.EqualTo(91));
+            Assert.That(names, Has.Count.EqualTo(92));
             Assert.That(names, Does.Contain("set_summary"));
+            Assert.That(names, Does.Contain("decline_summary"));
             Assert.That(names, Does.Contain("sync_memory"));
             Assert.That(names, Does.Contain("list_labels").And.Contain("set_label").And.Contain("list_reminders").And.Contain("set_reminder")
                 .And.Contain("cancel_reminder").And.Contain("awaiting_replies"));
@@ -154,7 +155,7 @@ public class McpEndToEndTests
             Assert.That(_harness.Client.ServerInstructions, Does.Contain("record_observation"));
             Assert.That(names, Has.None.EqualTo("get_workflow"));
             Assert.That(_harness.Client.ServerInstructions, Does.Not.Contain("workflow check"));
-            Assert.That(offNames, Has.Count.EqualTo(57));
+            Assert.That(offNames, Has.Count.EqualTo(58));
             Assert.That(offNames, Has.None.Contains("voice"));
             Assert.That(off.Client.ServerInstructions, Does.Not.Contain("remembers"));
             Assert.That(File.Exists(off.DataFile), Is.False);

@@ -24,4 +24,18 @@ public sealed class SummaryTools(ISummaryManager summaries, IAccountScope accoun
         [Description(ToolText.Account)] string? account = null,
         CancellationToken cancellationToken = default) =>
         ToolResults.RunAsync(accounts, account, () => summaries.KeepAsync(messageId, text, model, cancellationToken));
+
+    [McpServerTool(Name = "decline_summary", Destructive = false, ReadOnly = false, Idempotent = true, OpenWorld = false)]
+    [Description(
+        "Tell tawk a message needs no summary, so it does not ask for it again. Use it, instead of leaving a summary_wanted event unanswered, "
+        + "when the message is too short for a summary to be shorter than it (reason too_short) or says nothing worth summarising "
+        + "(reason nothing_to_say), or for any other reason you cannot write one (reason other). Like set_summary it needs no approval, "
+        + "sends nothing to WhatsApp, and should be called at once without asking the user. tawk refuses it for a chat that is not in TL;DR "
+        + "mode, and an older tawk (before 0.21.0) says it cannot take it.")]
+    public Task<CallToolResult> DeclineSummaryAsync(
+        [Description("The id of the message, from the summary_wanted event.")] string messageId,
+        [Description("Why: too_short, nothing_to_say or other.")] string reason,
+        [Description(ToolText.Account)] string? account = null,
+        CancellationToken cancellationToken = default) =>
+        ToolResults.RunAsync(accounts, account, () => summaries.DeclineAsync(messageId, reason, cancellationToken));
 }

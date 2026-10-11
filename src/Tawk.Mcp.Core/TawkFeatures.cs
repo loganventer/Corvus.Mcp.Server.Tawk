@@ -9,6 +9,9 @@ public static class TawkFeatures
     /// <summary>tawk keeps TL;DR summaries: <c>set_summary</c> and <c>get_summary</c> are there, and it asks for them with <c>summary_wanted</c>.</summary>
     public const string Summaries = "summaries";
 
+    /// <summary>tawk accepts an agent's answer that a message needs no summary: <c>decline_summary</c> is there, and the message is not asked for again.</summary>
+    public const string SummaryDecline = "summary_decline";
+
     /// <summary>tawk has an owner's chat: what the user types there arrives as <c>owner_message</c>, and an answer sent there needs no approval.</summary>
     public const string OwnerChat = "owner_chat";
 
