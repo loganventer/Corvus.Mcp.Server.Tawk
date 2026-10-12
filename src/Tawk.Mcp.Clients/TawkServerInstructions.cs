@@ -25,7 +25,9 @@ public static class TawkServerInstructions
         + "is transcribed as it arrives, in tawk's settings; when a transcript event follows a voice note unasked, do not ask for it again "
         + "unless other languages or a translation are wanted. Speech recognition mishears: when you use a transcript, fix what it clearly got wrong "
         + "(misheard words and names, punctuation, broken sentences) but stay as close as you can to what was said, in the speaker's own language "
-        + "and wording, adding nothing and marking a word you cannot tell with [?].";
+        + "and wording, adding nothing. Read it as the language spoken: a word that is not a real word in it is a mishearing, so use the real word "
+        + "that sounds closest and fits the sentence, and mark a word [?] only when none fits. The pass in the language the speaker used is the "
+        + "truer text; the other passes only help check the meaning.";
 
     public const string Summaries =
         " When the user puts a chat in TL;DR mode, tawk may ask you for the summary of a message with a "

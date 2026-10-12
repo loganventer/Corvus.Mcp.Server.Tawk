@@ -50,6 +50,17 @@ public class TranscriptionNoticeFormatterTests
     }
 
     [Test]
+    public void The_guidance_tells_the_agent_to_read_the_transcript_as_the_language_spoken()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(TranscriptionNoticeFormatter.Guidance, Does.Contain("not a real word in that language"));
+            Assert.That(TranscriptionNoticeFormatter.Guidance, Does.Contain("sounds closest"));
+            Assert.That(TranscriptionNoticeFormatter.Guidance, Does.Contain("wrong language"));
+        });
+    }
+
+    [Test]
     public void Nothing_heard_or_a_failure_gets_no_guidance()
     {
         var silent = _formatter.Describe(Job(

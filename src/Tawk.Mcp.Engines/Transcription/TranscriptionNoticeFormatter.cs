@@ -11,7 +11,11 @@ public sealed class TranscriptionNoticeFormatter(IUntrustedTextFence fence) : IT
     public const string Guidance =
         "How to use a transcript (tawk-mcp's own note): speech recognition mishears, so fix what it clearly got wrong, "
         + "such as misheard words and names, punctuation and broken sentences, but stay as close as you can to what was said. "
-        + "Keep the speaker's language, wording and order, add nothing, and where you cannot tell, keep the word as heard and mark it [?]. "
+        + "Keep the speaker's language, wording and order, and add nothing. Read it as the language that was spoken: a word that is not a real "
+        + "word in that language, or a phrase that makes no sense, is a mishearing, so replace it with the real word or phrase that sounds closest "
+        + "and fits the sentence, in that language's own vocabulary, grammar and spelling and in the mixes of languages its speakers use. "
+        + "Mark a word [?] only when no real word fits. When a note has more than one language pass, the pass in the language the speaker used "
+        + "is the truer text; the others may be the engine forcing the same speech into the wrong language, so use them only to check the meaning. "
         + "Say it is a transcript, not the speaker's exact words.";
 
     public string Started(TranscriptionJob job, bool joined)
