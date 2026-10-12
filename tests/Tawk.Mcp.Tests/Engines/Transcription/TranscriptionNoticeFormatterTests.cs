@@ -35,6 +35,36 @@ public class TranscriptionNoticeFormatterTests
     }
 
     [Test]
+    public void A_transcript_with_text_ends_with_the_guidance_outside_the_fence()
+    {
+        var text = _formatter.Describe(Job(
+            TranscriptionState.Done, new TranscriptionPass("af", new Transcript("Hallo daar", null, null, 4))));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(text, Does.EndWith(TranscriptionNoticeFormatter.Guidance));
+            Assert.That(text.IndexOf(TranscriptionNoticeFormatter.Guidance, StringComparison.Ordinal),
+                Is.GreaterThan(text.IndexOf("<<<END UNTRUSTED", StringComparison.Ordinal)));
+            Assert.That(text.Split(TranscriptionNoticeFormatter.Guidance).Length - 1, Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void Nothing_heard_or_a_failure_gets_no_guidance()
+    {
+        var silent = _formatter.Describe(Job(
+            TranscriptionState.Done, new TranscriptionPass("en", new Transcript("", null, null, null))));
+        var failed = _formatter.Describe(Job(
+            TranscriptionState.Failed, new TranscriptionPass("en", Failure: "timed out")));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(silent, Does.Not.Contain(TranscriptionNoticeFormatter.Guidance));
+            Assert.That(failed, Does.Not.Contain(TranscriptionNoticeFormatter.Guidance));
+        });
+    }
+
+    [Test]
     public void A_failed_language_says_why_and_a_detected_one_says_what_was_heard()
     {
         var text = _formatter.Describe(Job(

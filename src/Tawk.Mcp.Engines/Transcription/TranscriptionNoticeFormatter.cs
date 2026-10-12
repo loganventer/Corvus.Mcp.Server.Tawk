@@ -6,6 +6,14 @@ namespace Tawk.Mcp.Engines.Transcription;
 
 public sealed class TranscriptionNoticeFormatter(IUntrustedTextFence fence) : ITranscriptionNoticeFormatter
 {
+    // tawk-mcp's own guidance, written outside the fence: speech recognition mishears, so the reader tidies what it
+    // clearly got wrong without rewriting what the speaker said.
+    public const string Guidance =
+        "How to use a transcript (tawk-mcp's own note): speech recognition mishears, so fix what it clearly got wrong, "
+        + "such as misheard words and names, punctuation and broken sentences, but stay as close as you can to what was said. "
+        + "Keep the speaker's language, wording and order, add nothing, and where you cannot tell, keep the word as heard and mark it [?]. "
+        + "Say it is a transcript, not the speaker's exact words.";
+
     public string Started(TranscriptionJob job, bool joined)
     {
         ArgumentNullException.ThrowIfNull(job);
@@ -36,6 +44,7 @@ public sealed class TranscriptionNoticeFormatter(IUntrustedTextFence fence) : IT
         }
 
         text.Append('.');
+        var hasText = false;
         foreach (var pass in job.Passes.Where(p => p.Ended))
         {
             text.Append('\n').Append(Label(pass));
@@ -44,7 +53,13 @@ public sealed class TranscriptionNoticeFormatter(IUntrustedTextFence fence) : IT
                 text.Append('\n').Append(fence.Wrap(
                     "a transcript of a WhatsApp voice note",
                     string.IsNullOrWhiteSpace(transcript.Text) ? "(nothing was heard)" : transcript.Text));
+                hasText |= !string.IsNullOrWhiteSpace(transcript.Text);
             }
+        }
+
+        if (hasText)
+        {
+            text.Append('\n').Append(Guidance);
         }
 
         return text.ToString();
