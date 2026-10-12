@@ -46,7 +46,7 @@ public static class TawkMcpComposition
 {
     public static string Version { get; } =
         typeof(TawkMcpComposition).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
-        ?? "0.15.5";
+        ?? "0.15.6";
 
     public static IMcpServerBuilder AddTawkMcp(this IServiceCollection services, TawkMcpOptions options)
     {
@@ -105,6 +105,8 @@ public static class TawkMcpComposition
         services.AddSingleton<IChatReadingManager, ChatReadingManager>();
         services.AddSingleton<IPresenceManager, PresenceManager>();
         services.AddSingleton<ISummaryManager, SummaryManager>();
+        services.AddSingleton<ITranscriptKeeper, TawkTranscriptKeeper>();
+        services.AddSingleton<ITranscriptCorrectionManager, TranscriptCorrectionManager>();
         services.AddSingleton<IChatToolsManager, ChatToolsManager>();
         services.AddSingleton<IMessageSendingManager, MessageSendingManager>();
         services.AddSingleton<IFileSendingManager, FileSendingManager>();
@@ -218,6 +220,7 @@ public static class TawkMcpComposition
             .WithRequestFilters(filters => filters.AddCallToolFilter(WorkflowReminder.Filter(cadence, workflow)))
             .WithAdmin(admin)
             .WithTools<TranscriptionTools>()
+            .WithTools<TranscriptCorrectionTools>()
             .WithMemory(options.Memory, workflow);
     }
 

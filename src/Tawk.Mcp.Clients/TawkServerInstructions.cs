@@ -27,7 +27,8 @@ public static class TawkServerInstructions
         + "(misheard words and names, punctuation, broken sentences) but stay as close as you can to what was said, in the speaker's own language "
         + "and wording, adding nothing. Read it as the language spoken: a word that is not a real word in it is a mishearing, so use the real word "
         + "that sounds closest and fits the sentence, and mark a word [?] only when none fits. The pass in the language the speaker used is the "
-        + "truer text; the other passes only help check the meaning.";
+        + "truer text; the other passes only help check the meaning. Keep the corrected text in tawk with set_transcript (the message id, the language "
+        + "spoken and the text), which replaces the transcript tawk holds for that language and sends nothing to WhatsApp.";
 
     public const string Summaries =
         " When the user puts a chat in TL;DR mode, tawk may ask you for the summary of a message with a "

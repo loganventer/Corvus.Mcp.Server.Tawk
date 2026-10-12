@@ -16,7 +16,8 @@ public sealed class TranscriptionNoticeFormatter(IUntrustedTextFence fence) : IT
         + "and fits the sentence, in that language's own vocabulary, grammar and spelling and in the mixes of languages its speakers use. "
         + "Mark a word [?] only when no real word fits. When a note has more than one language pass, the pass in the language the speaker used "
         + "is the truer text; the others may be the engine forcing the same speech into the wrong language, so use them only to check the meaning. "
-        + "Say it is a transcript, not the speaker's exact words.";
+        + "When you have cleaned it, keep the result with set_transcript, under this message id and the language that was spoken, so tawk shows "
+        + "it under the voice note in place of the raw text. Say it is a transcript, not the speaker's exact words.";
 
     public string Started(TranscriptionJob job, bool joined)
     {

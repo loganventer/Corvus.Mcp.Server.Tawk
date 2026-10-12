@@ -37,7 +37,7 @@ sequenceDiagram
 
     S->>C: ConnectOnceAsync
     C->>T: connect to control.sock
-    C->>T: {"id":"1","op":"hello","args":{"client":"tawk-mcp","version":"0.15.5","protocol":1,"origin":"mcp"}}
+    C->>T: {"id":"1","op":"hello","args":{"client":"tawk-mcp","version":"0.15.6","protocol":1,"origin":"mcp"}}
     T-->>C: {"id":"1","ok":true,"result":{"protocol":1,"tawk":"0.6.4","access":"send",...}}
     C-->>L: ConnectionStateEvent(Connected)
     C-->>S: hello
@@ -264,7 +264,7 @@ sequenceDiagram
     Note over T: kept in tawk.db, drawn under the voice note
 ```
 
-A job an agent asked for with `transcribe_message` takes the same path from the queue on. The channel sink tells the agent the result as before; the handoff sink is one more listener of the same event, so nothing about a job changed. From 0.15.5 the text the agent receives ends with a short note of tawk-mcp's own, outside the fenced transcript, that speech recognition mishears: it asks the agent to fix what is clearly wrong (misheard words and names, punctuation) while staying as close as it can to what was said, and to mark a word it cannot tell with `[?]`. From 0.15.5 it also asks the agent to read the transcript as the language spoken (a non-word is a mishearing, replaced by the real word that sounds closest and fits) and to treat the pass in the speaker's language as the truer text. The note is left out when nothing was heard or the job failed. tawk-mcp writes none of it to disk. A tawk whose `hello` lists no `transcripts` feature is sent nothing.
+A job an agent asked for with `transcribe_message` takes the same path from the queue on. The channel sink tells the agent the result as before; the handoff sink is one more listener of the same event, so nothing about a job changed. From 0.15.6 the text the agent receives ends with a short note of tawk-mcp's own, outside the fenced transcript, that speech recognition mishears: it asks the agent to fix what is clearly wrong (misheard words and names, punctuation) while staying as close as it can to what was said, and to mark a word it cannot tell with `[?]`. From 0.15.6 it also asks the agent to read the transcript as the language spoken (a non-word is a mishearing, replaced by the real word that sounds closest and fits) and to treat the pass in the speaker's language as the truer text. The note is left out when nothing was heard or the job failed. When the agent has cleaned the text it keeps it in tawk with the `set_transcript` tool (from 0.15.6): tawk replaces the transcript it holds for that language only, sends nothing to WhatsApp, and refuses a chat that is not transcribed or text that is too long. tawk-mcp writes none of it to disk. A tawk whose `hello` lists no `transcripts` feature is sent nothing.
 
 ## A TL;DR summary
 
