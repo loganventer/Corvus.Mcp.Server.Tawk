@@ -264,7 +264,7 @@ sequenceDiagram
     Note over T: kept in tawk.db, drawn under the voice note
 ```
 
-A job an agent asked for with `transcribe_message` takes the same path from the queue on. The channel sink tells the agent the result as before; the handoff sink is one more listener of the same event, so nothing about a job changed. tawk-mcp writes none of it to disk. A tawk whose `hello` lists no `transcripts` feature is sent nothing.
+A job an agent asked for with `transcribe_message` takes the same path from the queue on. The channel sink tells the agent the result as before; the handoff sink is one more listener of the same event, so nothing about a job changed. From 0.15.4 the text the agent receives ends with a short note of tawk-mcp's own, outside the fenced transcript, that speech recognition mishears: it asks the agent to fix what is clearly wrong (misheard words and names, punctuation) while staying as close as it can to what was said, and to mark a word it cannot tell with `[?]`. The note is left out when nothing was heard or the job failed. tawk-mcp writes none of it to disk. A tawk whose `hello` lists no `transcripts` feature is sent nothing.
 
 ## A TL;DR summary
 

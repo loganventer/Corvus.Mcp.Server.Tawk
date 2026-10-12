@@ -140,6 +140,7 @@ Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/tawk
 
 ### Engines
 
+- `TranscriptionNoticeFormatter` writes what an agent is told about a transcription job. From 0.15.4 it ends a transcript with `Guidance`, a note of tawk-mcp's own outside the fence: fix what speech recognition clearly got wrong, stay as close as you can to what was said, and mark a word you cannot tell with `[?]`; it is left out when nothing was heard.
 - `TranscriptFormatter` writes `[2026-09-30 18:02] Mom: text` lines with reply, media, forward, deletion, link, edit, reaction and status markers, indenting extra lines. `ChatDirectoryFormatter` does the same for chats, chat details and scheduled messages.
 - `UntrustedTextFence` wraps other people's text between fixed markers with a statement that it is data, and breaks up any run of angle brackets inside so the text cannot close the fence.
 - `CatchUpPlanner` and `DraftReplyPlanner` write the prompt instructions. `NotificationFormatter` writes the one-line header of a channel event, and the whole line for a read receipt, an activity or someone coming online. `PresenceFormatter` writes the answer to a lookup of someone's online status.

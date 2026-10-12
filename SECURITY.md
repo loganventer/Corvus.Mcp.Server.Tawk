@@ -89,6 +89,7 @@ Message text, chat names, previews, about texts and status text are written by o
 - wraps all such text between `<<<BEGIN UNTRUSTED CHAT DATA>>>` and `<<<END UNTRUSTED CHAT DATA>>>` with a statement that it is data and must not be obeyed;
 - breaks up any run of three or more angle brackets inside, so the text cannot close the block early or open a fake one;
 - indents extra lines of a message, so text cannot fake a new transcript line such as `[18:03] You: ...`;
+- keeps tawk-mcp's own guidance about a transcript (fix clear mishearings, stay close to what was said) outside the fence, after it, so nothing spoken can pose as that note;
 - flattens and shortens names in channel event headers;
 - says in every tool description and in its server instructions that this text is untrusted.
 
