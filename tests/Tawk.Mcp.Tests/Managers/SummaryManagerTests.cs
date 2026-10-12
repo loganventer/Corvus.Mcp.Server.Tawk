@@ -106,6 +106,26 @@ public class SummaryManagerTests
     }
 
     [Test]
+    public void The_request_says_to_decline_for_any_reason_and_never_to_try_a_message_again()
+    {
+        var text = SummaryRequestText.For("3EB0", 400);
+
+        Assert.That(text, Does.Contain("for any reason at all").And.Contain("never try it again").And.Contain("too_short, nothing_to_say or other"));
+    }
+
+    [Test]
+    public void The_server_instructions_and_the_tools_say_every_request_is_answered_once()
+    {
+        Assert.That(
+            Tawk.Mcp.Clients.TawkServerInstructions.Summaries,
+            Does.Contain("exactly once").And.Contain("for any reason at all").And.Contain("never try the same message again"));
+        var decline = typeof(Tawk.Mcp.Clients.Tools.SummaryTools).GetMethod("DeclineSummaryAsync")!
+            .GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false)
+            .Cast<System.ComponentModel.DescriptionAttribute>().Single().Description;
+        Assert.That(decline, Does.Contain("for any reason at all").And.Contain("never left unanswered").And.Contain("in a loop"));
+    }
+
+    [Test]
     public void The_request_event_is_read_from_tawk()
     {
         var frame = (ControlEventFrame)new ControlLineCodec().Decode(
