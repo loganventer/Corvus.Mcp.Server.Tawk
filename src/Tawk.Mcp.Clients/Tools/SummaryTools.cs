@@ -33,7 +33,7 @@ public sealed class SummaryTools(ISummaryManager summaries, IAccountScope accoun
         + "any reason at all: the message is too short for a summary to be shorter than it (reason too_short), it says nothing worth "
         + "summarising, such as a link, a sticker or a greeting (reason nothing_to_say), or you cannot write one for any other reason, "
         + "including when set_summary was refused or you simply decide not to (reason other). A summary_wanted event is never left "
-        + "unanswered, and a message is never summarised again in a loop: tawk keeps asking until it gets a summary or this call, so "
+        + "unanswered, and a message is never summarised again in a loop: tawk asks again, up to five times, until it gets a summary or this call, so "
         + "answering with this is what ends the request. Like set_summary it needs no approval, sends nothing to WhatsApp, and should be "
         + "called at once without asking the user. tawk refuses it for a chat that is not in TL;DR mode, and an older tawk (before 0.21.0) "
         + "says it cannot take it.")]
