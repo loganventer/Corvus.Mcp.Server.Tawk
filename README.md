@@ -126,7 +126,7 @@ scripts/docker-run.sh               # builds, runs as you, prints the token and 
 | Settings | `get_settings`, `list_themes` | `set_setting` |
 | tawk itself | `app_status`, `get_version`, `list_accounts` | `describe_session`, `reconnect`, `decline_call` |
 | Voice notes | `transcribe_message`, `get_transcript`, `get_transcription_progress` | |
-| TL;DR summaries | | `set_summary` (asked for by tawk, for chats you put in TL;DR mode; changes only what tawk shows), `decline_summary` (says a message needs none, so tawk does not ask again; tawk 0.21.0 or later) |
+| TL;DR summaries | | `set_summary` (asked for by tawk, for chats you put in TL;DR mode; changes only what tawk shows), `decline_summary` (the answer whenever no summary is given, for any reason, so a request is answered once and never retried; tawk 0.21.0 or later) |
 | Labels, reminders, awaiting replies | `list_labels`, `list_reminders`, `awaiting_replies` | `set_label`, `set_reminder`, `cancel_reminder` |
 | Your own waiting requests (only with an admin token file) | `list_pending` | `approve_pending` |
 | Audience categories | `list_categories` | `set_category`, `delete_category` |
