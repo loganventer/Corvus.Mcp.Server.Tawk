@@ -116,7 +116,7 @@ Each line is `[time] sender: text`, followed by markers where they apply: `(repl
 
 Times are in your local time zone.
 
-A voice note or video shows its length beside its type, such as `[audio 0:42]`, and a voice note or video you sent shows when it was played after its delivery status, such as `(read, played 13:58)`. The date is added when it was played on another day than it was sent. Both come from tawk 0.26.0 or later; against an older tawk the line has neither. The time is when playback began: WhatsApp does not say how much of the note was heard.
+A voice note or video shows its length beside its type, such as `[audio 0:42]`, and a voice note or video you sent shows when it was played after its delivery status, such as `(read, played 2026-10-13 13:58:42)`. The played time is always the full date and the exact time to the second, in your local time zone, however old the note is and whether it was played the day it was sent or long after (0.15.9). Both come from tawk 0.26.0 or later; against an older tawk the line has neither. The time is when playback began: WhatsApp does not say how much of the note was heard.
 
 ## Reading tools
 
@@ -542,7 +542,7 @@ By default only messages from other people arrive. Set `TAWKMCP_CHANNEL_OWN=on` 
 
 Set `TAWKMCP_CHANNEL_READ=on` (or `--channel-read on`) and read receipts arrive as well: an event with `type="read"` saying who read which of your messages. The agent is told these are information only. They do not count as rounds for the memory workflow.
 
-Set `TAWKMCP_CHANNEL_PLAYED=on` (or `--channel-played on`) and plays arrive too (0.15.8): an event with `type="played"` saying who played which voice note or video you sent. It needs tawk 0.27.0 or later with **Push played voice notes** on, it is not also sent as a read, and the time is when playback began, not how much was heard. The agent is told it is information only, and it does not count as a round.
+Set `TAWKMCP_CHANNEL_PLAYED=on` (or `--channel-played on`) and plays arrive too (0.15.8): an event with `type="played"` saying who played which voice note or video you sent, with the exact date and time to the second (0.15.9). It needs tawk 0.27.0 or later with **Push played voice notes** on, it is not also sent as a read, and the time is when playback began, not how much was heard. The agent is told it is information only, and it does not count as a round.
 
 Three more kinds work the same way, each with its own option and each off by default: `TAWKMCP_CHANNEL_REACTIONS` (someone reacted to a message you sent, or took it back), `TAWKMCP_CHANNEL_EDITS` (someone changed or deleted a message they sent; an edit carries the new words, fenced as untrusted) and `TAWKMCP_CHANNEL_SCHEDULED` (a message you scheduled went out).
 

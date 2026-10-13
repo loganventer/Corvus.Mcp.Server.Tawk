@@ -76,7 +76,7 @@ TAWKMCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --uninstall && rm -
 Docker:
 
 ```sh
-docker build -t tawk-mcp:0.15.8 .
+docker build -t tawk-mcp:0.15.9 .
 scripts/docker-run.sh
 ```
 
