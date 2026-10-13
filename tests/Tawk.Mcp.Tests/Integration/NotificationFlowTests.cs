@@ -24,7 +24,7 @@ public class NotificationFlowTests
         sessions.Add(claude);
         var channel = new ChannelEventSink(new ChannelOptions(ChannelMode.Auto), sessions, new Tawk.Mcp.Clients.Workflow.WorkflowCadence(new Tawk.Mcp.Core.WorkflowOptions(0, null)), new ChannelContextHints());
         var live = new LiveUpdatesManager(
-            stack.Control, [hub, channel], new TranscriptFormatter(TimeProvider.System), new NotificationFormatter(),
+            stack.Control, [hub, channel], new TranscriptFormatter(TimeProvider.System, new AudioDetailFormatter(TimeProvider.System)), new NotificationFormatter(),
             new UntrustedTextFence(), NullLogger<LiveUpdatesManager>.Instance);
         using var stop = new CancellationTokenSource();
         var running = live.RunAsync(stop.Token);

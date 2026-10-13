@@ -8,11 +8,14 @@ public sealed class TranscriptFormatter : ITranscriptFormatter
 {
     private const string ContinuationIndent = "    ";
     private readonly TimeZoneInfo _timeZone;
+    private readonly IAudioDetailFormatter _audio;
 
-    public TranscriptFormatter(TimeProvider timeProvider)
+    public TranscriptFormatter(TimeProvider timeProvider, IAudioDetailFormatter audio)
     {
         ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(audio);
         _timeZone = timeProvider.LocalTimeZone;
+        _audio = audio;
     }
 
     public string FormatMessages(IEnumerable<ChatMessage> messages, bool includeChat = false)
@@ -58,7 +61,13 @@ public sealed class TranscriptFormatter : ITranscriptFormatter
         {
             if (!string.Equals(message.Type, "text", StringComparison.Ordinal))
             {
-                line.Append('[').Append(message.Type).Append(']');
+                line.Append('[').Append(message.Type);
+                if (_audio.Length(message) is { } length)
+                {
+                    line.Append(' ').Append(length);
+                }
+
+                line.Append(']');
                 if (!string.IsNullOrEmpty(message.Text))
                 {
                     line.Append(' ');
@@ -94,9 +103,9 @@ public sealed class TranscriptFormatter : ITranscriptFormatter
             line.Append(" (mentions you)");
         }
 
-        if (message.FromMe && !string.IsNullOrEmpty(message.Status))
+        if (message.FromMe && DeliveryDetails(message) is { Length: > 0 } details)
         {
-            line.Append(" (").Append(message.Status).Append(')');
+            line.Append(" (").Append(details).Append(')');
         }
 
         line.Append(" [id ").Append(message.Id).Append(']');
@@ -120,6 +129,10 @@ public sealed class TranscriptFormatter : ITranscriptFormatter
         var local = TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeSeconds(unixSeconds), _timeZone);
         return local.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
     }
+
+    // "delivered", "read", or "delivered, played 13:58": how far a sent message got, and when a voice note was played.
+    private string DeliveryDetails(ChatMessage message) =>
+        string.Join(", ", new[] { message.Status, _audio.Played(message) }.Where(part => !string.IsNullOrEmpty(part)));
 
     // Continuation lines are indented so text cannot start a line that looks like a new message.
     private static string Indent(string text) =>

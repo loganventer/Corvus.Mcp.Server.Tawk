@@ -9,7 +9,9 @@ public class TranscriptFormatterTests
     // 2026-09-30 18:02 UTC.
     private const long Ts = 1790791320;
 
-    private readonly TranscriptFormatter _formatter = new(new ManualTimeProvider());
+    private static readonly ManualTimeProvider Clock = new();
+
+    private readonly TranscriptFormatter _formatter = new(Clock, new AudioDetailFormatter(Clock));
 
     private static ChatMessage Message(string text = "See you at 6", bool fromMe = false) =>
         new("ID1", Samples.MomJid, Samples.MomJid, "Mom", fromMe, Ts, "text", text, fromMe ? "read" : null, false, false, false, null, null, null, false);
@@ -54,6 +56,40 @@ public class TranscriptFormatterTests
                 _formatter.FormatMessage(Message() with { ReplyTo = new ReplyRef("S", "Mom", null, true) }),
                 Does.Contain("(replying to a status of Mom)"));
         });
+    }
+
+    [Test]
+    public void Shows_the_length_of_a_voice_note_beside_its_type()
+    {
+        var note = Message(string.Empty) with { Type = "audio", DurationS = 42.2 };
+
+        Assert.That(_formatter.FormatMessage(note), Is.EqualTo("[2026-09-30 18:02] Mom: [audio 0:43] [id ID1]"));
+    }
+
+    [Test]
+    public void Shows_when_a_voice_note_you_sent_was_played()
+    {
+        var note = Message(string.Empty, fromMe: true) with { Type = "audio", DurationS = 42, PlayedAt = Ts + 360 };
+
+        Assert.That(
+            _formatter.FormatMessage(note),
+            Is.EqualTo("[2026-09-30 18:02] You: [audio 0:42] (read, played 18:08) [id ID1]"));
+    }
+
+    [Test]
+    public void Shows_the_played_time_alone_when_there_is_no_delivery_status()
+    {
+        var note = Message(string.Empty, fromMe: true) with { Type = "audio", Status = null, PlayedAt = Ts + 60 };
+
+        Assert.That(_formatter.FormatMessage(note), Does.EndWith(" (played 18:03) [id ID1]"));
+    }
+
+    [Test]
+    public void Leaves_a_voice_note_line_as_it_was_when_tawk_reports_nothing_more()
+    {
+        var note = Message(string.Empty, fromMe: true) with { Type = "audio" };
+
+        Assert.That(_formatter.FormatMessage(note), Is.EqualTo("[2026-09-30 18:02] You: [audio] (read) [id ID1]"));
     }
 
     [Test]

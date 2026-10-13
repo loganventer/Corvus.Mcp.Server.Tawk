@@ -11,7 +11,7 @@ public sealed class TestParts
     public TestParts(FakeTawkControl? control = null)
     {
         Control = control ?? new FakeTawkControl();
-        Transcript = new TranscriptFormatter(Clock);
+        Transcript = new TranscriptFormatter(Clock, new AudioDetailFormatter(Clock));
         Directory = new ChatDirectoryFormatter(Transcript);
         Gate = new ConfirmationGate(Control);
         Reading = new ChatReadingManager(Control, Transcript, Directory, Fence, new CatchUpPlanner(Clock), new DraftReplyPlanner());

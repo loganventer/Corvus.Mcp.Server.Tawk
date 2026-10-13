@@ -46,7 +46,7 @@ public static class TawkMcpComposition
 {
     public static string Version { get; } =
         typeof(TawkMcpComposition).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
-        ?? "0.15.6";
+        ?? "0.15.7";
 
     public static IMcpServerBuilder AddTawkMcp(this IServiceCollection services, TawkMcpOptions options)
     {
@@ -90,6 +90,7 @@ public static class TawkMcpComposition
             options.BreakerThreshold, TimeSpan.FromSeconds(options.BreakerCooldownS), sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton<IBackoffPolicy>(new ExponentialBackoffPolicy(
             TimeSpan.FromMilliseconds(options.BackoffInitialMs), TimeSpan.FromMilliseconds(options.BackoffMaxMs), Random.Shared.NextDouble));
+        services.AddSingleton<IAudioDetailFormatter, AudioDetailFormatter>();
         services.AddSingleton<ITranscriptFormatter, TranscriptFormatter>();
         services.AddSingleton<IChatDirectoryFormatter, ChatDirectoryFormatter>();
         services.AddSingleton<IUntrustedTextFence, UntrustedTextFence>();
