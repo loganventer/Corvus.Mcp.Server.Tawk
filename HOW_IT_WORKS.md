@@ -37,7 +37,7 @@ sequenceDiagram
 
     S->>C: ConnectOnceAsync
     C->>T: connect to control.sock
-    C->>T: {"id":"1","op":"hello","args":{"client":"tawk-mcp","version":"0.15.7","protocol":1,"origin":"mcp"}}
+    C->>T: {"id":"1","op":"hello","args":{"client":"tawk-mcp","version":"0.15.8","protocol":1,"origin":"mcp"}}
     T-->>C: {"id":"1","ok":true,"result":{"protocol":1,"tawk":"0.6.4","access":"send",...}}
     C-->>L: ConnectionStateEvent(Connected)
     C-->>S: hello
@@ -239,6 +239,12 @@ flowchart LR
     REVT --> ROPT{"TAWKMCP_CHANNEL_READ on?"}
     ROPT -- yes --> CH3["Channel event, type read"]
     ROPT -- no --> KEEP2["The event stream only"]
+    PL["Someone plays the user's voice note"] --> TP{"tawk: Push played voice notes on?"}
+    TP -- no --> NONE
+    TP -- yes --> PEVT["played event"]
+    PEVT --> POPT{"TAWKMCP_CHANNEL_PLAYED on?"}
+    POPT -- yes --> CH4["Channel event, type played"]
+    POPT -- no --> KEEP3["The event stream only"]
 ```
 
 ## A voice note's transcript

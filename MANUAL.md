@@ -521,7 +521,7 @@ The stdio instance connects to tawk by itself, next to any HTTP instance you run
 - finds Claude Code: `CLAUDE_BIN`, else the newest one the VS Code extension installed, else `claude` on your `PATH`
 - updates tawk-mcp by itself: when the checkout's upstream has a newer version, it is pulled, and the checkout is rebuilt with `install.sh --no-service` whenever it has a commit that has not been built yet. Only a clean fast-forward is taken, so local commits and uncommitted changes are left alone, and the script says so. `TAWK_MCP_SRC` names the checkout (default: the one the script is in), `TAWK_MCP_PULL=0` starts with the checkout as it is, and `TAWK_MCP_PULL_TIMEOUT` is how many seconds the remote gets to answer (default 10) before the start carries on without it
 - points `TAWKMCP_ADMIN_TOKEN_FILE` at tawk's `admin.token`, so the session can approve its own sends where you allowed that. `TAWK_MCP_ADMIN=0` leaves it out
-- turns on the channel events for your own messages, read receipts, reactions, edits and deletes, scheduled sends and online status. tawk's own switches still decide what is handed over
+- turns on the channel events for your own messages, read receipts, plays of voice notes, reactions, edits and deletes, scheduled sends and online status. tawk's own switches still decide what is handed over
 - loads the server registered as `tawk-channel`; `TAWK_MCP_SERVER` names another
 
 Claude Code shows a warning about development channels first; choose to continue. Your own messages are not pushed. On Team and Enterprise plans an admin must enable channels.
@@ -542,11 +542,13 @@ By default only messages from other people arrive. Set `TAWKMCP_CHANNEL_OWN=on` 
 
 Set `TAWKMCP_CHANNEL_READ=on` (or `--channel-read on`) and read receipts arrive as well: an event with `type="read"` saying who read which of your messages. The agent is told these are information only. They do not count as rounds for the memory workflow.
 
+Set `TAWKMCP_CHANNEL_PLAYED=on` (or `--channel-played on`) and plays arrive too (0.15.8): an event with `type="played"` saying who played which voice note or video you sent. It needs tawk 0.27.0 or later with **Push played voice notes** on, it is not also sent as a read, and the time is when playback began, not how much was heard. The agent is told it is information only, and it does not count as a round.
+
 Three more kinds work the same way, each with its own option and each off by default: `TAWKMCP_CHANNEL_REACTIONS` (someone reacted to a message you sent, or took it back), `TAWKMCP_CHANNEL_EDITS` (someone changed or deleted a message they sent; an edit carries the new words, fenced as untrusted) and `TAWKMCP_CHANNEL_SCHEDULED` (a message you scheduled went out).
 
 Set `TAWKMCP_CHANNEL_PRESENCE=on` (or `--channel-presence on`) and online status arrives too: an event with `type="presence"` and `state="online"` or `state="offline"` when the person in a one-to-one chat comes online or leaves, with `last_seen` where they share it. It has no message id, it does not count as a round, and it is sent on a change, not over and over. tawk only knows this for a chat you have opened in tawk since it connected, and only for people who share it with you; the agent can ask about one person at a time with `get_online_status`, when you allow that in tawk. The agent is told to treat it as information about timing: not to tell the other person it saw them, not to write to someone because they came online, and not to keep a record of when people are online.
 
-tawk has its own switch for every kind, under Settings, Automation, Agent events. Received and sent messages are on by default there; read receipts, reactions, edits and deletes, scheduled sends and online status are off. With one off, tawk does not hand those messages to tawk-mcp at all, so nothing here can turn them back on. A kind reaches the agent only when both sides have it on: tawk's switch for it, and the matching `TAWKMCP_CHANNEL_…` option here.
+tawk has its own switch for every kind, under Settings, Automation, Agent events. Received and sent messages are on by default there; read receipts, plays of voice notes, reactions, edits and deletes, scheduled sends and online status are off. With one off, tawk does not hand those messages to tawk-mcp at all, so nothing here can turn them back on. A kind reaches the agent only when both sides have it on: tawk's switch for it, and the matching `TAWKMCP_CHANNEL_…` option here.
 
 Anyone who can message you can put text in front of the model this way. Keep `access = read` if you only want to be told, and remember every write still needs your approval in tawk.
 
