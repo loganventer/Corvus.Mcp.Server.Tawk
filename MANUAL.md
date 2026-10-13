@@ -116,6 +116,8 @@ Each line is `[time] sender: text`, followed by markers where they apply: `(repl
 
 Times are in your local time zone.
 
+A voice note or video shows its length beside its type, such as `[audio 0:42]`, and a voice note or video you sent shows when it was played after its delivery status, such as `(read, played 13:58)`. The date is added when it was played on another day than it was sent. Both come from tawk 0.26.0 or later; against an older tawk the line has neither. The time is when playback began: WhatsApp does not say how much of the note was heard.
+
 ## Reading tools
 
 These need `access = read`.
