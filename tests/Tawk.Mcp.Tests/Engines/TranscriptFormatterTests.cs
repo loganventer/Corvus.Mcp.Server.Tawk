@@ -73,7 +73,7 @@ public class TranscriptFormatterTests
 
         Assert.That(
             _formatter.FormatMessage(note),
-            Is.EqualTo("[2026-09-30 18:02] You: [audio 0:42] (read, played 18:08) [id ID1]"));
+            Is.EqualTo("[2026-09-30 18:02] You: [audio 0:42] (read, played 2026-09-30 18:08:00) [id ID1]"));
     }
 
     [Test]
@@ -81,7 +81,7 @@ public class TranscriptFormatterTests
     {
         var note = Message(string.Empty, fromMe: true) with { Type = "audio", Status = null, PlayedAt = Ts + 60 };
 
-        Assert.That(_formatter.FormatMessage(note), Does.EndWith(" (played 18:03) [id ID1]"));
+        Assert.That(_formatter.FormatMessage(note), Does.EndWith(" (played 2026-09-30 18:03:00) [id ID1]"));
     }
 
     [Test]

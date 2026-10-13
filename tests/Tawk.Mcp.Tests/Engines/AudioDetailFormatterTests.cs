@@ -48,16 +48,16 @@ public class AudioDetailFormatterTests
     }
 
     [Test]
-    public void Shows_only_the_time_when_it_was_played_the_day_it_was_sent()
+    public void Shows_the_date_and_exact_time_even_when_it_was_played_the_day_it_was_sent()
     {
-        Assert.That(_formatter.Played(Note(playedAt: Ts + 360)), Is.EqualTo("played 18:08"));
+        Assert.That(_formatter.Played(Note(playedAt: Ts + 360)), Is.EqualTo("played 2026-09-30 18:08:00"));
     }
 
     [Test]
-    public void Adds_the_date_when_it_was_played_on_another_day()
+    public void Shows_the_date_and_exact_time_when_it_was_played_days_later()
     {
-        // The next day, 07:15 UTC.
-        Assert.That(_formatter.Played(Note(playedAt: 1790839000)), Is.EqualTo("played 2026-10-01 07:16"));
+        // The next day, 07:16:40 UTC.
+        Assert.That(_formatter.Played(Note(playedAt: 1790839000)), Is.EqualTo("played 2026-10-01 07:16:40"));
     }
 
     [Test]

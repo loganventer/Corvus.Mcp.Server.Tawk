@@ -46,7 +46,7 @@ public sealed partial class LiveUpdatesManager : ILiveUpdatesManager
             {
                 MessageEvent message => Describe(message),
                 ReadEvent read => _notification.Read(read.Chat, read.MessageId, read.Reader),
-                PlayedEvent played => _notification.Played(played.Chat, played.MessageId, played.Player),
+                PlayedEvent played => _notification.Played(played.Chat, played.MessageId, played.Player, played.At),
                 MessageActivityEvent activity => Describe(activity),
                 PresenceEvent presence => _notification.Presence(presence),
                 SummaryWantedEvent wanted => Describe(wanted),

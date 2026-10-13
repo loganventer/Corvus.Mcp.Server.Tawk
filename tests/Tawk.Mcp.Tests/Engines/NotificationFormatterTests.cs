@@ -19,9 +19,19 @@ public class NotificationFormatterTests
     [Test]
     public void Says_who_played_which_voice_note()
     {
+        // 2026-09-30 18:08:42 UTC.
         Assert.That(
-            new NotificationFormatter().Played(new ChatRef(Samples.MomJid, "Mom"), "3EB0", new ReaderRef(Samples.MomJid, "Mom")),
-            Is.EqualTo("Played: Mom played the user's voice note or video in \"Mom\" (id 3EB0)."));
+            new NotificationFormatter(new ManualTimeProvider()).Played(new ChatRef(Samples.MomJid, "Mom"), "3EB0", new ReaderRef(Samples.MomJid, "Mom"), 1790791722),
+            Is.EqualTo("Played: Mom played the user's voice note or video in \"Mom\" (id 3EB0) at 2026-09-30 18:08:42."));
+    }
+
+    [Test]
+    public void Gives_the_exact_play_time_even_for_an_old_voice_note()
+    {
+        // Played on 2026-10-13 07:28:41 UTC, whenever the note itself was sent.
+        Assert.That(
+            new NotificationFormatter(new ManualTimeProvider()).Played(new ChatRef(Samples.MomJid, "Mom"), "OLD1", new ReaderRef(Samples.MomJid, "Mom"), 1791876521),
+            Does.EndWith("(id OLD1) at 2026-10-13 07:28:41."));
     }
 
     [Test]

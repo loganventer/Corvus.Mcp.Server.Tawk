@@ -35,9 +35,7 @@ public sealed class AudioDetailFormatter : IAudioDetailFormatter
             return null;
         }
 
-        var played = Local(at);
-        var format = played.Date == Local(message.Ts).Date ? "HH:mm" : "yyyy-MM-dd HH:mm";
-        return "played " + played.ToString(format, CultureInfo.InvariantCulture);
+        return "played " + Local(at).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
     private DateTimeOffset Local(long unixSeconds) =>

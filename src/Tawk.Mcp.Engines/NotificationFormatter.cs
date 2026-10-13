@@ -23,12 +23,15 @@ public sealed class NotificationFormatter(TimeProvider? timeProvider = null) : I
         return $"Read receipt: {who} read the user's message in \"{Name(chat.Name)}\" (id {Name(messageId)}).";
     }
 
-    public string Played(ChatRef chat, string messageId, ReaderRef player)
+    public string Played(ChatRef chat, string messageId, ReaderRef player, long at)
     {
         ArgumentNullException.ThrowIfNull(chat);
         ArgumentNullException.ThrowIfNull(player);
         var who = Name(string.IsNullOrWhiteSpace(player.Name) ? player.Jid : player.Name);
-        return $"Played: {who} played the user's voice note or video in \"{Name(chat.Name)}\" (id {Name(messageId)}).";
+        var when = at > 0
+            ? " at " + TimeZoneInfo.ConvertTime(DateTimeOffset.FromUnixTimeSeconds(at), _timeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
+            : string.Empty;
+        return $"Played: {who} played the user's voice note or video in \"{Name(chat.Name)}\" (id {Name(messageId)}){when}.";
     }
 
     public string Activity(MessageActivityEvent activity)
