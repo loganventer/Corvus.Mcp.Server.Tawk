@@ -46,7 +46,7 @@ public static class TawkMcpComposition
 {
     public static string Version { get; } =
         typeof(TawkMcpComposition).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
-        ?? "0.15.7";
+        ?? "0.15.8";
 
     public static IMcpServerBuilder AddTawkMcp(this IServiceCollection services, TawkMcpOptions options)
     {
@@ -162,7 +162,7 @@ public static class TawkMcpComposition
         services.AddSingleton<IResourceSubscriptionRegistry>(subscriptions);
         services.AddSingleton(new ChannelOptions(
             options.Channel, options.ChannelOwn, options.ChannelRead, options.ChannelReactions, options.ChannelEdits, options.ChannelScheduled,
-            options.ChannelPresence));
+            options.ChannelPresence, options.ChannelPlayed));
         services.AddSingleton<EventStreamHub>();
         services.AddSingleton<IEventStreamHub>(sp => sp.GetRequiredService<EventStreamHub>());
         services.AddSingleton<IEventSink, ResourceUpdatePump>();
@@ -187,6 +187,7 @@ public static class TawkMcpComposition
                     + (options.Channel == ChannelMode.Off ? string.Empty : TawkServerInstructions.OwnerChat)
                     + (options.Channel != ChannelMode.Off && options.ChannelOwn ? TawkServerInstructions.ChannelOwn : string.Empty)
                     + (options.Channel != ChannelMode.Off && options.ChannelRead ? TawkServerInstructions.ChannelRead : string.Empty)
+                    + (options.Channel != ChannelMode.Off && options.ChannelPlayed ? TawkServerInstructions.ChannelPlayed : string.Empty)
                     + (options.Channel != ChannelMode.Off && (options.ChannelReactions || options.ChannelEdits || options.ChannelScheduled)
                         ? TawkServerInstructions.ChannelActivity
                         : string.Empty)

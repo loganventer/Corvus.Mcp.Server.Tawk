@@ -199,6 +199,22 @@ public class ControlLineCodecTests
     }
 
     [Test]
+    public void Reads_a_played_event()
+    {
+        var frame = new ControlLineCodec().Decode(
+            """{"evt":"played","chat":{"jid":"27820000000@s.whatsapp.net","name":"Mom"},"message_id":"3EB0","player":{"jid":"27820000000@s.whatsapp.net","name":"Mom"},"at":1790791500}""");
+
+        var played = (PlayedEvent)((ControlEventFrame)frame!).Event;
+        Assert.Multiple(() =>
+        {
+            Assert.That(played.Chat.Name, Is.EqualTo("Mom"));
+            Assert.That(played.MessageId, Is.EqualTo("3EB0"));
+            Assert.That(played.Player.Name, Is.EqualTo("Mom"));
+            Assert.That(played.At, Is.EqualTo(1790791500));
+        });
+    }
+
+    [Test]
     public void Reads_a_read_receipt_event()
     {
         var frame = new ControlLineCodec().Decode(

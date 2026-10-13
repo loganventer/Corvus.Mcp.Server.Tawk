@@ -46,6 +46,9 @@ public sealed record TawkMcpOptions
     /// <summary>Also push read receipts for the user's messages as channel events. Off by default.</summary>
     public bool ChannelRead { get; init; }
 
+    /// <summary>Also push when someone plays a voice note or video the user sent, as channel events. Off by default.</summary>
+    public bool ChannelPlayed { get; init; }
+
     /// <summary>Also push reactions to the user's messages as channel events. Off by default.</summary>
     public bool ChannelReactions { get; init; }
 

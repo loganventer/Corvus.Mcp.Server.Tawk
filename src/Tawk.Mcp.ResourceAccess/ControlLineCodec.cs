@@ -88,6 +88,11 @@ public sealed class ControlLineCodec
             root.TryGetProperty("message_id", out var read) ? read.GetString() ?? string.Empty : string.Empty,
             Property<ReaderRef>(root, "reader"),
             root.TryGetProperty("at", out var at) && at.TryGetInt64(out var seconds) ? seconds : 0),
+        "played" => new PlayedEvent(
+            Property<ChatRef>(root, "chat"),
+            root.TryGetProperty("message_id", out var played) ? played.GetString() ?? string.Empty : string.Empty,
+            Property<ReaderRef>(root, "player"),
+            root.TryGetProperty("at", out var playedAt) && playedAt.TryGetInt64(out var playedSeconds) ? playedSeconds : 0),
         "presence" => new PresenceEvent(
             Property<ChatRef>(root, "chat"),
             Property<ReaderRef>(root, "who"),

@@ -226,6 +226,18 @@ public class TawkMcpOptionsBinderTests
     }
 
     [Test]
+    public void Played_events_are_off_until_asked_for_by_flag_or_environment()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(TawkMcpOptionsBinder.Bind([], Env()).ChannelPlayed, Is.False);
+            Assert.That(TawkMcpOptionsBinder.Bind(["--channel-played", "on"], Env()).ChannelPlayed, Is.True);
+            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("TAWKMCP_CHANNEL_PLAYED", "on"))).ChannelPlayed, Is.True);
+            Assert.That(TawkMcpOptionsBinder.Bind(["--channel-played", "off"], Env(("TAWKMCP_CHANNEL_PLAYED", "on"))).ChannelPlayed, Is.False);
+        });
+    }
+
+    [Test]
     public void Online_status_events_are_off_until_asked_for_by_flag_or_environment()
     {
         Assert.Multiple(() =>

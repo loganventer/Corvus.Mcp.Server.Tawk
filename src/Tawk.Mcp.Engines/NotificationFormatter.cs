@@ -23,6 +23,14 @@ public sealed class NotificationFormatter(TimeProvider? timeProvider = null) : I
         return $"Read receipt: {who} read the user's message in \"{Name(chat.Name)}\" (id {Name(messageId)}).";
     }
 
+    public string Played(ChatRef chat, string messageId, ReaderRef player)
+    {
+        ArgumentNullException.ThrowIfNull(chat);
+        ArgumentNullException.ThrowIfNull(player);
+        var who = Name(string.IsNullOrWhiteSpace(player.Name) ? player.Jid : player.Name);
+        return $"Played: {who} played the user's voice note or video in \"{Name(chat.Name)}\" (id {Name(messageId)}).";
+    }
+
     public string Activity(MessageActivityEvent activity)
     {
         ArgumentNullException.ThrowIfNull(activity);

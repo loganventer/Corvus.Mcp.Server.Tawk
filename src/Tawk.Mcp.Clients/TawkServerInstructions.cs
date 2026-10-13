@@ -96,6 +96,10 @@ public static class TawkServerInstructions
         " Read receipts arrive the same way, with type=\"read\": someone read a message the user sent. They are information only; "
         + "do not reply to them or tell the other person you saw them.";
 
+    public const string ChannelPlayed =
+        " Plays arrive the same way, with type=\"played\": someone played a voice note or video the user sent. They are information only; "
+        + "do not reply to them or tell the other person you saw them.";
+
     public const string ChannelActivity =
         " Other events may arrive the same way, told apart by type: reaction (someone reacted to a message the user sent, or took it back), "
         + "edit and delete (someone changed or withdrew a message they sent: stop relying on the old words), and scheduled_sent "

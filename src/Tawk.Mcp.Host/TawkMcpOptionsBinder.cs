@@ -69,6 +69,7 @@ public static class TawkMcpOptionsBinder
                 "channel" => options with { Channel = Channel(arg, Next(), ref error) },
                 "channel-own" => options with { ChannelOwn = OnOff(arg, Next(), ref error) },
                 "channel-read" => options with { ChannelRead = OnOff(arg, Next(), ref error) },
+                "channel-played" => options with { ChannelPlayed = OnOff(arg, Next(), ref error) },
                 "channel-reactions" => options with { ChannelReactions = OnOff(arg, Next(), ref error) },
                 "channel-edits" => options with { ChannelEdits = OnOff(arg, Next(), ref error) },
                 "channel-scheduled" => options with { ChannelScheduled = OnOff(arg, Next(), ref error) },
@@ -248,6 +249,11 @@ public static class TawkMcpOptionsBinder
         if (env("TAWKMCP_CHANNEL_READ") is { Length: > 0 } channelRead)
         {
             options = options with { ChannelRead = OnOff("TAWKMCP_CHANNEL_READ", channelRead, ref error) };
+        }
+
+        if (env("TAWKMCP_CHANNEL_PLAYED") is { Length: > 0 } channelPlayed)
+        {
+            options = options with { ChannelPlayed = OnOff("TAWKMCP_CHANNEL_PLAYED", channelPlayed, ref error) };
         }
 
         if (env("TAWKMCP_CHANNEL_OWN") is { Length: > 0 } channelOwn)

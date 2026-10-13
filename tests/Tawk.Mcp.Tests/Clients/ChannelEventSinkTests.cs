@@ -137,6 +137,28 @@ public class ChannelEventSinkTests
     }
 
     [Test]
+    public async Task A_play_is_pushed_only_when_asked_for_and_is_not_a_round()
+    {
+        var played = new LiveUpdate(
+            new PlayedEvent(new ChatRef(Samples.MomJid, "Mom"), "3EB0C2A1F0", new ReaderRef(Samples.MomJid, "Mom"), 1790791500),
+            "Played: Mom played the user's voice note or video in \"Mom\" (id 3EB0C2A1F0).");
+
+        await new ChannelEventSink(new ChannelOptions(ChannelMode.On, ReadReceipts: true), _sessions, _cadence, new ChannelContextHints()).OnUpdateAsync(played, CancellationToken.None);
+        var before = _claude.Sent.Count;
+        await new ChannelEventSink(new ChannelOptions(ChannelMode.On, Played: true), _sessions, _cadence, new ChannelContextHints()).OnUpdateAsync(played, CancellationToken.None);
+
+        var meta = _claude.Sent.Single().Parameters["meta"]!.AsObject();
+        Assert.Multiple(() =>
+        {
+            Assert.That(before, Is.Zero);
+            Assert.That((string?)meta["type"], Is.EqualTo("played"));
+            Assert.That((string?)meta["message_id"], Is.EqualTo("3EB0C2A1F0"));
+            Assert.That((string?)meta["sender"], Is.EqualTo("Mom"));
+            Assert.That((string?)meta["ts"], Is.EqualTo("1790791500"));
+        });
+    }
+
+    [Test]
     public async Task Reactions_edits_and_scheduled_sends_each_follow_their_own_option()
     {
         var chat = new ChatRef(Samples.MomJid, "Mom");

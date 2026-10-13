@@ -89,6 +89,16 @@ public sealed class ChannelEventSink(
             ["type"] = "read",
             ["from_me"] = "false",
         },
+        PlayedEvent played when options.Played => new JsonObject
+        {
+            ["chat_jid"] = played.Chat.Jid,
+            ["chat_name"] = played.Chat.Name,
+            ["message_id"] = played.MessageId,
+            ["sender"] = played.Player.Name ?? played.Player.Jid,
+            ["ts"] = played.At.ToString(CultureInfo.InvariantCulture),
+            ["type"] = "played",
+            ["from_me"] = "false",
+        },
         MessageActivityEvent activity when Carries(activity.Kind) => new JsonObject
         {
             ["chat_jid"] = activity.Chat.Jid,
