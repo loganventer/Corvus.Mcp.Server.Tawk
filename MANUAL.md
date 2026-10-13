@@ -510,8 +510,8 @@ tawk-mcp's server instructions tell the model that this content is untrusted, an
 **Channels only work over stdio.** Claude Code's channel documentation requires a channel server that Claude Code starts itself and talks to over stdio, so channel events do not reach Claude Code through the HTTP endpoint. To use them, register tawk-mcp a second way, with `--stdio`, and during the preview load it with the development flag:
 
 ```sh
-claude mcp add tawk-channel -- tawk-mcp --stdio
-claude --dangerously-load-development-channels server:tawk-channel
+claude mcp add tawk -- tawk-mcp --stdio
+claude --dangerously-load-development-channels server:tawk
 ```
 
 The stdio instance connects to tawk by itself, next to any HTTP instance you run; tawk accepts several clients at once.
@@ -522,7 +522,7 @@ The stdio instance connects to tawk by itself, next to any HTTP instance you run
 - updates tawk-mcp by itself: when the checkout's upstream has a newer version, it is pulled, and the checkout is rebuilt with `install.sh --no-service` whenever it has a commit that has not been built yet. Only a clean fast-forward is taken, so local commits and uncommitted changes are left alone, and the script says so. `TAWK_MCP_SRC` names the checkout (default: the one the script is in), `TAWK_MCP_PULL=0` starts with the checkout as it is, and `TAWK_MCP_PULL_TIMEOUT` is how many seconds the remote gets to answer (default 10) before the start carries on without it
 - points `TAWKMCP_ADMIN_TOKEN_FILE` at tawk's `admin.token`, so the session can approve its own sends where you allowed that. `TAWK_MCP_ADMIN=0` leaves it out
 - turns on the channel events for your own messages, read receipts, plays of voice notes, reactions, edits and deletes, scheduled sends and online status. tawk's own switches still decide what is handed over
-- loads the server registered as `tawk-channel`; `TAWK_MCP_SERVER` names another
+- loads the server registered as `tawk` (0.15.10; it was `tawk-channel` before); `TAWK_MCP_SERVER` names another, such as `TAWK_MCP_SERVER=tawk-channel` for a registration that still has the old name
 
 Claude Code shows a warning about development channels first; choose to continue. Your own messages are not pushed. On Team and Enterprise plans an admin must enable channels.
 

@@ -269,8 +269,8 @@ Set these up only when the person asks for them.
 **New messages pushed into a Claude Code session** (channels, a research preview). They work over stdio only, so tawk-mcp is registered a second time and loaded with the development flag:
 
 ```bash
-claude mcp add tawk-channel -- tawk-mcp --stdio
-claude --dangerously-load-development-channels server:tawk-channel
+claude mcp add tawk -- tawk-mcp --stdio
+claude --dangerously-load-development-channels server:tawk
 ```
 
 `scripts/claude-tawk` wraps the second line: it pulls a newer tawk-mcp when there is one, rebuilds it when the checkout moved on, turns the channel events on and starts Claude Code. Claude Code shows a warning first, and on Team and Enterprise plans an admin must enable channels. See "Claude Code channel" in [MANUAL.md](MANUAL.md).
