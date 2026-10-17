@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Builds the tawk-mcp image and runs it as your user, next to your running tawk.
-# The container serves streamable HTTP, tawk-mcp's default transport, on loopback only.
+# Builds the corvus-tawk-mcp image and runs it as your user, next to your running tawk.
+# The container serves streamable HTTP, corvus-tawk-mcp's default transport, on loopback only.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-image="tawk-mcp:0.15.10"
-name="tawk-mcp"
+image="corvus-tawk-mcp:0.15.10"
+name="corvus-tawk-mcp"
 port="${CORVUS_TAWK_MCP_PORT:-8765}"
 runtime="${XDG_RUNTIME_DIR:-$HOME/.local/state}"
-tawk_dir="$runtime/tawk"
-data_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp"
+tawk_dir="$runtime/corvus/tawk"
+data_dir="${XDG_CONFIG_HOME:-$HOME/.config}/corvus/tawk-mcp"
 
-# Containers run in UTC unless told otherwise, which would put every time tawk-mcp shows or reads
+# Containers run in UTC unless told otherwise, which would put every time corvus-tawk-mcp shows or reads
 # (message times, "since" cutoffs, follow-up dates) off by your offset. Give it this machine's zone.
 host_timezone() {
   if [ -n "${TZ:-}" ]; then printf '%s\n' "$TZ"; return; fi
@@ -24,7 +24,7 @@ host_timezone() {
 }
 timezone="$(host_timezone)"
 
-# Docker would create missing bind folders owned by root, which tawk and tawk-mcp could not use.
+# Docker would create missing bind folders owned by root, which tawk and corvus-tawk-mcp could not use.
 mkdir -p "$tawk_dir" "$data_dir"
 chmod 0700 "$tawk_dir" "$data_dir"
 
@@ -47,19 +47,19 @@ done
 token="$(cat "$data_dir/token")"
 
 cat <<INFO
-tawk-mcp is running at http://127.0.0.1:$port/mcp (times in $timezone)
+corvus-tawk-mcp is running at http://127.0.0.1:$port/mcp (times in $timezone)
 Health: $(curl -fsS "http://127.0.0.1:$port/healthz" 2>/dev/null || echo "not answering yet")
 
 Bearer token (kept in $data_dir/token):
   $token
 
 Claude Code:
-  claude mcp add --transport http tawk http://127.0.0.1:$port/mcp --header "Authorization: Bearer $token"
+  claude mcp add --transport http corvus-tawk http://127.0.0.1:$port/mcp --header "Authorization: Bearer $token"
 
 VS Code (.vscode/mcp.json):
   {
     "servers": {
-      "tawk": {
+      "corvus-tawk": {
         "type": "http",
         "url": "http://127.0.0.1:$port/mcp",
         "headers": { "Authorization": "Bearer $token" }
@@ -70,7 +70,7 @@ VS Code (.vscode/mcp.json):
 Claude Desktop (claude_desktop_config.json, through the mcp-remote bridge):
   {
     "mcpServers": {
-      "tawk": {
+      "corvus-tawk": {
         "command": "npx",
         "args": ["-y", "mcp-remote", "http://127.0.0.1:$port/mcp", "--header", "Authorization: Bearer $token"]
       }

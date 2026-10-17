@@ -1,0 +1,14 @@
+# A user service that keeps corvus-tawk-mcp serving MCP over HTTP at http://127.0.0.1:8765/mcp.
+# Install: cp corvus-tawk-mcp.service ~/.config/systemd/user/ && systemctl --user enable --now corvus-tawk-mcp
+# It may start before tawk; it connects as soon as tawk's control socket appears.
+[Unit]
+Description=corvus-tawk-mcp, the MCP server for Corvus Tawk
+After=default.target
+
+[Service]
+ExecStart=%h/.local/bin/corvus-tawk-mcp
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

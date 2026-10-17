@@ -1,13 +1,13 @@
-# tawk-mcp serves streamable HTTP (its default transport) on 127.0.0.1:8765 with a bearer token.
+# corvus-tawk-mcp serves streamable HTTP (its default transport) on 127.0.0.1:8765 with a bearer token.
 # Run with scripts/docker-run.sh, or export UID and GID first: UID=$(id -u) GID=$(id -g) docker compose up -d
 # Containers run in UTC: set TZ to your zone (TZ=Africa/Johannesburg docker compose up -d) or the times
-# tawk-mcp shows and reads are off by your offset. scripts/docker-run.sh does this for you.
-# Create "$XDG_RUNTIME_DIR/tawk" and ~/.config/tawk-mcp yourself (mode 0700) before the first start,
-# otherwise Docker creates them owned by root and neither tawk nor tawk-mcp can use them.
+# corvus-tawk-mcp shows and reads are off by your offset. scripts/docker-run.sh does this for you.
+# Create "$XDG_RUNTIME_DIR/corvus/tawk" and ~/.config/corvus/tawk-mcp yourself (mode 0700) before the first start,
+# otherwise Docker creates them owned by root and neither tawk nor corvus-tawk-mcp can use them.
 services:
-  tawk-mcp:
+  corvus-tawk-mcp:
     build: .
-    image: tawk-mcp:0.2.0
+    image: corvus-tawk-mcp:0.2.0
     user: "${UID:-1000}:${GID:-1000}"
     ports:
       - "127.0.0.1:8765:8765"
@@ -17,7 +17,7 @@ services:
       CORVUS_TAWK_MCP_DATA_FILE: /data/memory.db
       TZ: "${TZ:-UTC}"
       # Memory sync is off unless a repository is set. There is no default; use a private one of your own. It
-      # goes over SSH: put a private key that may write to it, and a known_hosts file, in ~/.config/tawk-mcp/ssh.
+      # goes over SSH: put a private key that may write to it, and a known_hosts file, in ~/.config/corvus/tawk-mcp/ssh.
       CORVUS_TAWK_MCP_SYNC_REPO: "${CORVUS_TAWK_MCP_SYNC_REPO:-}"
       CORVUS_TAWK_MCP_SYNC_KEY: "${CORVUS_TAWK_MCP_SYNC_KEY:-}"
       GIT_SSH_COMMAND: "${CORVUS_TAWK_MCP_SYNC_SSH:-}"
@@ -25,6 +25,6 @@ services:
       # (/run/tawk/admin.token with the mount below). Never set by default; see CONFIGURATION.md.
       CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE: "${CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE:-}"
     volumes:
-      - "${XDG_RUNTIME_DIR:-/run/user/1000}/tawk:/run/tawk"
-      - "${HOME}/.config/tawk-mcp:/data"
+      - "${XDG_RUNTIME_DIR:-/run/user/1000}/corvus/tawk:/run/tawk"
+      - "${HOME}/.config/corvus/tawk-mcp:/data"
     restart: unless-stopped

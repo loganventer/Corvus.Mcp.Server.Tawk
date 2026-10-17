@@ -1,24 +1,26 @@
 #!/usr/bin/env bash
-# tawk-mcp installer: builds and installs tawk-mcp from source.
+# corvus-tawk-mcp installer: builds and installs corvus-tawk-mcp from source.
+# It installs PREFIX/bin/corvus-tawk-mcp and, from a checkout, links PREFIX/bin/corvus-claude to scripts/corvus-claude.
+# Legacy: it also links the old names tawk-mcp and claude-tawk to them for now; both print a deprecation notice.
 #
 # From a checkout:      ./install.sh [options]
-# Straight from GitHub: curl -fsSL https://raw.githubusercontent.com/loganventer/tawk-mcp/main/install.sh | bash
+# Straight from GitHub: curl -fsSL https://raw.githubusercontent.com/loganventer/Corvus.Mcp.Server.Tawk/main/install.sh | bash
 #                       curl -fsSL .../install.sh | bash -s -- --no-service
 #
 # Options:
 #   --prefix DIR       install location; the program goes in DIR/bin (default ~/.local)
 #   --ref REF          branch or tag to build when cloning (default main)
-#   --repo URL         repository to clone (default https://github.com/loganventer/tawk-mcp.git)
-#   --no-service       do not register tawk-mcp to start at boot (it is registered by default:
+#   --repo URL         repository to clone (default https://github.com/loganventer/Corvus.Mcp.Server.Tawk.git)
+#   --no-service       do not register corvus-tawk-mcp to start at boot (it is registered by default:
 #                      a systemd user service with linger, a LaunchAgent on macOS, or a crontab line)
 #   --systemd          accepted for compatibility; registering is the default
 #   --docker           build the Docker image instead of a program, and print how to run it
-#   --uninstall        remove an installed tawk-mcp and its user service
+#   --uninstall        remove an installed corvus-tawk-mcp and its user service
 #   -y, --yes          do not ask before installing the .NET SDK
 #   -h, --help         show this help
 set -euo pipefail
 
-REPO_URL="https://github.com/loganventer/tawk-mcp.git"
+REPO_URL="https://github.com/loganventer/Corvus.Mcp.Server.Tawk.git"
 REF="main"
 PREFIX="$HOME/.local"
 SERVICE=1
@@ -26,7 +28,7 @@ DOCKER=0
 UNINSTALL=0
 ASSUME_YES=0
 DOTNET_MAJOR=10
-CORVUS_TAWK_INSTALLER="https://raw.githubusercontent.com/loganventer/tawk/main/install.sh"
+CORVUS_TAWK_INSTALLER="https://raw.githubusercontent.com/loganventer/Corvus.App.Terminal.Tawk/main/install.sh"
 
 say()  { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m!!\033[0m %s\n' "$*" >&2; }
@@ -36,21 +38,21 @@ have() { command -v "$1" >/dev/null 2>&1; }
 # Printed from here so --help also works when the script arrives through a pipe.
 usage() {
     cat <<'HELP'
-tawk-mcp installer: builds and installs tawk-mcp from source.
+corvus-tawk-mcp installer: builds and installs corvus-tawk-mcp from source.
 
 From a checkout:      ./install.sh [options]
-Straight from GitHub: curl -fsSL https://raw.githubusercontent.com/loganventer/tawk-mcp/main/install.sh | bash
+Straight from GitHub: curl -fsSL https://raw.githubusercontent.com/loganventer/Corvus.Mcp.Server.Tawk/main/install.sh | bash
                       curl -fsSL .../install.sh | bash -s -- --no-service
 
 Options:
   --prefix DIR       install location; the program goes in DIR/bin (default ~/.local)
   --ref REF          branch or tag to build when cloning (default main)
-  --repo URL         repository to clone (default https://github.com/loganventer/tawk-mcp.git)
-  --no-service       do not register tawk-mcp to start at boot (it is registered by default:
+  --repo URL         repository to clone (default https://github.com/loganventer/Corvus.Mcp.Server.Tawk.git)
+  --no-service       do not register corvus-tawk-mcp to start at boot (it is registered by default:
                      a systemd user service with linger, a LaunchAgent on macOS, or a crontab line)
   --systemd          accepted for compatibility; registering is the default
   --docker           build the Docker image instead of a program, and print how to run it
-  --uninstall        remove an installed tawk-mcp and its user service
+  --uninstall        remove an installed corvus-tawk-mcp and its user service
   -y, --yes          do not ask before installing the .NET SDK
   -h, --help         show this help
 HELP
@@ -73,19 +75,27 @@ done
 
 
 BIN_DIR="$PREFIX/bin"
-BIN="$BIN_DIR/tawk-mcp"
+BIN="$BIN_DIR/corvus-tawk-mcp"
 UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
-UNIT="$UNIT_DIR/tawk-mcp.service"
-PLIST="$HOME/Library/LaunchAgents/com.loganventer.tawk-mcp.plist"
-PLIST_LABEL="com.loganventer.tawk-mcp"
-CRON_MARK="# tawk-mcp: start at boot (added by install.sh)"
+UNIT="$UNIT_DIR/corvus-tawk-mcp.service"
+PLIST="$HOME/Library/LaunchAgents/com.loganventer.corvus-tawk-mcp.plist"
+PLIST_LABEL="com.loganventer.corvus-tawk-mcp"
+CRON_MARK="# corvus-tawk-mcp: start at boot (added by install.sh)"
+LAUNCHER="$BIN_DIR/corvus-claude"
+# Legacy names, kept as symlinks to the new ones for a while (see CUTOVER.md). Remove them, and this block, later.
+LEGACY_BIN="$BIN_DIR/tawk-mcp"
+LEGACY_LAUNCHER="$BIN_DIR/claude-tawk"
+LEGACY_UNIT="$UNIT_DIR/tawk-mcp.service"
+LEGACY_PLIST="$HOME/Library/LaunchAgents/com.loganventer.tawk-mcp.plist"
+LEGACY_PLIST_LABEL="com.loganventer.tawk-mcp"
+LEGACY_CRON_MARK="# tawk-mcp: start at boot (added by install.sh)"
 ME="${USER:-$(id -un)}"
-TOKEN_FILE="${CORVUS_TAWK_MCP_TOKEN_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp/token}"
+TOKEN_FILE="${CORVUS_TAWK_MCP_TOKEN_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/corvus/tawk-mcp/token}"
 
 if [ "$UNINSTALL" -eq 1 ]; then
     if [ -f "$UNIT" ]; then
         if have systemctl; then
-            systemctl --user disable --now tawk-mcp >/dev/null 2>&1 || true
+            systemctl --user disable --now corvus-tawk-mcp >/dev/null 2>&1 || true
         fi
         rm -f "$UNIT"
         if have systemctl; then systemctl --user daemon-reload >/dev/null 2>&1 || true; fi
@@ -93,6 +103,12 @@ if [ "$UNINSTALL" -eq 1 ]; then
         if have loginctl && [ "$(loginctl show-user "$ME" -p Linger --value 2>/dev/null)" = yes ]; then
             echo "    Linger stays on for $ME (other user services may rely on it). Turn it off with: loginctl disable-linger $ME"
         fi
+    fi
+    if [ -f "$LEGACY_UNIT" ]; then
+        if have systemctl; then systemctl --user disable --now tawk-mcp >/dev/null 2>&1 || true; fi
+        rm -f "$LEGACY_UNIT"
+        if have systemctl; then systemctl --user daemon-reload >/dev/null 2>&1 || true; fi
+        say "removed the legacy tawk-mcp systemd user service"
     fi
     if [ -f "$PLIST" ]; then
         launchctl bootout "gui/$(id -u)/$PLIST_LABEL" >/dev/null 2>&1 || launchctl unload -w "$PLIST" >/dev/null 2>&1 || true
@@ -104,10 +120,17 @@ if [ "$UNINSTALL" -eq 1 ]; then
         say "removed the @reboot line from your crontab"
     fi
     rm -f "$BIN"
-    say "removed tawk-mcp from $BIN_DIR"
+    say "removed corvus-tawk-mcp from $BIN_DIR"
+    if [ -L "$LAUNCHER" ]; then rm -f "$LAUNCHER"; say "removed the corvus-claude link from $BIN_DIR"; fi
+    # Legacy links: removed only when they are links to the new names.
+    for link in "$LEGACY_BIN" "$LEGACY_LAUNCHER"; do
+        case "$(readlink "$link" 2>/dev/null)" in
+            corvus-tawk-mcp|corvus-claude|"$BIN"|"$LAUNCHER") rm -f "$link"; say "removed the legacy link $link" ;;
+        esac
+    done
     echo "    The bearer token was kept: $TOKEN_FILE. Delete it to remove everything."
-    if have docker && [ -n "$(docker images -q tawk-mcp 2>/dev/null)" ]; then
-        echo "    Docker images named tawk-mcp were kept; remove them with: docker image rm \$(docker images -q tawk-mcp)"
+    if have docker && [ -n "$(docker images -q corvus-tawk-mcp 2>/dev/null)" ]; then
+        echo "    Docker images named corvus-tawk-mcp were kept; remove them with: docker image rm \$(docker images -q corvus-tawk-mcp)"
     fi
     exit 0
 fi
@@ -119,7 +142,7 @@ ARCH="$(uname -m)"
 case "$OS" in
     Linux)  PLATFORM=linux ;;
     Darwin) PLATFORM=macos ;;
-    MINGW*|MSYS*|CYGWIN*) die "tawk-mcp runs beside tawk, which runs under WSL on Windows. Run this installer inside WSL." ;;
+    MINGW*|MSYS*|CYGWIN*) die "corvus-tawk-mcp runs beside tawk, which runs under WSL on Windows. Run this installer inside WSL." ;;
     *)      die "unsupported platform: $OS" ;;
 esac
 case "$PLATFORM-$ARCH" in
@@ -127,7 +150,7 @@ case "$PLATFORM-$ARCH" in
     linux-aarch64|linux-arm64)  RID=linux-arm64 ;;
     macos-x86_64)               RID=osx-x64 ;;
     macos-arm64)                RID=osx-arm64 ;;
-    *)                          die "tawk-mcp has no build for $OS on $ARCH" ;;
+    *)                          die "corvus-tawk-mcp has no build for $OS on $ARCH" ;;
 esac
 DISTRO=""
 # shellcheck source=/dev/null
@@ -192,7 +215,7 @@ install_dotnet() {
 
 find_dotnet
 if [ "$DOCKER" -eq 0 ] && ! dotnet_sdk_version >/dev/null; then
-    warn "the .NET $DOTNET_MAJOR SDK was not found; it is needed to build tawk-mcp"
+    warn "the .NET $DOTNET_MAJOR SDK was not found; it is needed to build corvus-tawk-mcp"
     if confirm "Install it with Microsoft's dotnet-install.sh into ~/.dotnet?"; then
         install_dotnet
         dotnet_sdk_version >/dev/null || die "the .NET SDK install did not work; see the messages above"
@@ -207,14 +230,14 @@ version_of() {
         dotnet) dotnet_sdk_version 2>/dev/null ;;
         git)    have git && git --version 2>/dev/null | cut -d' ' -f3 ;;
         docker) have docker && docker --version 2>/dev/null | sed 's/^Docker version //; s/,.*//' ;;
-        tawk)   have tawk && command -v tawk ;;
+        corvus-tawk) have corvus-tawk && command -v corvus-tawk ;;
     esac
 }
 say "toolchain"
-for tool in dotnet git docker tawk; do
+for tool in dotnet git docker corvus-tawk; do
     v="$(version_of "$tool" || true)"
     [ "$tool" = docker ] && [ -z "$v" ] && [ "$DOCKER" -eq 0 ] && continue
-    if [ -n "$v" ]; then printf '    %-8s %s\n' "$tool" "$v"; else printf '    %-8s %s\n' "$tool" "not found"; fi
+    if [ -n "$v" ]; then printf '    %-11s %s\n' "$tool" "$v"; else printf '    %-11s %s\n' "$tool" "not found"; fi
 done
 [ "$DOCKER" -eq 1 ] && ! have docker && die "--docker needs docker"
 
@@ -225,16 +248,18 @@ if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 fi
 CLEANUP=""
+FROM_CHECKOUT=0
 cleanup() { local d; for d in $CLEANUP; do rm -rf "$d"; done; }
 trap cleanup EXIT
 if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/Corvus.Mcp.Server.Tawk.slnx" ] && [ -f "$SCRIPT_DIR/src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj" ]; then
     SRC="$SCRIPT_DIR"
+    FROM_CHECKOUT=1
     say "building from $SRC"
 else
-    have git || die "git is required to download tawk-mcp"
-    SRC="$(mktemp -d "${TMPDIR:-/tmp}/tawk-mcp-build.XXXXXX")"
+    have git || die "git is required to download corvus-tawk-mcp"
+    SRC="$(mktemp -d "${TMPDIR:-/tmp}/corvus-tawk-mcp-build.XXXXXX")"
     CLEANUP="$SRC"
-    say "downloading tawk-mcp ($REF) from $REPO_URL"
+    say "downloading corvus-tawk-mcp ($REF) from $REPO_URL"
     git clone --quiet --depth 1 --branch "$REF" "$REPO_URL" "$SRC"
     say "building commit $(git -C "$SRC" log -1 --format='%h %s (%cd)' --date=short)"
 fi
@@ -245,26 +270,26 @@ VERSION="${VERSION:-latest}"
 # ---- Docker -----------------------------------------------------------------
 
 if [ "$DOCKER" -eq 1 ]; then
-    say "building the Docker image tawk-mcp:$VERSION"
-    docker build -t "tawk-mcp:$VERSION" "$SRC"
+    say "building the Docker image corvus-tawk-mcp:$VERSION"
+    docker build -t "corvus-tawk-mcp:$VERSION" "$SRC"
     RUNTIME="${XDG_RUNTIME_DIR:-$HOME/.local/state}"
     say "done. Create the two folders once (Docker would make them owned by root), then start it:"
     cat <<RUN
-    mkdir -p -m 0700 "$RUNTIME/tawk" "${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp"
-    docker run -d --name tawk-mcp --restart unless-stopped \\
+    mkdir -p -m 0700 "$RUNTIME/corvus/tawk" "${XDG_CONFIG_HOME:-$HOME/.config}/corvus/tawk-mcp"
+    docker run -d --name corvus-tawk-mcp --restart unless-stopped \\
       --user "\$(id -u):\$(id -g)" -p 127.0.0.1:8765:8765 \\
-      -v "$RUNTIME/tawk:/run/tawk" -v "${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp:/data" \\
-      tawk-mcp:$VERSION
-    The bearer token appears in ${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp/token once it has started.
+      -v "$RUNTIME/corvus/tawk:/run/tawk" -v "${XDG_CONFIG_HOME:-$HOME/.config}/corvus/tawk-mcp:/data" \\
+      corvus-tawk-mcp:$VERSION
+    The bearer token appears in ${XDG_CONFIG_HOME:-$HOME/.config}/corvus/tawk-mcp/token once it has started.
     With --restart unless-stopped, Docker starts it again at boot whenever the Docker service starts at boot.
 RUN
-    have tawk || warn "tawk itself is not installed. Install it with: curl -fsSL $CORVUS_TAWK_INSTALLER | bash"
+    have corvus-tawk || warn "Corvus Tawk (corvus-tawk) is not installed. Install it with: curl -fsSL $CORVUS_TAWK_INSTALLER | bash"
     exit 0
 fi
 
 # ---- build and install ------------------------------------------------------
 
-OUT="$(mktemp -d "${TMPDIR:-/tmp}/tawk-mcp-publish.XXXXXX")"
+OUT="$(mktemp -d "${TMPDIR:-/tmp}/corvus-tawk-mcp-publish.XXXXXX")"
 CLEANUP="${CLEANUP:+$CLEANUP }$OUT"
 say "publishing a self-contained single file for $RID (this takes a minute the first time)"
 DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 "$DOTNET" publish "$SRC/src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj" \
@@ -274,7 +299,32 @@ DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 "$DOTNET" publish "$SRC/src/Corvus
 
 say "installing to $BIN"
 mkdir -p "$BIN_DIR"
-install -m 0755 "$OUT/tawk-mcp" "$BIN"
+install -m 0755 "$OUT/corvus-tawk-mcp" "$BIN"
+
+# The launcher that starts Claude Code with the channel on is linked, not copied, so it finds this checkout
+# to rebuild from. A launcher already there that is not a link is left alone.
+if [ "$FROM_CHECKOUT" -eq 1 ] && [ -f "$SRC/scripts/corvus-claude" ]; then
+    if [ -e "$LAUNCHER" ] && [ ! -L "$LAUNCHER" ]; then
+        warn "$LAUNCHER exists and is not a link; leaving it as it is"
+    else
+        ln -sfn "$SRC/scripts/corvus-claude" "$LAUNCHER"
+        say "linked $LAUNCHER to $SRC/scripts/corvus-claude"
+    fi
+fi
+
+# Legacy: the old command names point at the new ones, so registrations and aliases that still use them keep
+# working; each prints a deprecation notice when run under the old name. tawk-mcp may be the old program
+# itself, which is replaced. claude-tawk is replaced only when it is a link (to an older checkout, say).
+ln -sfn corvus-tawk-mcp "$LEGACY_BIN"
+say "legacy: linked $LEGACY_BIN to corvus-tawk-mcp (deprecated; see CUTOVER.md)"
+if [ -L "$LAUNCHER" ]; then
+    if [ -e "$LEGACY_LAUNCHER" ] && [ ! -L "$LEGACY_LAUNCHER" ]; then
+        warn "$LEGACY_LAUNCHER exists and is not a link; leaving it as it is"
+    else
+        ln -sfn corvus-claude "$LEGACY_LAUNCHER"
+        say "legacy: linked $LEGACY_LAUNCHER to corvus-claude (deprecated; see CUTOVER.md)"
+    fi
+fi
 
 case ":$PATH:" in
     *":$BIN_DIR:"*) ;;
@@ -290,33 +340,47 @@ systemd_user_ok() {
 }
 
 enable_linger() {
-    have loginctl || { warn "loginctl not found; tawk-mcp starts when you log in, not at boot"; return 0; }
+    have loginctl || { warn "loginctl not found; corvus-tawk-mcp starts when you log in, not at boot"; return 0; }
     if [ "$(loginctl show-user "$ME" -p Linger --value 2>/dev/null)" = yes ]; then
         say "linger is already on for $ME, so user services start at boot"
         return 0
     fi
     if loginctl enable-linger "$ME" 2>/dev/null; then
-        say "turned on linger for $ME, so tawk-mcp starts at boot without anyone logging in"
+        say "turned on linger for $ME, so corvus-tawk-mcp starts at boot without anyone logging in"
     elif [ "$ASSUME_YES" -eq 1 ] && have sudo && sudo -n loginctl enable-linger "$ME" 2>/dev/null; then
-        say "turned on linger for $ME (with sudo), so tawk-mcp starts at boot"
+        say "turned on linger for $ME (with sudo), so corvus-tawk-mcp starts at boot"
     else
-        warn "could not turn on linger, so tawk-mcp starts when you log in rather than at boot. To fix that run:"
+        warn "could not turn on linger, so corvus-tawk-mcp starts when you log in rather than at boot. To fix that run:"
         echo "    sudo loginctl enable-linger $ME"
     fi
 }
 
+# The service was called tawk-mcp before. Registering the new one retires the old one, which would hold the same port.
+retire_legacy_systemd() {
+    [ -f "$LEGACY_UNIT" ] || return 0
+    systemctl --user disable --now tawk-mcp >/dev/null 2>&1 || true
+    rm -f "$LEGACY_UNIT"
+    say "legacy: stopped, disabled and removed the old tawk-mcp user service"
+}
+
 register_systemd() {
+    retire_legacy_systemd
     mkdir -p "$UNIT_DIR"
-    sed "s#%h/.local/bin/tawk-mcp#$BIN#" "$SRC/contrib/systemd/tawk-mcp.service" > "$UNIT"
+    sed "s#%h/.local/bin/corvus-tawk-mcp#$BIN#" "$SRC/contrib/systemd/corvus-tawk-mcp.service" > "$UNIT"
     systemctl --user daemon-reload
-    systemctl --user enable --now tawk-mcp >/dev/null 2>&1 || warn "systemctl --user enable --now tawk-mcp failed; see: systemctl --user status tawk-mcp"
+    systemctl --user enable --now corvus-tawk-mcp >/dev/null 2>&1 || warn "systemctl --user enable --now corvus-tawk-mcp failed; see: systemctl --user status corvus-tawk-mcp"
     enable_linger
-    say "systemd user service tawk-mcp: $(systemctl --user is-enabled tawk-mcp 2>/dev/null || echo unknown), $(systemctl --user is-active tawk-mcp 2>/dev/null || echo unknown)"
-    echo "    Its log: journalctl --user -u tawk-mcp"
+    say "systemd user service corvus-tawk-mcp: $(systemctl --user is-enabled corvus-tawk-mcp 2>/dev/null || echo unknown), $(systemctl --user is-active corvus-tawk-mcp 2>/dev/null || echo unknown)"
+    echo "    Its log: journalctl --user -u corvus-tawk-mcp"
     SERVICE_KIND="systemd"
 }
 
 register_launchagent() {
+    if [ -f "$LEGACY_PLIST" ]; then
+        launchctl bootout "gui/$(id -u)/$LEGACY_PLIST_LABEL" >/dev/null 2>&1 || launchctl unload -w "$LEGACY_PLIST" >/dev/null 2>&1 || true
+        rm -f "$LEGACY_PLIST"
+        say "legacy: unloaded and removed the old LaunchAgent $LEGACY_PLIST_LABEL"
+    fi
     mkdir -p "$(dirname "$PLIST")" "$HOME/Library/Logs"
     cat > "$PLIST" <<PLISTXML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -334,9 +398,9 @@ register_launchagent() {
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>$HOME/Library/Logs/tawk-mcp.log</string>
+    <string>$HOME/Library/Logs/corvus-tawk-mcp.log</string>
     <key>StandardErrorPath</key>
-    <string>$HOME/Library/Logs/tawk-mcp.log</string>
+    <string>$HOME/Library/Logs/corvus-tawk-mcp.log</string>
 </dict>
 </plist>
 PLISTXML
@@ -349,7 +413,7 @@ PLISTXML
     else
         say "LaunchAgent $PLIST_LABEL: $(launchctl list | grep -F "$PLIST_LABEL" || echo 'not loaded')"
     fi
-    echo "    It starts when you log in and restarts if it stops. Its log: ~/Library/Logs/tawk-mcp.log"
+    echo "    It starts when you log in and restarts if it stops. Its log: ~/Library/Logs/corvus-tawk-mcp.log"
     SERVICE_KIND="launchagent"
 }
 
@@ -363,25 +427,29 @@ register_crontab() {
         warn "there is no systemd user session here, so no user service can be registered"
     fi
     if ! have crontab; then
-        warn "crontab is not available either, so tawk-mcp was NOT registered to start at boot. Start it yourself: $BIN"
+        warn "crontab is not available either, so corvus-tawk-mcp was NOT registered to start at boot. Start it yourself: $BIN"
         return 0
     fi
+    if crontab -l 2>/dev/null | grep -qF "$LEGACY_CRON_MARK"; then
+        { crontab -l 2>/dev/null | grep -vF "$LEGACY_CRON_MARK" || true; } | crontab -
+        say "legacy: removed the old tawk-mcp @reboot line from your crontab"
+    fi
     if crontab -l 2>/dev/null | grep -qF "$CRON_MARK"; then
-        say "your crontab already starts tawk-mcp at boot"
+        say "your crontab already starts corvus-tawk-mcp at boot"
         SERVICE_KIND="crontab"
         return 0
     fi
-    if confirm "Add an @reboot line to your crontab to start tawk-mcp at boot instead?"; then
+    if confirm "Add an @reboot line to your crontab to start corvus-tawk-mcp at boot instead?"; then
         { crontab -l 2>/dev/null || true; printf '@reboot %s >/dev/null 2>&1 %s\n' "$BIN" "$CRON_MARK"; } | crontab -
         say "added to your crontab: @reboot $BIN (it starts at the next boot; start it now with: $BIN &)"
         SERVICE_KIND="crontab"
     else
-        warn "tawk-mcp was NOT registered to start at boot. Start it yourself: $BIN"
+        warn "corvus-tawk-mcp was NOT registered to start at boot. Start it yourself: $BIN"
     fi
 }
 
 if [ "$SERVICE" -eq 1 ]; then
-    say "registering tawk-mcp to start at boot (--no-service skips this)"
+    say "registering corvus-tawk-mcp to start at boot (--no-service skips this)"
     if [ "$PLATFORM" = macos ]; then
         register_launchagent
     elif systemd_user_ok; then
@@ -395,11 +463,11 @@ fi
 
 say "checking: $("$BIN" --version)"
 "$BIN" print-token >/dev/null
-say "the bearer token for HTTP clients is in $TOKEN_FILE (tawk-mcp print-token shows it)"
+say "the bearer token for HTTP clients is in $TOKEN_FILE (corvus-tawk-mcp print-token shows it)"
 
-# Voice notes are transcribed inside tawk-mcp. The default model is fetched now so the first one does
+# Voice notes are transcribed inside corvus-tawk-mcp. The default model is fetched now so the first one does
 # not wait for a download (about 1.6 GB); another model chosen in tawk is fetched the first time it is needed.
-MODEL_DIR="${CORVUS_TAWK_MCP_TRANSCRIBE_MODEL_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/tawk-mcp/models}"
+MODEL_DIR="${CORVUS_TAWK_MCP_TRANSCRIBE_MODEL_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/corvus/tawk-mcp/models}"
 DEFAULT_MODEL=large-v3-turbo
 if [ -f "$MODEL_DIR/ggml-$DEFAULT_MODEL.bin" ]; then
     say "transcription model: $DEFAULT_MODEL is already in $MODEL_DIR"
@@ -408,13 +476,13 @@ else
     if "$BIN" fetch-model "$DEFAULT_MODEL" >/dev/null 2>&1; then
         say "transcription model: fetched $DEFAULT_MODEL into $MODEL_DIR"
     else
-        warn "the $DEFAULT_MODEL transcription model could not be fetched now. tawk-mcp fetches it the first time"
-        warn "a voice note is transcribed, or run: tawk-mcp fetch-model $DEFAULT_MODEL"
+        warn "the $DEFAULT_MODEL transcription model could not be fetched now. corvus-tawk-mcp fetches it the first time"
+        warn "a voice note is transcribed, or run: corvus-tawk-mcp fetch-model $DEFAULT_MODEL"
     fi
 fi
 
-if ! have tawk; then
-    warn "tawk itself is not installed. tawk-mcp needs a running tawk; install it with:"
+if ! have corvus-tawk; then
+    warn "Corvus Tawk (corvus-tawk) is not installed. corvus-tawk-mcp needs it running; install it with:"
     echo "    curl -fsSL $CORVUS_TAWK_INSTALLER | bash"
 fi
 
@@ -423,9 +491,9 @@ echo "    1. In tawk, turn on Settings > Automation > Control socket, and choose
 echo "       under Settings > Automation > Agent access (read, send or manage)."
 echo "       What agents do shows in tawk's Agentic tab (F3, or click 🤖 Agentic in the header)."
 case "$SERVICE_KIND" in
-    systemd|launchagent) echo "    2. tawk-mcp is already serving http://127.0.0.1:8765/mcp, and starts at boot." ;;
-    crontab)             echo "    2. tawk-mcp starts at boot; start it now with: $BIN &   (it serves http://127.0.0.1:8765/mcp)" ;;
+    systemd|launchagent) echo "    2. corvus-tawk-mcp is already serving http://127.0.0.1:8765/mcp, and starts at boot." ;;
+    crontab)             echo "    2. corvus-tawk-mcp starts at boot; start it now with: $BIN &   (it serves http://127.0.0.1:8765/mcp)" ;;
     *)                   echo "    2. Start it: $BIN   (it serves http://127.0.0.1:8765/mcp)" ;;
 esac
 echo "    3. Add it to Claude Code:"
-echo "       claude mcp add --transport http tawk http://127.0.0.1:8765/mcp --header \"Authorization: Bearer \$($BIN print-token)\""
+echo "       claude mcp add --transport http corvus-tawk http://127.0.0.1:8765/mcp --header \"Authorization: Bearer \$($BIN print-token)\""

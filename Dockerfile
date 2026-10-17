@@ -1,4 +1,4 @@
-# This image serves tawk-mcp over HTTP on port 8765, never stdio.
+# This image serves corvus-tawk-mcp over HTTP on port 8765, never stdio.
 # Publish the port on loopback only (-p 127.0.0.1:8765:8765): the bearer token is the only other guard.
 # tawk accepts control socket clients of its own user only, so run the container as your user
 # (--user "$(id -u):$(id -g)") and mount tawk's runtime folder at /run/tawk. scripts/docker-run.sh does all this.
@@ -33,5 +33,5 @@ ENV ASPNETCORE_URLS=http://0.0.0.0:8765 \
 VOLUME ["/data"]
 EXPOSE 8765
 USER $APP_UID
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD ["dotnet", "/app/tawk-mcp.dll", "healthcheck"]
-ENTRYPOINT ["dotnet", "/app/tawk-mcp.dll"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD ["dotnet", "/app/corvus-tawk-mcp.dll", "healthcheck"]
+ENTRYPOINT ["dotnet", "/app/corvus-tawk-mcp.dll"]
