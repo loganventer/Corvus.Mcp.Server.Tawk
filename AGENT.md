@@ -69,7 +69,7 @@ The installer (`install.sh`) mirrors tawk's own: the same `say`, `warn`, `die` a
 ```sh
 tmp="$(mktemp -d)"
 CORVUS_TAWK_MCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --no-service
-"$tmp/bin/corvus-tawk-mcp" --version
+"$tmp/bin/mcp/corvus-tawk-mcp" --version
 CORVUS_TAWK_MCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --uninstall && rm -rf "$tmp"
 ```
 

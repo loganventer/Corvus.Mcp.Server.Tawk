@@ -18,9 +18,9 @@
 
 | Path | Contents |
 | --- | --- |
-| `~/.local/bin/corvus-tawk-mcp` | The program, as `install.sh` puts it (`--prefix` changes the folder) |
+| `~/.local/bin/mcp/corvus-tawk-mcp` | The program, as `install.sh` puts it. `~/.local/bin/mcp` holds every MCP server and need not be on `PATH`; registrations and services name the program in full. `--prefix` changes the base (`PREFIX/bin/mcp`), `--mcp-dir` the folder itself |
 | `~/.local/bin/corvus-claude` | A link to `scripts/corvus-claude` in the checkout, made when `install.sh` runs from one: starts Claude Code with the channel on |
-| `~/.local/bin/tawk-mcp`, `~/.local/bin/claude-tawk` | Legacy links to `corvus-tawk-mcp` and `corvus-claude`, kept for now so old registrations and aliases still start; each prints a deprecation notice. See [CUTOVER.md](CUTOVER.md) |
+| `~/.local/bin/tawk-mcp`, `~/.local/bin/claude-tawk` | Legacy links to `corvus-tawk-mcp` and `corvus-claude`, made only by `install.sh --legacy-links`, for old registrations and aliases; each prints a deprecation notice. See [CUTOVER.md](CUTOVER.md) |
 | `~/.config/systemd/user/corvus-tawk-mcp.service` | The user service the installer registers on Linux with systemd |
 | `~/Library/LaunchAgents/com.loganventer.corvus-tawk-mcp.plist` | The LaunchAgent the installer registers on macOS; its log is `~/Library/Logs/corvus-tawk-mcp.log` |
 | `~/.config/corvus/tawk-mcp/token` | The bearer token for HTTP mode (file 0600, folder 0700). `$XDG_CONFIG_HOME` is used instead of `~/.config` when set |
@@ -112,6 +112,8 @@ A value out of range or a flag corvus-tawk-mcp does not know stops it at start w
 `ASPNETCORE_URLS` has no effect: HTTP mode listens only where `CORVUS_TAWK_MCP_BIND` and `CORVUS_TAWK_MCP_PORT` say.
 
 ## Commands
+
+`install.sh` puts the program in `~/.local/bin/mcp`, which is not on `PATH`; run these as `~/.local/bin/mcp/corvus-tawk-mcp ...`, or with the folder you gave `--mcp-dir`.
 
 | Command | Does |
 | --- | --- |

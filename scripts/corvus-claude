@@ -1,11 +1,12 @@
 #!/bin/sh
 # corvus-claude: starts Claude Code with Corvus Tawk's channel on: new WhatsApp messages arrive in the session.
-# Register the stdio server once first:  claude mcp add corvus-tawk -- corvus-tawk-mcp --stdio
+# Register the stdio server once first:  claude mcp add corvus-tawk -- ~/.local/bin/mcp/corvus-tawk-mcp --stdio
+# (install.sh puts corvus-tawk-mcp in ~/.local/bin/mcp, which need not be on PATH: the registration names it in full.)
 # Link this file into a directory on your PATH (a copy works too, with CORVUS_TAWK_MCP_SRC set). Arguments are passed on to Claude Code.
 
-# Legacy: install.sh also links this file as corvus-claude for a while. That name is going away.
+# Legacy: install.sh --legacy-links also links this file as claude-tawk. That name is going away.
 case "$(basename "$0")" in
-    corvus-claude) echo "corvus-claude is deprecated and will be removed: run corvus-claude instead (see CUTOVER.md)" >&2 ;;
+    claude-tawk) echo "claude-tawk is deprecated and will be removed: run corvus-claude instead (see CUTOVER.md)" >&2 ;;
 esac
 
 # Uses CLAUDE_BIN when set, else the newest Claude Code that the VS Code extension installed, else the one on PATH.

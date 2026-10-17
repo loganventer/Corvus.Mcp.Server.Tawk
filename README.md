@@ -47,13 +47,14 @@ With one command:
 curl -fsSL https://raw.githubusercontent.com/loganventer/Corvus.Mcp.Server.Tawk/main/install.sh | bash
 ```
 
-The installer builds corvus-tawk-mcp from source as one self-contained file in `~/.local/bin`. It finds the .NET 10 SDK, or offers to install it into `~/.dotnet` with Microsoft's `dotnet-install.sh` (no sudo). It registers corvus-tawk-mcp to start at boot (a systemd user service with linger on Linux, a LaunchAgent on macOS, or an `@reboot` crontab line where there is no systemd), starts it, creates the bearer token and prints the exact `claude mcp add` line. From a checkout, run `./install.sh` instead.
+The installer builds corvus-tawk-mcp from source as one self-contained file, `~/.local/bin/mcp/corvus-tawk-mcp` (`~/.local/bin/mcp` holds every MCP server; it need not be on `PATH`, because registrations name the program in full). It finds the .NET 10 SDK, or offers to install it into `~/.dotnet` with Microsoft's `dotnet-install.sh` (no sudo). It registers corvus-tawk-mcp to start at boot (a systemd user service with linger on Linux, a LaunchAgent on macOS, or an `@reboot` crontab line where there is no systemd), starts it, creates the bearer token and prints the exact `claude mcp add` line. From a checkout, run `./install.sh` instead.
 
 | Goal | Command |
 | --- | --- |
 | Install without starting it at boot | `./install.sh --no-service` |
 | Build the Docker image instead | `./install.sh --docker` |
-| Install somewhere else | `./install.sh --prefix /opt/corvus-tawk-mcp` |
+| Install somewhere else | `./install.sh --prefix /opt/corvus-tawk-mcp` (the program goes in `PREFIX/bin/mcp`) |
+| Put the program in another folder | `./install.sh --mcp-dir ~/mcp-servers` |
 | Build a tag or branch | `./install.sh --ref v0.1.0` |
 | Install the SDK without asking | `./install.sh --yes` |
 | Remove corvus-tawk-mcp | `./install.sh --uninstall` |
@@ -67,15 +68,15 @@ corvus-tawk-mcp needs [tawk](https://github.com/loganventer/Corvus.App.Terminal.
 corvus-tawk-mcp serves MCP over streamable HTTP at `http://127.0.0.1:8765/mcp`. The installer starts it and registers it to start at boot ([MANUAL.md](MANUAL.md#keeping-it-running)); with `--no-service`, start it yourself:
 
 ```sh
-corvus-tawk-mcp                            # http://127.0.0.1:8765/mcp
-corvus-tawk-mcp print-token                # the bearer token every request needs
+~/.local/bin/mcp/corvus-tawk-mcp               # http://127.0.0.1:8765/mcp
+~/.local/bin/mcp/corvus-tawk-mcp print-token   # the bearer token every request needs
 ```
 
 **Claude Code**
 
 ```sh
 claude mcp add --transport http corvus-tawk http://127.0.0.1:8765/mcp \
-  --header "Authorization: Bearer $(corvus-tawk-mcp print-token)"
+  --header "Authorization: Bearer $(~/.local/bin/mcp/corvus-tawk-mcp print-token)"
 ```
 
 **Claude Desktop** (`claude_desktop_config.json`), through the `mcp-remote` bridge because the file only starts local programs:
@@ -112,7 +113,7 @@ claude mcp add --transport http corvus-tawk http://127.0.0.1:8765/mcp \
 scripts/docker-run.sh               # builds, runs as you, prints the token and a client snippet
 ```
 
-**stdio instead.** A client can also start corvus-tawk-mcp itself with `--stdio`, for example `claude mcp add corvus-tawk -- corvus-tawk-mcp --stdio`. Claude Code channels, which push new messages into a session, need this; see [MANUAL.md](MANUAL.md#claude-code-channel).
+**stdio instead.** A client can also start corvus-tawk-mcp itself with `--stdio`, for example `claude mcp add corvus-tawk -- ~/.local/bin/mcp/corvus-tawk-mcp --stdio`. Claude Code channels, which push new messages into a session, need this; see [MANUAL.md](MANUAL.md#claude-code-channel).
 
 **Windows**: run tawk and corvus-tawk-mcp under WSL, and connect over HTTP through WSL2's localhost forwarding. See [MANUAL.md](MANUAL.md#windows).
 

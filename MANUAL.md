@@ -55,7 +55,7 @@ or `./install.sh` from a checkout. The installer:
 1. prints the platform and the toolchain it found (the .NET SDK, git, docker if present, and tawk);
 2. finds the .NET 10 SDK, or offers to install it into `~/.dotnet` with Microsoft's `dotnet-install.sh`. It never uses sudo for that, asks first unless you pass `--yes`, and when it cannot ask it lists the package manager commands instead;
 3. clones the repository into a temporary folder when it is not run from a checkout, and removes it afterwards;
-4. publishes a self-contained single file for your system (linux-x64, linux-arm64, osx-x64 or osx-arm64) into `~/.local/bin`, warning if that folder is not on your `PATH`;
+4. publishes a self-contained single file for your system (linux-x64, linux-arm64, osx-x64 or osx-arm64) into `~/.local/bin/mcp/corvus-tawk-mcp` (`--mcp-dir` chooses another folder). That folder holds MCP servers only and need not be on your `PATH`: registrations name the program in full;
 5. registers corvus-tawk-mcp to start at boot and starts it (see [Keeping it running](#keeping-it-running)), unless you pass `--no-service`;
 6. runs `corvus-tawk-mcp --version`, creates the bearer token and says where it lives, and prints the `claude mcp add --transport http` line;
 7. tells you if tawk itself is missing, with tawk's one-line installer.
@@ -417,9 +417,9 @@ A subject is named by a chat's jid or name, `self`, or a topic id starting with 
 Two commands exchange knowledge with other OKF stores:
 
 ```sh
-corvus-tawk-mcp export-okf ~/tawk-knowledge          # a new or empty folder
-corvus-tawk-mcp export-okf ~/tawk-knowledge --include-sensitive
-corvus-tawk-mcp import-okf ~/some-okf-bundle
+~/.local/bin/mcp/corvus-tawk-mcp export-okf ~/tawk-knowledge          # a new or empty folder
+~/.local/bin/mcp/corvus-tawk-mcp export-okf ~/tawk-knowledge --include-sensitive
+~/.local/bin/mcp/corvus-tawk-mcp import-okf ~/some-okf-bundle
 ```
 
 An export is one Markdown file per concept, with YAML frontmatter (`type`, `title`, `resource`, `tags`, `generated`, `verified`, `status`, `stale_after`, `sources`) and an `index.md` that declares `okf_version: "0.2"`. A contact's profile fields are in its file under `profile`, and its relations appear both under `links` and as Markdown links in the body. The folder is readable only by you. An import reads any conformant bundle: only `type` is required, unknown keys are kept, and in a bundle from elsewhere every Markdown link between concepts becomes a relation labelled "related to". Where a concept is already in memory, the stronger source wins, then the newer change.
@@ -510,13 +510,13 @@ corvus-tawk-mcp's server instructions tell the model that this content is untrus
 **Channels only work over stdio.** Claude Code's channel documentation requires a channel server that Claude Code starts itself and talks to over stdio, so channel events do not reach Claude Code through the HTTP endpoint. To use them, register corvus-tawk-mcp a second way, with `--stdio`, and during the preview load it with the development flag:
 
 ```sh
-claude mcp add corvus-tawk -- corvus-tawk-mcp --stdio
+claude mcp add corvus-tawk -- ~/.local/bin/mcp/corvus-tawk-mcp --stdio
 claude --dangerously-load-development-channels server:corvus-tawk
 ```
 
 The stdio instance connects to tawk by itself, next to any HTTP instance you run; tawk accepts several clients at once.
 
-**`scripts/corvus-claude`** does the second line for you, with the rest set up. `install.sh`, run from a checkout, links it into `~/.local/bin` (or link it yourself: `ln -s "$PWD/scripts/corvus-claude" ~/.local/bin/`); run `corvus-claude`. A legacy link named `claude-tawk` still points at it for now and prints a deprecation notice. It works on Linux and macOS; arguments are passed on to Claude Code. It:
+**`scripts/corvus-claude`** does the second line for you, with the rest set up. `install.sh`, run from a checkout, links it into `~/.local/bin`, which should be on your `PATH` (or link it yourself: `ln -s "$PWD/scripts/corvus-claude" ~/.local/bin/`); run `corvus-claude`. `install.sh --legacy-links` also links it as `claude-tawk`, which prints a deprecation notice. It works on Linux and macOS; arguments are passed on to Claude Code. It:
 
 - finds Claude Code: `CLAUDE_BIN`, else the newest one the VS Code extension installed, else `claude` on your `PATH`
 - updates corvus-tawk-mcp by itself: when the checkout's upstream has a newer version, it is pulled, and the checkout is rebuilt with `install.sh --no-service` whenever it has a commit that has not been built yet. Only a clean fast-forward is taken, so local commits and uncommitted changes are left alone, and the script says so. `CORVUS_TAWK_MCP_SRC` names the checkout (default: the one the script is in), `CORVUS_TAWK_MCP_PULL=0` starts with the checkout as it is, and `CORVUS_TAWK_MCP_PULL_TIMEOUT` is how many seconds the remote gets to answer (default 10) before the start carries on without it
@@ -570,7 +570,7 @@ The label is your own text, and is flattened to one plain line like a name. Mess
 `GET /events` (HTTP mode, the default) streams server-sent events for other programs, behind the same bearer token and origin check as `/mcp`:
 
 ```sh
-curl -N -H "Authorization: Bearer $(corvus-tawk-mcp print-token)" http://127.0.0.1:8765/events
+curl -N -H "Authorization: Bearer $(~/.local/bin/mcp/corvus-tawk-mcp print-token)" http://127.0.0.1:8765/events
 ```
 
 ```text
@@ -606,16 +606,16 @@ A `: heartbeat` comment is sent every 15 seconds. The last 200 events are kept: 
 `corvus-tawk-mcp` on its own serves MCP over streamable HTTP at `http://127.0.0.1:8765/mcp`, with `/events` and `/healthz` beside it. Every request needs the bearer token:
 
 ```sh
-corvus-tawk-mcp                      # http://127.0.0.1:8765/mcp
-corvus-tawk-mcp --port 9000          # another port
-corvus-tawk-mcp print-token          # the bearer token
+~/.local/bin/mcp/corvus-tawk-mcp                      # http://127.0.0.1:8765/mcp
+~/.local/bin/mcp/corvus-tawk-mcp --port 9000          # another port
+~/.local/bin/mcp/corvus-tawk-mcp print-token          # the bearer token
 ```
 
 Claude Code:
 
 ```sh
 claude mcp add --transport http corvus-tawk http://127.0.0.1:8765/mcp \
-  --header "Authorization: Bearer $(corvus-tawk-mcp print-token)"
+  --header "Authorization: Bearer $(~/.local/bin/mcp/corvus-tawk-mcp print-token)"
 ```
 
 Claude Desktop's `claude_desktop_config.json` only starts local programs, so connect through the `mcp-remote` bridge (it needs Node.js), putting in the token from `corvus-tawk-mcp print-token`:
@@ -656,8 +656,8 @@ With `--stdio` (or `CORVUS_TAWK_MCP_TRANSPORT=stdio`) corvus-tawk-mcp speaks MCP
 
 | Client | Setup |
 | --- | --- |
-| Claude Code | `claude mcp add corvus-tawk -- corvus-tawk-mcp --stdio` |
-| Claude Desktop | `{"mcpServers":{"corvus-tawk":{"command":"/home/you/.local/bin/corvus-tawk-mcp","args":["--stdio"]}}}` in `claude_desktop_config.json` |
+| Claude Code | `claude mcp add corvus-tawk -- ~/.local/bin/mcp/corvus-tawk-mcp --stdio` |
+| Claude Desktop | `{"mcpServers":{"corvus-tawk":{"command":"/home/you/.local/bin/mcp/corvus-tawk-mcp","args":["--stdio"]}}}` in `claude_desktop_config.json` |
 | VS Code | `{"servers":{"corvus-tawk":{"type":"stdio","command":"corvus-tawk-mcp","args":["--stdio"]}}}` in `.vscode/mcp.json` |
 
 ## Keeping it running
@@ -674,7 +674,7 @@ Description=corvus-tawk-mcp, the MCP server for tawk
 After=default.target
 
 [Service]
-ExecStart=%h/.local/bin/corvus-tawk-mcp
+ExecStart=%h/.local/bin/mcp/corvus-tawk-mcp
 Restart=on-failure
 RestartSec=2
 
@@ -715,7 +715,7 @@ When `systemctl --user` does not work, the installer explains how to turn system
 systemd=true
 ```
 
-As a fallback it offers an `@reboot` line in your crontab, added only when you agree or pass `--yes`. If neither works, it says plainly that corvus-tawk-mcp was not registered, and you start it yourself with `corvus-tawk-mcp`.
+As a fallback it offers an `@reboot` line in your crontab, added only when you agree or pass `--yes`. If neither works, it says plainly that corvus-tawk-mcp was not registered, and you start it yourself with `~/.local/bin/mcp/corvus-tawk-mcp`.
 
 ### Docker
 
@@ -729,13 +729,13 @@ Docker serves HTTP too. The run line the installer and `scripts/docker-run.sh` u
 
 tawk and its control socket live in Linux, so on Windows both run under WSL.
 
-- **HTTP through WSL2**: run `corvus-tawk-mcp` in WSL (the installer registers it to start at boot where WSL has systemd turned on). WSL2 forwards `localhost` to Windows, so Windows clients use `http://127.0.0.1:8765/mcp` with the token from `corvus-tawk-mcp print-token`.
+- **HTTP through WSL2**: run `corvus-tawk-mcp` in WSL (the installer registers it to start at boot where WSL has systemd turned on). WSL2 forwards `localhost` to Windows, so Windows clients use `http://127.0.0.1:8765/mcp` with the token from `~/.local/bin/mcp/corvus-tawk-mcp print-token`.
 - **stdio through WSL**: a Windows client can instead start corvus-tawk-mcp through WSL:
 
   ```json
   {
     "mcpServers": {
-      "corvus-tawk": { "command": "wsl.exe", "args": ["-e", "/home/you/.local/bin/corvus-tawk-mcp", "--stdio"] }
+      "corvus-tawk": { "command": "wsl.exe", "args": ["-e", "/home/you/.local/bin/mcp/corvus-tawk-mcp", "--stdio"] }
     }
   }
   ```

@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
 # corvus-tawk-mcp installer: builds and installs corvus-tawk-mcp from source.
-# It installs PREFIX/bin/corvus-tawk-mcp and, from a checkout, links PREFIX/bin/corvus-claude to scripts/corvus-claude.
-# Legacy: it also links the old names tawk-mcp and claude-tawk to them for now; both print a deprecation notice.
+# It installs PREFIX/bin/mcp/corvus-tawk-mcp (the folder that holds every MCP server) and, from a checkout,
+# links PREFIX/bin/corvus-claude to scripts/corvus-claude. With --legacy-links it also links the old names
+# tawk-mcp and claude-tawk in PREFIX/bin to them; both print a deprecation notice.
 #
 # From a checkout:      ./install.sh [options]
 # Straight from GitHub: curl -fsSL https://raw.githubusercontent.com/loganventer/Corvus.Mcp.Server.Tawk/main/install.sh | bash
 #                       curl -fsSL .../install.sh | bash -s -- --no-service
 #
 # Options:
-#   --prefix DIR       install location; the program goes in DIR/bin (default ~/.local)
+#   --prefix DIR       install location (default ~/.local): corvus-tawk-mcp goes in DIR/bin/mcp,
+#                      the corvus-claude launcher in DIR/bin
+#   --mcp-dir DIR      put corvus-tawk-mcp in DIR instead of PREFIX/bin/mcp
 #   --ref REF          branch or tag to build when cloning (default main)
 #   --repo URL         repository to clone (default https://github.com/loganventer/Corvus.Mcp.Server.Tawk.git)
 #   --no-service       do not register corvus-tawk-mcp to start at boot (it is registered by default:
 #                      a systemd user service with linger, a LaunchAgent on macOS, or a crontab line)
 #   --systemd          accepted for compatibility; registering is the default
 #   --docker           build the Docker image instead of a program, and print how to run it
+#   --legacy-links     also link the old names tawk-mcp and claude-tawk in PREFIX/bin (deprecated)
 #   --uninstall        remove an installed corvus-tawk-mcp and its user service
 #   -y, --yes          do not ask before installing the .NET SDK
 #   -h, --help         show this help
@@ -23,6 +27,8 @@ set -euo pipefail
 REPO_URL="https://github.com/loganventer/Corvus.Mcp.Server.Tawk.git"
 REF="main"
 PREFIX="$HOME/.local"
+MCP_DIR=""
+LEGACY_LINKS=0
 SERVICE=1
 DOCKER=0
 UNINSTALL=0
@@ -45,13 +51,16 @@ Straight from GitHub: curl -fsSL https://raw.githubusercontent.com/loganventer/C
                       curl -fsSL .../install.sh | bash -s -- --no-service
 
 Options:
-  --prefix DIR       install location; the program goes in DIR/bin (default ~/.local)
+  --prefix DIR       install location (default ~/.local): corvus-tawk-mcp goes in DIR/bin/mcp,
+                     the corvus-claude launcher in DIR/bin
+  --mcp-dir DIR      put corvus-tawk-mcp in DIR instead of PREFIX/bin/mcp
   --ref REF          branch or tag to build when cloning (default main)
   --repo URL         repository to clone (default https://github.com/loganventer/Corvus.Mcp.Server.Tawk.git)
   --no-service       do not register corvus-tawk-mcp to start at boot (it is registered by default:
                      a systemd user service with linger, a LaunchAgent on macOS, or a crontab line)
   --systemd          accepted for compatibility; registering is the default
   --docker           build the Docker image instead of a program, and print how to run it
+  --legacy-links     also link the old names tawk-mcp and claude-tawk in PREFIX/bin (deprecated)
   --uninstall        remove an installed corvus-tawk-mcp and its user service
   -y, --yes          do not ask before installing the .NET SDK
   -h, --help         show this help
@@ -63,6 +72,8 @@ while [ $# -gt 0 ]; do
         --prefix)    PREFIX="${2:?--prefix needs a directory}"; shift 2 ;;
         --ref)       REF="${2:?--ref needs a branch or tag}"; shift 2 ;;
         --repo)      REPO_URL="${2:?--repo needs a URL}"; shift 2 ;;
+        --mcp-dir)   MCP_DIR="${2:?--mcp-dir needs a directory}"; shift 2 ;;
+        --legacy-links) LEGACY_LINKS=1; shift ;;
         --systemd)   SERVICE=1; shift ;;
         --no-service) SERVICE=0; shift ;;
         --docker)    DOCKER=1; shift ;;
@@ -75,14 +86,19 @@ done
 
 
 BIN_DIR="$PREFIX/bin"
-BIN="$BIN_DIR/corvus-tawk-mcp"
+# MCP servers all live in one folder, apart from the commands people type. It need not be on PATH:
+# registrations name the program by its full path.
+MCP_DIR="${MCP_DIR:-$BIN_DIR/mcp}"
+BIN="$MCP_DIR/corvus-tawk-mcp"
+# Where corvus-tawk-mcp was installed before it moved to MCP_DIR (see CUTOVER.md).
+OLD_BIN="$BIN_DIR/corvus-tawk-mcp"
 UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 UNIT="$UNIT_DIR/corvus-tawk-mcp.service"
 PLIST="$HOME/Library/LaunchAgents/com.loganventer.corvus-tawk-mcp.plist"
 PLIST_LABEL="com.loganventer.corvus-tawk-mcp"
 CRON_MARK="# corvus-tawk-mcp: start at boot (added by install.sh)"
 LAUNCHER="$BIN_DIR/corvus-claude"
-# Legacy names, kept as symlinks to the new ones for a while (see CUTOVER.md). Remove them, and this block, later.
+# Legacy names: symlinks to the new ones, made only with --legacy-links (see CUTOVER.md). Remove them, and this block, later.
 LEGACY_BIN="$BIN_DIR/tawk-mcp"
 LEGACY_LAUNCHER="$BIN_DIR/claude-tawk"
 LEGACY_UNIT="$UNIT_DIR/tawk-mcp.service"
@@ -119,13 +135,21 @@ if [ "$UNINSTALL" -eq 1 ]; then
         { crontab -l 2>/dev/null | grep -vF "$CRON_MARK" || true; } | crontab -
         say "removed the @reboot line from your crontab"
     fi
-    rm -f "$BIN"
-    say "removed corvus-tawk-mcp from $BIN_DIR"
+    if [ -e "$BIN" ]; then
+        rm -f "$BIN"
+        say "removed corvus-tawk-mcp from $MCP_DIR"
+        rmdir "$MCP_DIR" 2>/dev/null || true
+    fi
+    # An install from before corvus-tawk-mcp moved to MCP_DIR left it in BIN_DIR.
+    if [ -f "$OLD_BIN" ] && [ "$OLD_BIN" != "$BIN" ]; then
+        rm -f "$OLD_BIN"
+        say "removed the older corvus-tawk-mcp from $BIN_DIR"
+    fi
     if [ -L "$LAUNCHER" ]; then rm -f "$LAUNCHER"; say "removed the corvus-claude link from $BIN_DIR"; fi
-    # Legacy links: removed only when they are links to the new names.
+    # Legacy links, if present: removed only when they are links to the new names.
     for link in "$LEGACY_BIN" "$LEGACY_LAUNCHER"; do
         case "$(readlink "$link" 2>/dev/null)" in
-            corvus-tawk-mcp|corvus-claude|"$BIN"|"$LAUNCHER") rm -f "$link"; say "removed the legacy link $link" ;;
+            corvus-tawk-mcp|corvus-claude|"$BIN"|"$OLD_BIN"|"$LAUNCHER") rm -f "$link"; say "removed the legacy link $link" ;;
         esac
     done
     echo "    The bearer token was kept: $TOKEN_FILE. Delete it to remove everything."
@@ -298,8 +322,12 @@ DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 "$DOTNET" publish "$SRC/src/Corvus
     -o "$OUT" >/dev/null
 
 say "installing to $BIN"
-mkdir -p "$BIN_DIR"
+mkdir -p "$MCP_DIR"
 install -m 0755 "$OUT/corvus-tawk-mcp" "$BIN"
+if [ -f "$OLD_BIN" ] && [ ! -L "$OLD_BIN" ] && [ "$OLD_BIN" != "$BIN" ]; then
+    warn "an older corvus-tawk-mcp is still in $BIN_DIR and is no longer updated. Point registrations and services"
+    warn "at $BIN, then remove it: rm $OLD_BIN   (see CUTOVER.md)"
+fi
 
 # The launcher that starts Claude Code with the channel on is linked, not copied, so it finds this checkout
 # to rebuild from. A launcher already there that is not a link is left alone.
@@ -307,29 +335,37 @@ if [ "$FROM_CHECKOUT" -eq 1 ] && [ -f "$SRC/scripts/corvus-claude" ]; then
     if [ -e "$LAUNCHER" ] && [ ! -L "$LAUNCHER" ]; then
         warn "$LAUNCHER exists and is not a link; leaving it as it is"
     else
+        mkdir -p "$BIN_DIR"
         ln -sfn "$SRC/scripts/corvus-claude" "$LAUNCHER"
         say "linked $LAUNCHER to $SRC/scripts/corvus-claude"
     fi
 fi
 
-# Legacy: the old command names point at the new ones, so registrations and aliases that still use them keep
-# working; each prints a deprecation notice when run under the old name. tawk-mcp may be the old program
-# itself, which is replaced. claude-tawk is replaced only when it is a link (to an older checkout, say).
-ln -sfn corvus-tawk-mcp "$LEGACY_BIN"
-say "legacy: linked $LEGACY_BIN to corvus-tawk-mcp (deprecated; see CUTOVER.md)"
-if [ -L "$LAUNCHER" ]; then
-    if [ -e "$LEGACY_LAUNCHER" ] && [ ! -L "$LEGACY_LAUNCHER" ]; then
-        warn "$LEGACY_LAUNCHER exists and is not a link; leaving it as it is"
-    else
-        ln -sfn corvus-claude "$LEGACY_LAUNCHER"
-        say "legacy: linked $LEGACY_LAUNCHER to corvus-claude (deprecated; see CUTOVER.md)"
+# Legacy, only with --legacy-links: the old command names point at the new ones, so registrations and aliases
+# that still use them keep working; each prints a deprecation notice when run under the old name. tawk-mcp may
+# be the old program itself, which is replaced. claude-tawk is replaced only when it is a link (to an older
+# checkout, say).
+if [ "$LEGACY_LINKS" -eq 1 ]; then
+    mkdir -p "$BIN_DIR"
+    ln -sfn "$BIN" "$LEGACY_BIN"
+    say "legacy: linked $LEGACY_BIN to $BIN (deprecated; see CUTOVER.md)"
+    if [ -L "$LAUNCHER" ]; then
+        if [ -e "$LEGACY_LAUNCHER" ] && [ ! -L "$LEGACY_LAUNCHER" ]; then
+            warn "$LEGACY_LAUNCHER exists and is not a link; leaving it as it is"
+        else
+            ln -sfn corvus-claude "$LEGACY_LAUNCHER"
+            say "legacy: linked $LEGACY_LAUNCHER to corvus-claude (deprecated; see CUTOVER.md)"
+        fi
     fi
 fi
 
-case ":$PATH:" in
-    *":$BIN_DIR:"*) ;;
-    *) warn "$BIN_DIR is not on your PATH; add it, for example: export PATH=\"$BIN_DIR:\$PATH\"" ;;
-esac
+# Only the commands people type need PATH; $MCP_DIR does not, as registrations use the full path.
+if [ -L "$LAUNCHER" ] || [ "$LEGACY_LINKS" -eq 1 ]; then
+    case ":$PATH:" in
+        *":$BIN_DIR:"*) ;;
+        *) warn "$BIN_DIR is not on your PATH, so corvus-claude is not found by name; add it, for example: export PATH=\"$BIN_DIR:\$PATH\"" ;;
+    esac
+fi
 
 # ---- start at boot -----------------------------------------------------------
 
@@ -366,7 +402,7 @@ retire_legacy_systemd() {
 register_systemd() {
     retire_legacy_systemd
     mkdir -p "$UNIT_DIR"
-    sed "s#%h/.local/bin/corvus-tawk-mcp#$BIN#" "$SRC/contrib/systemd/corvus-tawk-mcp.service" > "$UNIT"
+    sed "s#%h/.local/bin/mcp/corvus-tawk-mcp#$BIN#" "$SRC/contrib/systemd/corvus-tawk-mcp.service" > "$UNIT"
     systemctl --user daemon-reload
     systemctl --user enable --now corvus-tawk-mcp >/dev/null 2>&1 || warn "systemctl --user enable --now corvus-tawk-mcp failed; see: systemctl --user status corvus-tawk-mcp"
     enable_linger
@@ -463,7 +499,7 @@ fi
 
 say "checking: $("$BIN" --version)"
 "$BIN" print-token >/dev/null
-say "the bearer token for HTTP clients is in $TOKEN_FILE (corvus-tawk-mcp print-token shows it)"
+say "the bearer token for HTTP clients is in $TOKEN_FILE ($BIN print-token shows it)"
 
 # Voice notes are transcribed inside corvus-tawk-mcp. The default model is fetched now so the first one does
 # not wait for a download (about 1.6 GB); another model chosen in tawk is fetched the first time it is needed.
@@ -477,7 +513,7 @@ else
         say "transcription model: fetched $DEFAULT_MODEL into $MODEL_DIR"
     else
         warn "the $DEFAULT_MODEL transcription model could not be fetched now. corvus-tawk-mcp fetches it the first time"
-        warn "a voice note is transcribed, or run: corvus-tawk-mcp fetch-model $DEFAULT_MODEL"
+        warn "a voice note is transcribed, or run: $BIN fetch-model $DEFAULT_MODEL"
     fi
 fi
 
@@ -497,3 +533,5 @@ case "$SERVICE_KIND" in
 esac
 echo "    3. Add it to Claude Code:"
 echo "       claude mcp add --transport http corvus-tawk http://127.0.0.1:8765/mcp --header \"Authorization: Bearer \$($BIN print-token)\""
+echo "       or, for the channel that corvus-claude starts with (stdio):"
+echo "       claude mcp add corvus-tawk -- $BIN --stdio"

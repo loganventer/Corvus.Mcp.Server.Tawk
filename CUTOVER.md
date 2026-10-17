@@ -29,7 +29,7 @@ This file lists every name that changed and the ordered steps to switch a live i
 | `claude-tawk` (`scripts/claude-tawk`) | `corvus-claude` (`scripts/corvus-claude`) |
 | `tawk` (Corvus Tawk itself; its own repository changes it) | `corvus-tawk` |
 
-`install.sh` keeps **legacy symlinks** `~/.local/bin/tawk-mcp -> corvus-tawk-mcp` and `~/.local/bin/claude-tawk -> corvus-claude`, so old registrations and aliases still start. Each prints a one-line deprecation notice on stderr when run under the old name. They are temporary: remove them once nothing uses the old names (step 10).
+`install.sh --legacy-links` makes **legacy symlinks** `~/.local/bin/tawk-mcp -> ~/.local/bin/mcp/corvus-tawk-mcp` and `~/.local/bin/claude-tawk -> corvus-claude`, so old registrations and aliases still start. Without the flag they are not made. Each prints a one-line deprecation notice on stderr when run under the old name. They are temporary: remove them once nothing uses the old names (step 10). `install.sh --uninstall` removes them if they are there.
 
 ### Environment variables
 
@@ -61,9 +61,26 @@ There is no fallback: the old names are not read any more.
 | state, cache | `~/.local/state/tawk-mcp/`, `~/.cache/tawk-mcp/` (unused) | `~/.local/state/corvus/tawk-mcp/`, `~/.cache/corvus/tawk-mcp/` |
 | tawk's control socket | `$XDG_RUNTIME_DIR/tawk/control.sock`, else `~/.local/state/tawk/control.sock` | `$XDG_RUNTIME_DIR/corvus/tawk/control.sock`, else `~/.local/state/corvus/tawk/control.sock` |
 | tawk's admin token | `admin.token` beside the old socket | `admin.token` beside the new socket |
-| program | `~/.local/bin/tawk-mcp` | `~/.local/bin/corvus-tawk-mcp` (old name: legacy link) |
-| launcher | `~/.local/bin/claude-tawk` -> `tawk-mcp/scripts/claude-tawk` | `~/.local/bin/corvus-claude` -> `Corvus.Mcp.Server.Tawk/scripts/corvus-claude` (old name: legacy link) |
+| program | `~/.local/bin/tawk-mcp` | `~/.local/bin/mcp/corvus-tawk-mcp` (old name: legacy link, with `--legacy-links`) |
+| launcher | `~/.local/bin/claude-tawk` -> `tawk-mcp/scripts/claude-tawk` | `~/.local/bin/corvus-claude` -> `Corvus.Mcp.Server.Tawk/scripts/corvus-claude` (old name: legacy link, with `--legacy-links`) |
 | temp folders | `tawk-mcp-build.*`, `tawk-mcp-publish.*`, `tawk-mcp-sync-*` | `corvus-tawk-mcp-build.*`, `corvus-tawk-mcp-publish.*`, `corvus-tawk-mcp-sync-*` |
+
+### The MCP folder: `~/.local/bin/mcp`
+
+Every MCP server is now installed into one folder, `~/.local/bin/mcp`, apart from the commands people type, which stay in `~/.local/bin`. So `corvus-tawk-mcp` is `~/.local/bin/mcp/corvus-tawk-mcp`, and `corvus-claude` stays `~/.local/bin/corvus-claude`. `~/.local/bin/mcp` need not be on `PATH`: registrations, the systemd unit, the LaunchAgent and the crontab line name the program in full. `install.sh --mcp-dir DIR` picks another folder.
+
+An install from before this change left the program at `~/.local/bin/corvus-tawk-mcp`. The new `install.sh` (and so `corvus-claude`, which runs it to rebuild) installs to `~/.local/bin/mcp/` and warns while the old file is there, but leaves it, because a registration may still start it; it is no longer updated. To move over:
+
+```sh
+./install.sh --no-service -y          # or ./install.sh -y with the HTTP service; it rewrites the unit with the new path
+claude mcp remove corvus-tawk -s user
+claude mcp add corvus-tawk --scope user \
+  --env CORVUS_TAWK_MCP_SYNC_REPO=git@github-tawk-memory:loganventer/Corvus.Data.Sync.TawkMemory.git \
+  -- "$HOME/.local/bin/mcp/corvus-tawk-mcp" --stdio
+rm ~/.local/bin/corvus-tawk-mcp       # once nothing starts it any more
+```
+
+Keep the `--env` options the old registration had (`claude mcp get corvus-tawk` shows them). Close and restart the `ct` sessions afterwards; each runs its own `--stdio` server. A unit written by hand from `contrib/systemd` needs its `ExecStart` changed to `%h/.local/bin/mcp/corvus-tawk-mcp`, then `systemctl --user daemon-reload && systemctl --user restart corvus-tawk-mcp`. `install.sh --uninstall` also removes the old file.
 
 ### Services, registrations, images
 
@@ -88,10 +105,10 @@ Do the steps in this order. Commands assume the default folders and Linux.
 
 2. **Stop what uses the old files.** Close every Claude Code session started with `ct` or `claude-tawk`; each runs its own `tawk-mcp --stdio`. If you run the HTTP service, stop it with `systemctl --user stop tawk-mcp`.
 
-3. **Build and install under the new names.** This installs `corvus-tawk-mcp`, links `corvus-claude`, and makes the legacy links (the old `~/.local/bin/tawk-mcp` binary is replaced by a link):
+3. **Build and install under the new names.** This installs `~/.local/bin/mcp/corvus-tawk-mcp`, links `corvus-claude`, and with `--legacy-links` makes the legacy links (the old `~/.local/bin/tawk-mcp` binary is replaced by a link). Leave `--legacy-links` out if nothing uses the old names:
    ```sh
    cd ~/Documents/dev/Corvus.Mcp.Server.Tawk
-   PATH="$HOME/.dotnet:$PATH" ./install.sh --no-service -y
+   PATH="$HOME/.dotnet:$PATH" ./install.sh --no-service -y --legacy-links
    ```
    If you run the HTTP service, use `./install.sh -y` instead. It registers `corvus-tawk-mcp.service` and retires `tawk-mcp.service`.
 
@@ -106,7 +123,7 @@ Do the steps in this order. Commands assume the default folders and Linux.
    claude mcp remove tawk -s user
    claude mcp add corvus-tawk --scope user \
      --env CORVUS_TAWK_MCP_SYNC_REPO=git@github-tawk-memory:loganventer/Corvus.Data.Sync.TawkMemory.git \
-     -- "$HOME/.local/bin/corvus-tawk-mcp" --stdio
+     -- "$HOME/.local/bin/mcp/corvus-tawk-mcp" --stdio
    ```
    Until GitHub has renamed `tawk-memory`, the old address still works: `git@github-tawk-memory:loganventer/tawk-memory.git`. After the rename, GitHub redirects it.
 
@@ -122,14 +139,14 @@ Do the steps in this order. Commands assume the default folders and Linux.
 
 9. **Check.** Run these, then start `ct` and run `/mcp`. `corvus-tawk` should show as connected, and in Corvus Tawk's Agents list the session should show as `corvus-tawk-mcp`.
    ```sh
-   corvus-tawk-mcp --version
+   ~/.local/bin/mcp/corvus-tawk-mcp --version
    claude mcp get corvus-tawk
-   corvus-tawk-mcp sync      # with CORVUS_TAWK_MCP_SYNC_REPO set: should say it is in step
+   ~/.local/bin/mcp/corvus-tawk-mcp sync      # with CORVUS_TAWK_MCP_SYNC_REPO set: should say it is in step
    ```
 
-10. **Later, once nothing uses the old names,** remove the legacy links and the old folders. These steps are not automatic:
+10. **Later, once nothing uses the old names,** remove the legacy links (if you made them) and the old folders. These steps are not automatic:
     ```sh
-    rm ~/.local/bin/tawk-mcp ~/.local/bin/claude-tawk
+    rm -f ~/.local/bin/tawk-mcp ~/.local/bin/claude-tawk
     rm -r ~/.config/tawk-mcp ~/.local/share/tawk-mcp
     ```
 

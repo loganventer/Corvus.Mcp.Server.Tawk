@@ -6,7 +6,7 @@ Description=corvus-tawk-mcp, the MCP server for Corvus Tawk
 After=default.target
 
 [Service]
-ExecStart=%h/.local/bin/corvus-tawk-mcp
+ExecStart=%h/.local/bin/mcp/corvus-tawk-mcp
 Restart=on-failure
 RestartSec=2
 

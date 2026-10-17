@@ -32,17 +32,17 @@ access = read
 curl -fsSL https://raw.githubusercontent.com/loganventer/Corvus.Mcp.Server.Tawk/main/install.sh | bash
 ```
 
-The installer builds corvus-tawk-mcp into `~/.local/bin`. If the .NET 10 SDK is missing it offers to install it into `~/.dotnet` first (no sudo). It registers corvus-tawk-mcp to start at boot and starts it (a systemd user service on Linux, a LaunchAgent on macOS), then creates the bearer token and prints the `claude mcp add` line to use. From a checkout, `./install.sh` does the same.
+The installer builds corvus-tawk-mcp into `~/.local/bin/mcp/corvus-tawk-mcp` (the folder for MCP servers; it need not be on `PATH`). If the .NET 10 SDK is missing it offers to install it into `~/.dotnet` first (no sudo). It registers corvus-tawk-mcp to start at boot and starts it (a systemd user service on Linux, a LaunchAgent on macOS), then creates the bearer token and prints the `claude mcp add` line to use. From a checkout, `./install.sh` does the same.
 
 ## 4. Start it and add it to Claude Code
 
-corvus-tawk-mcp is already running and serving MCP over HTTP on your own machine (check with `curl http://127.0.0.1:8765/healthz`). If the installer said it could not register it, start it yourself in a spare terminal with `corvus-tawk-mcp`.
+corvus-tawk-mcp is already running and serving MCP over HTTP on your own machine (check with `curl http://127.0.0.1:8765/healthz`). If the installer said it could not register it, start it yourself in a spare terminal with `~/.local/bin/mcp/corvus-tawk-mcp`.
 
 Then add it to Claude Code:
 
 ```sh
 claude mcp add --transport http corvus-tawk http://127.0.0.1:8765/mcp \
-  --header "Authorization: Bearer $(corvus-tawk-mcp print-token)"
+  --header "Authorization: Bearer $(~/.local/bin/mcp/corvus-tawk-mcp print-token)"
 ```
 
 Start `claude` and run `/mcp`. `corvus-tawk` should show as connected with its tools.
@@ -64,6 +64,6 @@ Nothing is marked as read. To let the model propose replies, set **Access** to `
 | "tawk is not running, or its control socket is off" | Start tawk and turn on the control socket. corvus-tawk-mcp connects by itself as soon as the socket appears. |
 | "tawk does not allow this" | The action needs `access = send` or `manage` in tawk, or the chat is outside tawk's `chats` list. |
 | The tools do not show in `/mcp` | Check corvus-tawk-mcp is running (`curl http://127.0.0.1:8765/healthz`) and that `claude mcp list` shows `corvus-tawk`. |
-| 401 from corvus-tawk-mcp | The token in the header is wrong or missing. Add the server again with `$(corvus-tawk-mcp print-token)`. |
+| 401 from corvus-tawk-mcp | The token in the header is wrong or missing. Add the server again with `$(~/.local/bin/mcp/corvus-tawk-mcp print-token)`. |
 
 More in [MANUAL.md](MANUAL.md#troubleshooting).
