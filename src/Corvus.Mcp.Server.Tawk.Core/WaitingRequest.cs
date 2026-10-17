@@ -1,0 +1,11 @@
+namespace Corvus.Mcp.Server.Tawk.Core;
+
+/// <summary>
+/// A write of this instance that tawk queued for an answer. <see cref="Outcome"/> is null while it still
+/// waits, and says what became of it once tawk answered without this instance approving it.
+/// </summary>
+public sealed record WaitingRequest(string Id, string Op, DateTimeOffset Since, string? Outcome)
+{
+    /// <summary>The account it was asked of, as the request named it, or null for the default account.</summary>
+    public string? Account { get; init; }
+}

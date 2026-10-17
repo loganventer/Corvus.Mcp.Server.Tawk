@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>tawk-mcp</AssemblyName>
+    <RootNamespace>Corvus.Mcp.Server.Tawk.Host</RootNamespace>
+    <UserSecretsId />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol.AspNetCore" />
+    <PackageReference Include="Whisper.net.Runtime" GeneratePathProperty="true" />
+  </ItemGroup>
+  <!--
+    tawk-mcp is installed as one file, and Whisper's native libraries are separate files. For a published
+    program they are carried inside the assembly, for its own platform only, and unpacked on first use
+    (BundledWhisperRuntime). The package names its folders linux-x64, macos-arm64, win-x64 and so on.
+  -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <WhisperNativeFolder>$(RuntimeIdentifier)</WhisperNativeFolder>
+    <WhisperNativeFolder Condition="$(RuntimeIdentifier.StartsWith('osx-'))">macos-$(RuntimeIdentifier.Substring(4))</WhisperNativeFolder>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(WhisperNativeFolder)' != '' and Exists('$(PkgWhisper_net_Runtime)/build/$(WhisperNativeFolder)')">
+    <EmbeddedResource Include="$(PkgWhisper_net_Runtime)/build/$(WhisperNativeFolder)/*" LogicalName="whisper-native/$(WhisperNativeFolder)/%(Filename)%(Extension)" Visible="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Corvus.Mcp.Server.Tawk.Core\Corvus.Mcp.Server.Tawk.Core.csproj" />
+    <ProjectReference Include="..\Corvus.Mcp.Server.Tawk.ResourceAccess\Corvus.Mcp.Server.Tawk.ResourceAccess.csproj" />
+    <ProjectReference Include="..\Corvus.Mcp.Server.Tawk.Engines\Corvus.Mcp.Server.Tawk.Engines.csproj" />
+    <ProjectReference Include="..\Corvus.Mcp.Server.Tawk.Managers\Corvus.Mcp.Server.Tawk.Managers.csproj" />
+    <ProjectReference Include="..\Corvus.Mcp.Server.Tawk.Clients\Corvus.Mcp.Server.Tawk.Clients.csproj" />
+  </ItemGroup>
+</Project>

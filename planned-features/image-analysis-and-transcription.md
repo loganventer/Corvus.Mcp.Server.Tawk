@@ -257,7 +257,7 @@ How the calls run:
 
 ### 7.3 One type per file
 
-Every class, record, enum and interface above is its own file named after it, with no nested types. That includes the two enums and the exception. Fakes for the tests (`FakeTranscriber`, `FakeMediaFiles`, `FakeTranscriptionJobStore`) go in `tests/Tawk.Mcp.Tests/Fakes`, one per file, hand-written.
+Every class, record, enum and interface above is its own file named after it, with no nested types. That includes the two enums and the exception. Fakes for the tests (`FakeTranscriber`, `FakeMediaFiles`, `FakeTranscriptionJobStore`) go in `tests/Corvus.Mcp.Server.Tawk.Tests/Fakes`, one per file, hand-written.
 
 ### 7.4 Composition over inheritance
 

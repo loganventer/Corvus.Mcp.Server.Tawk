@@ -6,15 +6,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY global.json nuget.config Directory.Build.props Directory.Packages.props ./
-COPY src/Tawk.Mcp.Core/Tawk.Mcp.Core.csproj src/Tawk.Mcp.Core/
-COPY src/Tawk.Mcp.ResourceAccess/Tawk.Mcp.ResourceAccess.csproj src/Tawk.Mcp.ResourceAccess/
-COPY src/Tawk.Mcp.Engines/Tawk.Mcp.Engines.csproj src/Tawk.Mcp.Engines/
-COPY src/Tawk.Mcp.Managers/Tawk.Mcp.Managers.csproj src/Tawk.Mcp.Managers/
-COPY src/Tawk.Mcp.Clients/Tawk.Mcp.Clients.csproj src/Tawk.Mcp.Clients/
-COPY src/Tawk.Mcp.Host/Tawk.Mcp.Host.csproj src/Tawk.Mcp.Host/
-RUN dotnet restore src/Tawk.Mcp.Host/Tawk.Mcp.Host.csproj
+COPY src/Corvus.Mcp.Server.Tawk.Core/Corvus.Mcp.Server.Tawk.Core.csproj src/Corvus.Mcp.Server.Tawk.Core/
+COPY src/Corvus.Mcp.Server.Tawk.ResourceAccess/Corvus.Mcp.Server.Tawk.ResourceAccess.csproj src/Corvus.Mcp.Server.Tawk.ResourceAccess/
+COPY src/Corvus.Mcp.Server.Tawk.Engines/Corvus.Mcp.Server.Tawk.Engines.csproj src/Corvus.Mcp.Server.Tawk.Engines/
+COPY src/Corvus.Mcp.Server.Tawk.Managers/Corvus.Mcp.Server.Tawk.Managers.csproj src/Corvus.Mcp.Server.Tawk.Managers/
+COPY src/Corvus.Mcp.Server.Tawk.Clients/Corvus.Mcp.Server.Tawk.Clients.csproj src/Corvus.Mcp.Server.Tawk.Clients/
+COPY src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj src/Corvus.Mcp.Server.Tawk.Host/
+RUN dotnet restore src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj
 COPY . .
-RUN dotnet publish src/Tawk.Mcp.Host/Tawk.Mcp.Host.csproj -c Release -o /app --no-restore
+RUN dotnet publish src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app

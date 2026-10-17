@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Corvus.Mcp.Server.Tawk.Core/Corvus.Mcp.Server.Tawk.Core.csproj" />
+    <Project Path="src/Corvus.Mcp.Server.Tawk.ResourceAccess/Corvus.Mcp.Server.Tawk.ResourceAccess.csproj" />
+    <Project Path="src/Corvus.Mcp.Server.Tawk.Engines/Corvus.Mcp.Server.Tawk.Engines.csproj" />
+    <Project Path="src/Corvus.Mcp.Server.Tawk.Managers/Corvus.Mcp.Server.Tawk.Managers.csproj" />
+    <Project Path="src/Corvus.Mcp.Server.Tawk.Clients/Corvus.Mcp.Server.Tawk.Clients.csproj" />
+    <Project Path="src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Corvus.Mcp.Server.Tawk.Tests/Corvus.Mcp.Server.Tawk.Tests.csproj" />
+  </Folder>
+</Solution>

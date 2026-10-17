@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Corvus.Mcp.Server.Tawk.Core\Corvus.Mcp.Server.Tawk.Core.csproj" />
+    <ProjectReference Include="..\Corvus.Mcp.Server.Tawk.Managers\Corvus.Mcp.Server.Tawk.Managers.csproj" />
+  </ItemGroup>
+</Project>

@@ -227,7 +227,7 @@ fi
 CLEANUP=""
 cleanup() { local d; for d in $CLEANUP; do rm -rf "$d"; done; }
 trap cleanup EXIT
-if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/TawkMcp.slnx" ] && [ -f "$SCRIPT_DIR/src/Tawk.Mcp.Host/Tawk.Mcp.Host.csproj" ]; then
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/Corvus.Mcp.Server.Tawk.slnx" ] && [ -f "$SCRIPT_DIR/src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj" ]; then
     SRC="$SCRIPT_DIR"
     say "building from $SRC"
 else
@@ -267,7 +267,7 @@ fi
 OUT="$(mktemp -d "${TMPDIR:-/tmp}/tawk-mcp-publish.XXXXXX")"
 CLEANUP="${CLEANUP:+$CLEANUP }$OUT"
 say "publishing a self-contained single file for $RID (this takes a minute the first time)"
-DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 "$DOTNET" publish "$SRC/src/Tawk.Mcp.Host/Tawk.Mcp.Host.csproj" \
+DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 "$DOTNET" publish "$SRC/src/Corvus.Mcp.Server.Tawk.Host/Corvus.Mcp.Server.Tawk.Host.csproj" \
     -c Release -r "$RID" --self-contained \
     -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=none \
     -o "$OUT" >/dev/null

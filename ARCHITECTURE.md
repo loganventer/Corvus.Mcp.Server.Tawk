@@ -21,12 +21,12 @@ Each class, record, enum and interface lives in its own file. Nullable reference
 
 | Layer | Project | Responsibility | May call |
 | --- | --- | --- | --- |
-| Host | `Tawk.Mcp.Host` (assembly `tawk-mcp`) | The composition root, the command line, streamable HTTP hosting (the default) and stdio hosting, the bearer token and origin middleware, `/events` and `/healthz` | Everything, to compose it |
-| Clients | `Tawk.Mcp.Clients` | MCP tools, resources and prompts, resource subscriptions, the channel sink, the event stream hub, session tracking, the notification dispatcher | Managers |
-| Managers | `Tawk.Mcp.Managers` | Use cases: reading, sending, managing messages, chats, scheduled messages, statuses, the profile, settings and the app, online status lookups, and live updates; in `Memory`, categories, voices, contact profiles and templates | Engines, resource access |
-| Engines | `Tawk.Mcp.Engines` | Rules with no I/O: transcript and chat formatting, untrusted text fencing, catch-up and draft planning, notification headers, exponential backoff, the circuit breaker, schedule jitter; in `Memory`, style measuring, voice rules and scoring, voice resolution, guide import, the contact field catalog, template filling and memory formatting | Core |
-| Resource access | `Tawk.Mcp.ResourceAccess` | tawk's control socket: the line codec, the connection, the control client, the connection supervisor, the socket locator and watcher, the confirmation gate, the chat source for memory; in `Memory`, the SQLite connection factory, schema migrator and one store per kind of memory | Core |
-| Core | `Tawk.Mcp.Core` | Records for tawk's values, events, error codes, the `TawkControlException`, and contracts shared across layers (`ICircuitBreaker`, `IBackoffPolicy`, `IUserConfirmation`, `IDelay`) | Nothing above |
+| Host | `Corvus.Mcp.Server.Tawk.Host` (assembly `tawk-mcp`) | The composition root, the command line, streamable HTTP hosting (the default) and stdio hosting, the bearer token and origin middleware, `/events` and `/healthz` | Everything, to compose it |
+| Clients | `Corvus.Mcp.Server.Tawk.Clients` | MCP tools, resources and prompts, resource subscriptions, the channel sink, the event stream hub, session tracking, the notification dispatcher | Managers |
+| Managers | `Corvus.Mcp.Server.Tawk.Managers` | Use cases: reading, sending, managing messages, chats, scheduled messages, statuses, the profile, settings and the app, online status lookups, and live updates; in `Memory`, categories, voices, contact profiles and templates | Engines, resource access |
+| Engines | `Corvus.Mcp.Server.Tawk.Engines` | Rules with no I/O: transcript and chat formatting, untrusted text fencing, catch-up and draft planning, notification headers, exponential backoff, the circuit breaker, schedule jitter; in `Memory`, style measuring, voice rules and scoring, voice resolution, guide import, the contact field catalog, template filling and memory formatting | Core |
+| Resource access | `Corvus.Mcp.Server.Tawk.ResourceAccess` | tawk's control socket: the line codec, the connection, the control client, the connection supervisor, the socket locator and watcher, the confirmation gate, the chat source for memory; in `Memory`, the SQLite connection factory, schema migrator and one store per kind of memory | Core |
+| Core | `Corvus.Mcp.Server.Tawk.Core` | Records for tawk's values, events, error codes, the `TawkControlException`, and contracts shared across layers (`ICircuitBreaker`, `IBackoffPolicy`, `IUserConfirmation`, `IDelay`) | Nothing above |
 
 ```mermaid
 flowchart TD

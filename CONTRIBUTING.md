@@ -27,19 +27,19 @@ Every change keeps to these six. A pull request that breaks one is sent back, ho
 
 | You are adding | It goes in |
 | --- | --- |
-| A record, event, error code or a contract shared across layers | `src/Tawk.Mcp.Core` |
-| A rule with no I/O: formatting, planning, scoring, merging | `src/Tawk.Mcp.Engines` |
-| Anything that touches tawk's control socket, SQLite or git | `src/Tawk.Mcp.ResourceAccess`, behind an interface |
-| A use case | `src/Tawk.Mcp.Managers`, in the manager for its area |
-| An MCP tool, resource or prompt | `src/Tawk.Mcp.Clients` |
-| A binding, a command line option, middleware or an endpoint | `src/Tawk.Mcp.Host` |
-| A test or a fake | `tests/Tawk.Mcp.Tests`, fakes in `Fakes/`, one per file |
+| A record, event, error code or a contract shared across layers | `src/Corvus.Mcp.Server.Tawk.Core` |
+| A rule with no I/O: formatting, planning, scoring, merging | `src/Corvus.Mcp.Server.Tawk.Engines` |
+| Anything that touches tawk's control socket, SQLite or git | `src/Corvus.Mcp.Server.Tawk.ResourceAccess`, behind an interface |
+| A use case | `src/Corvus.Mcp.Server.Tawk.Managers`, in the manager for its area |
+| An MCP tool, resource or prompt | `src/Corvus.Mcp.Server.Tawk.Clients` |
+| A binding, a command line option, middleware or an endpoint | `src/Corvus.Mcp.Server.Tawk.Host` |
+| A test or a fake | `tests/Corvus.Mcp.Server.Tawk.Tests`, fakes in `Fakes/`, one per file |
 
 ## Build and test
 
 ```sh
-dotnet build TawkMcp.slnx -warnaserror
-dotnet test TawkMcp.slnx
+dotnet build Corvus.Mcp.Server.Tawk.slnx -warnaserror
+dotnet test Corvus.Mcp.Server.Tawk.slnx
 ```
 
 The build is strict: nullable enabled, `latest-recommended` analysers, warnings as errors. Do not suppress a warning in code to get past it; fix it, or, if the rule does not fit this codebase, turn it off in `.editorconfig` with a comment saying why.

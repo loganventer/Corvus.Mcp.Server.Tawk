@@ -9,16 +9,16 @@ tawk-mcp is an MCP server for [tawk](https://github.com/loganventer/tawk), a Wha
 ## Layout
 
 ```text
-TawkMcp.slnx
+Corvus.Mcp.Server.Tawk.slnx
 Directory.Build.props        net10.0, nullable, analysers, warnings as errors, version
 Directory.Packages.props     central package versions
-src/Tawk.Mcp.Core            records, events, error codes, shared contracts; Okf/ concepts and links; Sync/ rows, plans, options
-src/Tawk.Mcp.ResourceAccess  codec, socket connection, control client, supervisor, watcher, confirmation gate; Memory/ SQLite stores; Sync/ snapshots, the git remote over SSH
-src/Tawk.Mcp.Engines         formatters, fence, planners, backoff, circuit breaker, schedule jitter; Memory/ voice rules, field catalog; Knowledge/ OKF bundles; Sync/ merge rules
-src/Tawk.Mcp.Managers        use cases, one manager per area, plus IEventSink; Memory/ voices, contacts, templates; Knowledge/; Sync/
-src/Tawk.Mcp.Clients         tools, resources, prompts, subscriptions, channel, event stream, dispatcher; Workflow/ the workflow check
-src/Tawk.Mcp.Host            composition root, Program, middleware, endpoints (assembly tawk-mcp)
-tests/Tawk.Mcp.Tests         NUnit tests, Fakes/ holds every fake
+src/Corvus.Mcp.Server.Tawk.Core            records, events, error codes, shared contracts; Okf/ concepts and links; Sync/ rows, plans, options
+src/Corvus.Mcp.Server.Tawk.ResourceAccess  codec, socket connection, control client, supervisor, watcher, confirmation gate; Memory/ SQLite stores; Sync/ snapshots, the git remote over SSH
+src/Corvus.Mcp.Server.Tawk.Engines         formatters, fence, planners, backoff, circuit breaker, schedule jitter; Memory/ voice rules, field catalog; Knowledge/ OKF bundles; Sync/ merge rules
+src/Corvus.Mcp.Server.Tawk.Managers        use cases, one manager per area, plus IEventSink; Memory/ voices, contacts, templates; Knowledge/; Sync/
+src/Corvus.Mcp.Server.Tawk.Clients         tools, resources, prompts, subscriptions, channel, event stream, dispatcher; Workflow/ the workflow check
+src/Corvus.Mcp.Server.Tawk.Host            composition root, Program, middleware, endpoints (assembly tawk-mcp)
+tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
 ```
 
 [ARCHITECTURE.md](ARCHITECTURE.md) describes each component; [HOW_IT_WORKS.md](HOW_IT_WORKS.md) shows the flows.
@@ -37,7 +37,7 @@ tests/Tawk.Mcp.Tests         NUnit tests, Fakes/ holds every fake
 - **Every delete leaves a tombstone** and every write clears it (`Tombstones`), or memory sync brings the row back from another machine.
 - **Sync has no default destination, ever.** The repository and the SSH key are always the user's own, set per instance. Do not add a default repository, key or owner anywhere in the code, the image or the documentation.
 - **Only fixed text and the user's own instructions file become instructions.** Never load text from a chat or from the memory database into the server instructions or the workflow check.
-- **Tests use hand-written fakes only**, no mocking library. Put fakes in `tests/Tawk.Mcp.Tests/Fakes`, one per file. Socket behaviour is tested against `FakeTawkServer` in a temp folder.
+- **Tests use hand-written fakes only**, no mocking library. Put fakes in `tests/Corvus.Mcp.Server.Tawk.Tests/Fakes`, one per file. Socket behaviour is tested against `FakeTawkServer` in a temp folder.
 
 ## Writing
 
@@ -50,8 +50,8 @@ tests/Tawk.Mcp.Tests         NUnit tests, Fakes/ holds every fake
 ## Build and test
 
 ```sh
-dotnet build TawkMcp.slnx -warnaserror
-dotnet test TawkMcp.slnx
+dotnet build Corvus.Mcp.Server.Tawk.slnx -warnaserror
+dotnet test Corvus.Mcp.Server.Tawk.slnx
 ```
 
 The tests need a Unix-like system (they use Unix domain sockets and file modes). They run in a few seconds.
@@ -59,8 +59,8 @@ The tests need a Unix-like system (they use Unix domain sockets and file modes).
 Try it by hand:
 
 ```sh
-dotnet run --project src/Tawk.Mcp.Host -- --help
-TAWK_CONTROL_SOCKET=/tmp/none.sock dotnet run --project src/Tawk.Mcp.Host -- --port 18765
+dotnet run --project src/Corvus.Mcp.Server.Tawk.Host -- --help
+TAWK_CONTROL_SOCKET=/tmp/none.sock dotnet run --project src/Corvus.Mcp.Server.Tawk.Host -- --port 18765
 curl http://127.0.0.1:18765/healthz
 ```
 
