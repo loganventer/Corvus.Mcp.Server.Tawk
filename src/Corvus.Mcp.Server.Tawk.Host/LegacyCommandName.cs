@@ -1,7 +1,7 @@
 namespace Corvus.Mcp.Server.Tawk.Host;
 
 /// <summary>
-/// Legacy: install.sh keeps a tawk-mcp symlink to corvus-tawk-mcp for a while, so old registrations still start.
+/// Legacy: install.sh --legacy-links makes a tawk-mcp symlink to corvus-tawk-mcp, so old registrations still start.
 /// Started under that name, the program says once on stderr that the name is going away. Remove with the symlink.
 /// </summary>
 public static class LegacyCommandName
