@@ -77,12 +77,21 @@ public sealed class OggOpusDecoder : IAudioDecoder
             try
             {
                 count = decoder.Decode(packet, frame, frame.Length, false);
-                decoded++;
             }
             catch (Exception ex) when (ex is OpusException or ArgumentException or InvalidOperationException or IndexOutOfRangeException)
             {
-                // The decoder refuses some packets that phones write. One of them is left out as silence of
-                // its own length and the decoder starts afresh, so a fraction of a second is lost, not the note.
+                count = -1;
+            }
+
+            // Concentus decodes with the system's libopus when it finds one, and that decoder reports a refused
+            // packet with a negative count instead of throwing. Both are the same refusal: the packet is left out
+            // as silence of its own length and the decoder starts afresh, so a fraction of a second is lost, not the note.
+            if (count >= 0)
+            {
+                decoded++;
+            }
+            else
+            {
                 skipped++;
                 decoder.ResetState();
                 count = Length(packet);
