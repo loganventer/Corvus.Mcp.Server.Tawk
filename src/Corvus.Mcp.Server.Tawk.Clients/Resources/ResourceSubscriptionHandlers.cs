@@ -6,7 +6,7 @@ using Corvus.Mcp.Server.Tawk.Clients.Sessions;
 
 namespace Corvus.Mcp.Server.Tawk.Clients.Resources;
 
-/// <summary>The SDK's subscribe and unsubscribe handlers. tawk-mcp already follows every chat, so only the registry changes.</summary>
+/// <summary>The SDK's subscribe and unsubscribe handlers. corvus-tawk-mcp already follows every chat, so only the registry changes.</summary>
 public static class ResourceSubscriptionHandlers
 {
     public static ValueTask<EmptyResult> SubscribeAsync(RequestContext<SubscribeRequestParams> context, CancellationToken cancellationToken)

@@ -53,7 +53,7 @@ public class OkfBundleManagerTests
             Assert.That(index, Does.Contain("# Contacts\n\n* [Anneke Venter](contacts/" + Anneke + ".md)"));
             Assert.That(index, Does.Contain("# Observations").And.Contain(" - Starts a new job in March."));
             Assert.That(contact, Does.Contain("title: Anneke Venter\nresource: \"whatsapp:" + Anneke + "\"\n"));
-            Assert.That(contact, Does.Match(@"generated:\n  by: tawk-mcp/test\n  at: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\n"));
+            Assert.That(contact, Does.Match(@"generated:\n  by: corvus-tawk-mcp/test\n  at: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\n"));
             Assert.That(contact, Does.Contain("status: stable\n"));
             Assert.That(contact, Does.Contain("# Relations\n\n* spouse of [the user](/self.md): since 2010\n"));
             Assert.That(contact, Does.Contain("profile:\n  humour_ok:\n    value: true\n").And.Contain("  relation:\n    value: spouse\n    source: user\n"));
@@ -144,7 +144,7 @@ public class OkfBundleManagerTests
     public async Task Text_that_yaml_could_misread_survives()
     {
         var concept = new OkfConcept(
-            "concepts/odd", "Concept", "yes: \"quoted\" #1 😀\nsecond line", "007", null, ["on", "a b"], "tawk-mcp/test", _parts.Clock.GetUtcNow(), [],
+            "concepts/odd", "Concept", "yes: \"quoted\" #1 😀\nsecond line", "007", null, ["on", "a b"], "corvus-tawk-mcp/test", _parts.Clock.GetUtcNow(), [],
             OkfStatus.Draft, null, [], """{"nested":{"list":[1,{"k":"v: w"}],"n":null},"flag":false}""", "Body with --- inside\n---\nand more", _parts.Clock.GetUtcNow());
         await _parts.Knowledge.UpsertAsync(concept, default);
 

@@ -24,12 +24,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends git openssh-cli
 RUN mkdir -p /data /run/tawk && chown "$APP_UID" /data && chmod 0700 /data
 ENV ASPNETCORE_URLS=http://0.0.0.0:8765 \
     HTTP_PORTS= \
-    TAWKMCP_TRANSPORT=Http \
-    TAWKMCP_BIND=0.0.0.0 \
-    TAWKMCP_PORT=8765 \
-    TAWKMCP_TOKEN_FILE=/data/token \
-    TAWKMCP_DATA_FILE=/data/memory.db \
-    TAWK_CONTROL_SOCKET=/run/tawk/control.sock
+    CORVUS_TAWK_MCP_TRANSPORT=Http \
+    CORVUS_TAWK_MCP_BIND=0.0.0.0 \
+    CORVUS_TAWK_MCP_PORT=8765 \
+    CORVUS_TAWK_MCP_TOKEN_FILE=/data/token \
+    CORVUS_TAWK_MCP_DATA_FILE=/data/memory.db \
+    CORVUS_TAWK_CONTROL_SOCKET=/run/tawk/control.sock
 VOLUME ["/data"]
 EXPOSE 8765
 USER $APP_UID

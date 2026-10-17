@@ -6,10 +6,10 @@ namespace Corvus.Mcp.Server.Tawk.Engines.Transcription;
 
 public sealed class TranscriptionNoticeFormatter(IUntrustedTextFence fence) : ITranscriptionNoticeFormatter
 {
-    // tawk-mcp's own guidance, written outside the fence: speech recognition mishears, so the reader tidies what it
+    // corvus-tawk-mcp's own guidance, written outside the fence: speech recognition mishears, so the reader tidies what it
     // clearly got wrong without rewriting what the speaker said.
     public const string Guidance =
-        "How to use a transcript (tawk-mcp's own note): speech recognition mishears, so fix what it clearly got wrong, "
+        "How to use a transcript (corvus-tawk-mcp's own note): speech recognition mishears, so fix what it clearly got wrong, "
         + "such as misheard words and names, punctuation and broken sentences, but stay as close as you can to what was said. "
         + "Keep the speaker's language, wording and order, and add nothing. Read it as the language that was spoken: a word that is not a real "
         + "word in that language, or a phrase that makes no sense, is a mishearing, so replace it with the real word or phrase that sounds closest "
@@ -124,7 +124,7 @@ public sealed class TranscriptionNoticeFormatter(IUntrustedTextFence fence) : IT
         _ => "failed",
     };
 
-    // The label is tawk-mcp's own line, written outside the fence.
+    // The label is corvus-tawk-mcp's own line, written outside the fence.
     private static string Label(TranscriptionPass pass)
     {
         if (pass.Failure is not null)

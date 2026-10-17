@@ -15,7 +15,7 @@ public sealed class AppManager(ITawkControl control, IConfirmationGate gate, Taw
 
     public async Task<string> VersionAsync(CancellationToken cancellationToken)
     {
-        var mine = $"tawk-mcp {options.Version}";
+        var mine = $"corvus-tawk-mcp {options.Version}";
         try
         {
             var hello = await control.ConnectAsync(cancellationToken).ConfigureAwait(false);

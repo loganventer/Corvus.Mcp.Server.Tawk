@@ -4,7 +4,7 @@ namespace Corvus.Mcp.Server.Tawk.Host;
 
 /// <summary>
 /// Rejects any request whose Origin is not http(s)://localhost or http(s)://127.0.0.1 on any port,
-/// so a web page in the user's browser cannot talk to tawk-mcp.
+/// so a web page in the user's browser cannot talk to corvus-tawk-mcp.
 /// </summary>
 public sealed class OriginGuardMiddleware(RequestDelegate next)
 {

@@ -18,7 +18,7 @@ public sealed class KnowledgeManager(
     TimeProvider clock,
     IAccountTag? accountTag = null) : IKnowledgeManager
 {
-    private const string Label = "knowledge from tawk-mcp's memory, written by the user or by an agent that read their chats";
+    private const string Label = "knowledge from corvus-tawk-mcp's memory, written by the user or by an agent that read their chats";
     private const int MaxTextLength = 2000;
     private const int MaxLabelLength = 60;
     private const int MaxTags = 8;

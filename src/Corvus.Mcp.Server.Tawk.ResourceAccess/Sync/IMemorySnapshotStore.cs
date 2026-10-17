@@ -8,8 +8,8 @@ public interface IMemorySnapshotStore
     Task<MemorySnapshot> ReadAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Reads a memory database from a file, such as a downloaded copy. One from an older tawk-mcp is brought
-    /// up to this schema first; one from a newer tawk-mcp is refused with a MemoryException.
+    /// Reads a memory database from a file, such as a downloaded copy. One from an older corvus-tawk-mcp is brought
+    /// up to this schema first; one from a newer corvus-tawk-mcp is refused with a MemoryException.
     /// </summary>
     Task<MemorySnapshot> ReadFileAsync(string path, CancellationToken cancellationToken);
 

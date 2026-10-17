@@ -23,7 +23,7 @@ public class FileTokenStoreTests
     [UnsupportedOSPlatform("windows")]
     public void Creates_a_random_base64url_token_once_in_private_files()
     {
-        var path = Path.Combine(_root, "tawk-mcp", "token");
+        var path = Path.Combine(_root, "corvus", "tawk-mcp", "token");
         var store = new FileTokenStore(path);
 
         var first = store.GetOrCreate();
@@ -52,8 +52,8 @@ public class FileTokenStoreTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(FileTokenStore.DefaultPath(_ => null, "/home/me"), Is.EqualTo("/home/me/.config/tawk-mcp/token"));
-            Assert.That(FileTokenStore.DefaultPath(k => k == "XDG_CONFIG_HOME" ? "/cfg" : null, "/home/me"), Is.EqualTo("/cfg/tawk-mcp/token"));
+            Assert.That(FileTokenStore.DefaultPath(_ => null, "/home/me"), Is.EqualTo("/home/me/.config/corvus/tawk-mcp/token"));
+            Assert.That(FileTokenStore.DefaultPath(k => k == "XDG_CONFIG_HOME" ? "/cfg" : null, "/home/me"), Is.EqualTo("/cfg/corvus/tawk-mcp/token"));
         });
     }
 }

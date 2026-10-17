@@ -1,7 +1,7 @@
 #!/bin/sh
 # Starts Claude Code with tawk's channel on: new WhatsApp messages arrive in the session.
 # Register the stdio server once first:  claude mcp add tawk -- tawk-mcp --stdio
-# Link this file into a directory on your PATH (a copy works too, with TAWK_MCP_SRC set). Arguments are passed on to Claude Code.
+# Link this file into a directory on your PATH (a copy works too, with CORVUS_TAWK_MCP_SRC set). Arguments are passed on to Claude Code.
 
 # Uses CLAUDE_BIN when set, else the newest Claude Code that the VS Code extension installed, else the one on PATH.
 bin="${CLAUDE_BIN:-}"
@@ -10,24 +10,24 @@ bin="${CLAUDE_BIN:-}"
 [ -n "$bin" ] && [ -x "$bin" ] || { echo "Claude Code was not found: set CLAUDE_BIN, or install it" >&2; exit 1; }
 
 # Runs the latest tawk-mcp: a newer version on the remote is pulled, and when the checkout has moved on since the last build, it is built again.
-# TAWK_MCP_SRC names the checkout; without it, the one this file lives in (a copy outside it skips all of this).
-# TAWK_MCP_PULL=0 starts with the checkout as it is. The remote gets TAWK_MCP_PULL_TIMEOUT seconds (10) to answer, so no network does not hold the start up.
+# CORVUS_TAWK_MCP_SRC names the checkout; without it, the one this file lives in (a copy outside it skips all of this).
+# CORVUS_TAWK_MCP_PULL=0 starts with the checkout as it is. The remote gets CORVUS_TAWK_MCP_PULL_TIMEOUT seconds (10) to answer, so no network does not hold the start up.
 self="$0"
 while [ -L "$self" ]; do                                   # run through a link: find the file it points at
     target="$(readlink "$self")"
     case "$target" in /*) self="$target" ;; *) self="$(dirname "$self")/$target" ;; esac
 done
-src="${TAWK_MCP_SRC:-$(cd "$(dirname "$self")/.." 2>/dev/null && pwd)}"
+src="${CORVUS_TAWK_MCP_SRC:-$(cd "$(dirname "$self")/.." 2>/dev/null && pwd)}"
 stamp="${XDG_DATA_HOME:-$HOME/.local/share}/tawk-mcp/built-commit"
 if [ -f "$src/install.sh" ] && command -v git >/dev/null 2>&1; then
     # Follows the remote: when the checkout's upstream has a newer tawk-mcp, it is taken before the build check.
     # Only a clean fast-forward is taken; local commits and uncommitted changes are left alone, and said so.
-    if [ "${TAWK_MCP_PULL:-1}" = 1 ]; then
+    if [ "${CORVUS_TAWK_MCP_PULL:-1}" = 1 ]; then
         git -C "$src" fetch --quiet 2>/dev/null &
         fetch=$!
         tick=1; step=10                                       # waits in tenths of a second where sleep can
         sleep 0.1 2>/dev/null && { tick=0.1; step=1; }
-        left=$(( ${TAWK_MCP_PULL_TIMEOUT:-10} * 10 ))
+        left=$(( ${CORVUS_TAWK_MCP_PULL_TIMEOUT:-10} * 10 ))
         while kill -0 "$fetch" 2>/dev/null && [ "$left" -gt 0 ]; do sleep "$tick"; left=$((left - step)); done
         if kill -0 "$fetch" 2>/dev/null; then
             kill "$fetch" 2>/dev/null
@@ -59,30 +59,30 @@ if [ -f "$src/install.sh" ] && command -v git >/dev/null 2>&1; then
 fi
 
 # Lets this session's tawk-mcp approve its own queued sends, when tawk's access is admin: it is handed the
-# admin token file tawk writes beside its control socket. TAWK_MCP_ADMIN=0 starts without it.
-if [ "${TAWK_MCP_ADMIN:-1}" = 1 ] && [ -z "${TAWKMCP_ADMIN_TOKEN_FILE:-}" ]; then
-    if [ -n "${TAWK_CONTROL_SOCKET:-}" ]; then run="$(dirname "$TAWK_CONTROL_SOCKET")"
+# admin token file tawk writes beside its control socket. CORVUS_TAWK_MCP_ADMIN=0 starts without it.
+if [ "${CORVUS_TAWK_MCP_ADMIN:-1}" = 1 ] && [ -z "${CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE:-}" ]; then
+    if [ -n "${CORVUS_TAWK_CONTROL_SOCKET:-}" ]; then run="$(dirname "$CORVUS_TAWK_CONTROL_SOCKET")"
     elif [ -n "${XDG_RUNTIME_DIR:-}" ]; then run="$XDG_RUNTIME_DIR/tawk"
     else run="${XDG_STATE_HOME:-$HOME/.local/state}/tawk"; fi
-    export TAWKMCP_ADMIN_TOKEN_FILE="$run/admin.token"
+    export CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE="$run/admin.token"
 fi
 
 # This session is started with the channel, so tawk-mcp may promise tawk that it answers what tawk asks of
 # an agent: TL;DR summaries, and what you write in the owner's chat. A session started without it promises nothing.
-export TAWKMCP_CHANNEL="${TAWKMCP_CHANNEL:-on}"
+export CORVUS_TAWK_MCP_CHANNEL="${CORVUS_TAWK_MCP_CHANNEL:-on}"
 # The messages you send arrive on the channel as well as the ones you receive. tawk's own switches
 # (Settings > Automation > Push ...) decide whether either kind is handed over at all.
-export TAWKMCP_CHANNEL_OWN="${TAWKMCP_CHANNEL_OWN:-on}"
+export CORVUS_TAWK_MCP_CHANNEL_OWN="${CORVUS_TAWK_MCP_CHANNEL_OWN:-on}"
 # Read receipts for your messages arrive too, once tawk's "Push read receipts" switch is on.
-export TAWKMCP_CHANNEL_READ="${TAWKMCP_CHANNEL_READ:-on}"
+export CORVUS_TAWK_MCP_CHANNEL_READ="${CORVUS_TAWK_MCP_CHANNEL_READ:-on}"
 # The same for reactions, edits and deletes, and scheduled sends: tawk's Agent events switches decide.
-export TAWKMCP_CHANNEL_REACTIONS="${TAWKMCP_CHANNEL_REACTIONS:-on}"
-export TAWKMCP_CHANNEL_EDITS="${TAWKMCP_CHANNEL_EDITS:-on}"
-export TAWKMCP_CHANNEL_SCHEDULED="${TAWKMCP_CHANNEL_SCHEDULED:-on}"
+export CORVUS_TAWK_MCP_CHANNEL_REACTIONS="${CORVUS_TAWK_MCP_CHANNEL_REACTIONS:-on}"
+export CORVUS_TAWK_MCP_CHANNEL_EDITS="${CORVUS_TAWK_MCP_CHANNEL_EDITS:-on}"
+export CORVUS_TAWK_MCP_CHANNEL_SCHEDULED="${CORVUS_TAWK_MCP_CHANNEL_SCHEDULED:-on}"
 # Who came online or left, in a chat you have open, once tawk's "Push online status" switch is on.
-export TAWKMCP_CHANNEL_PRESENCE="${TAWKMCP_CHANNEL_PRESENCE:-on}"
+export CORVUS_TAWK_MCP_CHANNEL_PRESENCE="${CORVUS_TAWK_MCP_CHANNEL_PRESENCE:-on}"
 
-# Memory sync is off unless TAWKMCP_SYNC_REPO names your own private repository; it is passed on as it is.
+# Memory sync is off unless CORVUS_TAWK_MCP_SYNC_REPO names your own private repository; it is passed on as it is.
 
-# TAWK_MCP_SERVER is the name the stdio server was registered under.
-exec "$bin" --dangerously-load-development-channels "server:${TAWK_MCP_SERVER:-tawk}" "$@"
+# CORVUS_TAWK_MCP_SERVER is the name the stdio server was registered under.
+exec "$bin" --dangerously-load-development-channels "server:${CORVUS_TAWK_MCP_SERVER:-tawk}" "$@"

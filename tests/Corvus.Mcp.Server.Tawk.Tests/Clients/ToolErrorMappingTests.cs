@@ -61,7 +61,7 @@ public class ToolErrorMappingTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsError, Is.True);
-            Assert.That(ToolOutput.Text(result), Does.Contain("tawk-mcp will connect as soon as it is").And.Contain("/run/user/1000/tawk/control.sock"));
+            Assert.That(ToolOutput.Text(result), Does.Contain("corvus-tawk-mcp will connect as soon as it is").And.Contain("/run/user/1000/tawk/control.sock"));
         });
     }
 }

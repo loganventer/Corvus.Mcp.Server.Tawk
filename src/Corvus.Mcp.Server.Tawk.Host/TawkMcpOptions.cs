@@ -6,7 +6,7 @@ using Corvus.Mcp.Server.Tawk.Core.Transcription;
 
 namespace Corvus.Mcp.Server.Tawk.Host;
 
-/// <summary>Everything tawk-mcp can be told, from TAWKMCP_* environment variables and command-line flags.</summary>
+/// <summary>Everything corvus-tawk-mcp can be told, from CORVUS_TAWK_MCP_* environment variables and command-line flags.</summary>
 public sealed record TawkMcpOptions
 {
     public HostCommand Command { get; init; } = HostCommand.Serve;
@@ -23,7 +23,7 @@ public sealed record TawkMcpOptions
 
     public string? Token { get; init; }
 
-    /// <summary>Where voices, contact profiles and templates are kept. Defaults to ~/.local/share/tawk-mcp/memory.db.</summary>
+    /// <summary>Where voices, contact profiles and templates are kept. Defaults to ~/.local/share/corvus/tawk-mcp/memory.db.</summary>
     public string? DataFile { get; init; }
 
     public MemoryMode Memory { get; init; } = MemoryMode.Write;
@@ -88,7 +88,7 @@ public sealed record TawkMcpOptions
     /// <summary>The agent is handed the memory workflow once every this many rounds. 0 turns it off.</summary>
     public int WorkflowEvery { get; init; } = WorkflowOptions.DefaultEvery;
 
-    /// <summary>A text file of the user's own standing instructions for agents. Defaults to ~/.config/tawk-mcp/instructions.md.</summary>
+    /// <summary>A text file of the user's own standing instructions for agents. Defaults to ~/.config/corvus/tawk-mcp/instructions.md.</summary>
     public string? InstructionsFile { get; init; }
 
     /// <summary>
@@ -102,17 +102,17 @@ public sealed record TawkMcpOptions
 
     /// <summary>
     /// How voice notes are transcribed. By default a transcriber the user runs when one is set and answers,
-    /// and otherwise one model loaded inside tawk-mcp.
+    /// and otherwise one model loaded inside corvus-tawk-mcp.
     /// </summary>
     public TranscriptionEngine Transcribe { get; init; } = TranscriptionEngine.Auto;
 
-    /// <summary>The folder of model files for the model tawk-mcp loads itself. Defaults to ~/.local/share/tawk-mcp/models.</summary>
+    /// <summary>The folder of model files for the model corvus-tawk-mcp loads itself. Defaults to ~/.local/share/corvus/tawk-mcp/models.</summary>
     public string? TranscribeModelDir { get; init; }
 
     /// <summary>Minutes with no job before that model is let go. 0 keeps it loaded.</summary>
     public int TranscribeIdleUnloadM { get; init; } = 15;
 
-    /// <summary>The model `tawk-mcp fetch-model` was asked for.</summary>
+    /// <summary>The model `corvus-tawk-mcp fetch-model` was asked for.</summary>
     public string? FetchModel { get; init; }
 
     /// <summary>The transcriber's base address for the http engine. On this machine unless <see cref="TranscribeRemote"/> is on.</summary>

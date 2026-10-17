@@ -43,7 +43,7 @@ public class TranscriptionPolicyTests
         {
             Assert.That(fromPanel.Model, Is.EqualTo("small"));
             Assert.That(fromPanel.Languages, Is.EqualTo(new[] { "af", "en" }), "what is not a language is passed over");
-            Assert.That(withFlags.Automatic(panel), Is.True, "the switch in tawk wins over tawk-mcp's own");
+            Assert.That(withFlags.Automatic(panel), Is.True, "the switch in tawk wins over corvus-tawk-mcp's own");
             Assert.That(fromFlags.Model, Is.EqualTo("base"));
             Assert.That(fromFlags.Languages, Is.EqualTo(new[] { "zu" }));
             Assert.That(Policy(new TranscriptionOptions { Automatic = true }).Automatic(TranscriptionPreferences.None), Is.True);

@@ -4,7 +4,7 @@ namespace Corvus.Mcp.Server.Tawk.Engines.Transcription;
 
 /// <summary>
 /// Decides whether a call's choices are allowed, and fills in the user's defaults. tawk's settings panel
-/// comes first; tawk-mcp's own settings stand in only for what tawk does not say, as with an older tawk
+/// comes first; corvus-tawk-mcp's own settings stand in only for what tawk does not say, as with an older tawk
 /// or one that is not running; the built-in value is last.
 /// </summary>
 public interface ITranscriptionPolicy

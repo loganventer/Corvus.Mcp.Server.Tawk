@@ -34,7 +34,7 @@ public sealed class SqliteMemorySnapshotStore(ISqliteConnectionFactory connectio
                     await SqliteCommands.ScalarAsync(raw, "PRAGMA user_version;", cancellationToken).ConfigureAwait(false), CultureInfo.InvariantCulture);
                 if (version > SqliteSchemaMigrator.CurrentVersion)
                 {
-                    throw new MemoryException("The remote memory was written by a newer tawk-mcp. Update tawk-mcp on this machine to sync again.");
+                    throw new MemoryException("The remote memory was written by a newer corvus-tawk-mcp. Update corvus-tawk-mcp on this machine to sync again.");
                 }
             }
 
@@ -54,7 +54,7 @@ public sealed class SqliteMemorySnapshotStore(ISqliteConnectionFactory connectio
         }
         catch (SqliteException ex)
         {
-            throw new MemoryException("The remote memory is not a database tawk-mcp can read: " + ex.Message, ex);
+            throw new MemoryException("The remote memory is not a database corvus-tawk-mcp can read: " + ex.Message, ex);
         }
     }
 

@@ -127,7 +127,7 @@ internal sealed class ControlConnection : IAsyncDisposable
             onTimeout?.Invoke();
             throw TawkControlException.Offline(
                 $"tawk did not answer within {timeout!.Value.TotalSeconds:0.#} s and looks hung. "
-                + "tawk-mcp dropped the connection and will reconnect.");
+                + "corvus-tawk-mcp dropped the connection and will reconnect.");
         }
         catch (OperationCanceledException)
         {

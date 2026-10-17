@@ -116,224 +116,224 @@ public static class TawkMcpOptionsBinder
 
     private static TawkMcpOptions Apply(TawkMcpOptions options, Func<string, string?> env, ref string? error)
     {
-        if (env("TAWKMCP_TRANSPORT") is { Length: > 0 } transport)
+        if (env("CORVUS_TAWK_MCP_TRANSPORT") is { Length: > 0 } transport)
         {
             options = transport.ToUpperInvariant() switch
             {
                 "HTTP" => options with { Transport = TransportKind.Http },
                 "STDIO" => options with { Transport = TransportKind.Stdio },
-                _ => Fail(options, $"TAWKMCP_TRANSPORT must be stdio or http, not {transport}.", ref error),
+                _ => Fail(options, $"CORVUS_TAWK_MCP_TRANSPORT must be stdio or http, not {transport}.", ref error),
             };
         }
 
-        if (env("TAWKMCP_PORT") is { Length: > 0 } port)
+        if (env("CORVUS_TAWK_MCP_PORT") is { Length: > 0 } port)
         {
-            options = options with { Port = Int("TAWKMCP_PORT", port, 1, 65535, ref error) };
+            options = options with { Port = Int("CORVUS_TAWK_MCP_PORT", port, 1, 65535, ref error) };
         }
 
-        if (env("TAWKMCP_BIND") is { Length: > 0 } bind)
+        if (env("CORVUS_TAWK_MCP_BIND") is { Length: > 0 } bind)
         {
             options = options with { Bind = bind };
         }
 
-        if (env("TAWKMCP_TOKEN_FILE") is { Length: > 0 } tokenFile)
+        if (env("CORVUS_TAWK_MCP_TOKEN_FILE") is { Length: > 0 } tokenFile)
         {
             options = options with { TokenFile = tokenFile };
         }
 
-        if (env("TAWKMCP_DATA_FILE") is { Length: > 0 } dataFile)
+        if (env("CORVUS_TAWK_MCP_DATA_FILE") is { Length: > 0 } dataFile)
         {
             options = options with { DataFile = dataFile };
         }
 
-        if (env("TAWKMCP_MEMORY") is { Length: > 0 } memory)
+        if (env("CORVUS_TAWK_MCP_MEMORY") is { Length: > 0 } memory)
         {
-            options = options with { Memory = Memory("TAWKMCP_MEMORY", memory, ref error) };
+            options = options with { Memory = Memory("CORVUS_TAWK_MCP_MEMORY", memory, ref error) };
         }
 
-        if (env("TAWKMCP_TOKEN") is { Length: > 0 } token)
+        if (env("CORVUS_TAWK_MCP_TOKEN") is { Length: > 0 } token)
         {
             options = options with { Token = token };
         }
 
-        if (env("TAWKMCP_BACKOFF_INITIAL_MS") is { Length: > 0 } initial)
+        if (env("CORVUS_TAWK_MCP_BACKOFF_INITIAL_MS") is { Length: > 0 } initial)
         {
-            options = options with { BackoffInitialMs = Int("TAWKMCP_BACKOFF_INITIAL_MS", initial, 1, 600_000, ref error) };
+            options = options with { BackoffInitialMs = Int("CORVUS_TAWK_MCP_BACKOFF_INITIAL_MS", initial, 1, 600_000, ref error) };
         }
 
-        if (env("TAWKMCP_BACKOFF_MAX_MS") is { Length: > 0 } max)
+        if (env("CORVUS_TAWK_MCP_BACKOFF_MAX_MS") is { Length: > 0 } max)
         {
-            options = options with { BackoffMaxMs = Int("TAWKMCP_BACKOFF_MAX_MS", max, 1, 3_600_000, ref error) };
+            options = options with { BackoffMaxMs = Int("CORVUS_TAWK_MCP_BACKOFF_MAX_MS", max, 1, 3_600_000, ref error) };
         }
 
-        if (env("TAWKMCP_BREAKER_THRESHOLD") is { Length: > 0 } threshold)
+        if (env("CORVUS_TAWK_MCP_BREAKER_THRESHOLD") is { Length: > 0 } threshold)
         {
-            options = options with { BreakerThreshold = Int("TAWKMCP_BREAKER_THRESHOLD", threshold, 1, 1000, ref error) };
+            options = options with { BreakerThreshold = Int("CORVUS_TAWK_MCP_BREAKER_THRESHOLD", threshold, 1, 1000, ref error) };
         }
 
-        if (env("TAWKMCP_BREAKER_COOLDOWN_S") is { Length: > 0 } cooldown)
+        if (env("CORVUS_TAWK_MCP_BREAKER_COOLDOWN_S") is { Length: > 0 } cooldown)
         {
-            options = options with { BreakerCooldownS = Int("TAWKMCP_BREAKER_COOLDOWN_S", cooldown, 0, 86_400, ref error) };
+            options = options with { BreakerCooldownS = Int("CORVUS_TAWK_MCP_BREAKER_COOLDOWN_S", cooldown, 0, 86_400, ref error) };
         }
 
-        if (env("TAWKMCP_REQUEST_TIMEOUT_S") is { Length: > 0 } timeout)
+        if (env("CORVUS_TAWK_MCP_REQUEST_TIMEOUT_S") is { Length: > 0 } timeout)
         {
-            options = options with { RequestTimeoutS = Int("TAWKMCP_REQUEST_TIMEOUT_S", timeout, 1, 600, ref error) };
+            options = options with { RequestTimeoutS = Int("CORVUS_TAWK_MCP_REQUEST_TIMEOUT_S", timeout, 1, 600, ref error) };
         }
 
-        if (env("TAWKMCP_SCHEDULE_JITTER_S") is { Length: > 0 } jitter)
+        if (env("CORVUS_TAWK_MCP_SCHEDULE_JITTER_S") is { Length: > 0 } jitter)
         {
-            options = options with { ScheduleJitterS = Int("TAWKMCP_SCHEDULE_JITTER_S", jitter, 0, 3600, ref error) };
+            options = options with { ScheduleJitterS = Int("CORVUS_TAWK_MCP_SCHEDULE_JITTER_S", jitter, 0, 3600, ref error) };
         }
 
-        if (env("TAWKMCP_SYNC_KEY") is { Length: > 0 } syncKey)
+        if (env("CORVUS_TAWK_MCP_SYNC_KEY") is { Length: > 0 } syncKey)
         {
             options = options with { SyncKeyFile = syncKey };
         }
 
-        if (env("TAWKMCP_SYNC_REPO") is { Length: > 0 } repository)
+        if (env("CORVUS_TAWK_MCP_SYNC_REPO") is { Length: > 0 } repository)
         {
-            options = options with { SyncRepository = Repository("TAWKMCP_SYNC_REPO", repository, ref error) };
+            options = options with { SyncRepository = Repository("CORVUS_TAWK_MCP_SYNC_REPO", repository, ref error) };
         }
 
-        if (env("TAWKMCP_SYNC_BRANCH") is { Length: > 0 } branch)
+        if (env("CORVUS_TAWK_MCP_SYNC_BRANCH") is { Length: > 0 } branch)
         {
             options = options with { SyncBranch = branch };
         }
 
-        if (env("TAWKMCP_SYNC_FILE") is { Length: > 0 } syncFile)
+        if (env("CORVUS_TAWK_MCP_SYNC_FILE") is { Length: > 0 } syncFile)
         {
-            options = options with { SyncFile = SyncFile("TAWKMCP_SYNC_FILE", syncFile, ref error) };
+            options = options with { SyncFile = SyncFile("CORVUS_TAWK_MCP_SYNC_FILE", syncFile, ref error) };
         }
 
-        if (env("TAWKMCP_SYNC_INTERVAL_MINUTES") is { Length: > 0 } interval)
+        if (env("CORVUS_TAWK_MCP_SYNC_INTERVAL_MINUTES") is { Length: > 0 } interval)
         {
-            options = options with { SyncIntervalMinutes = Int("TAWKMCP_SYNC_INTERVAL_MINUTES", interval, 1, 10_080, ref error) };
+            options = options with { SyncIntervalMinutes = Int("CORVUS_TAWK_MCP_SYNC_INTERVAL_MINUTES", interval, 1, 10_080, ref error) };
         }
 
-        if (env("TAWKMCP_WORKFLOW_EVERY") is { Length: > 0 } every)
+        if (env("CORVUS_TAWK_MCP_WORKFLOW_EVERY") is { Length: > 0 } every)
         {
-            options = options with { WorkflowEvery = Int("TAWKMCP_WORKFLOW_EVERY", every, 0, 10_000, ref error) };
+            options = options with { WorkflowEvery = Int("CORVUS_TAWK_MCP_WORKFLOW_EVERY", every, 0, 10_000, ref error) };
         }
 
-        if (env("TAWKMCP_ADMIN_TOKEN_FILE") is { Length: > 0 } adminToken)
+        if (env("CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE") is { Length: > 0 } adminToken)
         {
             options = options with { AdminTokenFile = adminToken };
         }
 
-        if (env("TAWKMCP_INSTRUCTIONS_FILE") is { Length: > 0 } instructions)
+        if (env("CORVUS_TAWK_MCP_INSTRUCTIONS_FILE") is { Length: > 0 } instructions)
         {
             options = options with { InstructionsFile = instructions };
         }
 
-        if (env("TAWKMCP_CHANNEL_REACTIONS") is { Length: > 0 } channelReactions)
+        if (env("CORVUS_TAWK_MCP_CHANNEL_REACTIONS") is { Length: > 0 } channelReactions)
         {
-            options = options with { ChannelReactions = OnOff("TAWKMCP_CHANNEL_REACTIONS", channelReactions, ref error) };
+            options = options with { ChannelReactions = OnOff("CORVUS_TAWK_MCP_CHANNEL_REACTIONS", channelReactions, ref error) };
         }
 
-        if (env("TAWKMCP_CHANNEL_EDITS") is { Length: > 0 } channelEdits)
+        if (env("CORVUS_TAWK_MCP_CHANNEL_EDITS") is { Length: > 0 } channelEdits)
         {
-            options = options with { ChannelEdits = OnOff("TAWKMCP_CHANNEL_EDITS", channelEdits, ref error) };
+            options = options with { ChannelEdits = OnOff("CORVUS_TAWK_MCP_CHANNEL_EDITS", channelEdits, ref error) };
         }
 
-        if (env("TAWKMCP_CHANNEL_SCHEDULED") is { Length: > 0 } channelScheduled)
+        if (env("CORVUS_TAWK_MCP_CHANNEL_SCHEDULED") is { Length: > 0 } channelScheduled)
         {
-            options = options with { ChannelScheduled = OnOff("TAWKMCP_CHANNEL_SCHEDULED", channelScheduled, ref error) };
+            options = options with { ChannelScheduled = OnOff("CORVUS_TAWK_MCP_CHANNEL_SCHEDULED", channelScheduled, ref error) };
         }
 
-        if (env("TAWKMCP_CHANNEL_PRESENCE") is { Length: > 0 } channelPresence)
+        if (env("CORVUS_TAWK_MCP_CHANNEL_PRESENCE") is { Length: > 0 } channelPresence)
         {
-            options = options with { ChannelPresence = OnOff("TAWKMCP_CHANNEL_PRESENCE", channelPresence, ref error) };
+            options = options with { ChannelPresence = OnOff("CORVUS_TAWK_MCP_CHANNEL_PRESENCE", channelPresence, ref error) };
         }
 
-        if (env("TAWKMCP_CHANNEL_READ") is { Length: > 0 } channelRead)
+        if (env("CORVUS_TAWK_MCP_CHANNEL_READ") is { Length: > 0 } channelRead)
         {
-            options = options with { ChannelRead = OnOff("TAWKMCP_CHANNEL_READ", channelRead, ref error) };
+            options = options with { ChannelRead = OnOff("CORVUS_TAWK_MCP_CHANNEL_READ", channelRead, ref error) };
         }
 
-        if (env("TAWKMCP_CHANNEL_PLAYED") is { Length: > 0 } channelPlayed)
+        if (env("CORVUS_TAWK_MCP_CHANNEL_PLAYED") is { Length: > 0 } channelPlayed)
         {
-            options = options with { ChannelPlayed = OnOff("TAWKMCP_CHANNEL_PLAYED", channelPlayed, ref error) };
+            options = options with { ChannelPlayed = OnOff("CORVUS_TAWK_MCP_CHANNEL_PLAYED", channelPlayed, ref error) };
         }
 
-        if (env("TAWKMCP_CHANNEL_OWN") is { Length: > 0 } channelOwn)
+        if (env("CORVUS_TAWK_MCP_CHANNEL_OWN") is { Length: > 0 } channelOwn)
         {
-            options = options with { ChannelOwn = OnOff("TAWKMCP_CHANNEL_OWN", channelOwn, ref error) };
+            options = options with { ChannelOwn = OnOff("CORVUS_TAWK_MCP_CHANNEL_OWN", channelOwn, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE") is { Length: > 0 } transcribe)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE") is { Length: > 0 } transcribe)
         {
-            options = options with { Transcribe = Engine("TAWKMCP_TRANSCRIBE", transcribe, ref error) };
+            options = options with { Transcribe = Engine("CORVUS_TAWK_MCP_TRANSCRIBE", transcribe, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_MODEL_DIR") is { Length: > 0 } transcribeModelDir)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_MODEL_DIR") is { Length: > 0 } transcribeModelDir)
         {
             options = options with { TranscribeModelDir = transcribeModelDir };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_IDLE_UNLOAD_M") is { Length: > 0 } transcribeIdle)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_IDLE_UNLOAD_M") is { Length: > 0 } transcribeIdle)
         {
-            options = options with { TranscribeIdleUnloadM = Int("TAWKMCP_TRANSCRIBE_IDLE_UNLOAD_M", transcribeIdle, 0, 1440, ref error) };
+            options = options with { TranscribeIdleUnloadM = Int("CORVUS_TAWK_MCP_TRANSCRIBE_IDLE_UNLOAD_M", transcribeIdle, 0, 1440, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_URL") is { Length: > 0 } transcribeUrl)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_URL") is { Length: > 0 } transcribeUrl)
         {
-            options = options with { TranscribeUrl = Address("TAWKMCP_TRANSCRIBE_URL", transcribeUrl, ref error) };
+            options = options with { TranscribeUrl = Address("CORVUS_TAWK_MCP_TRANSCRIBE_URL", transcribeUrl, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_REMOTE") is { Length: > 0 } transcribeRemote)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_REMOTE") is { Length: > 0 } transcribeRemote)
         {
-            options = options with { TranscribeRemote = OnOff("TAWKMCP_TRANSCRIBE_REMOTE", transcribeRemote, ref error) };
+            options = options with { TranscribeRemote = OnOff("CORVUS_TAWK_MCP_TRANSCRIBE_REMOTE", transcribeRemote, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_COMMAND") is { Length: > 0 } transcribeCommand)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_COMMAND") is { Length: > 0 } transcribeCommand)
         {
             options = options with { TranscribeCommand = transcribeCommand };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_MODEL") is { Length: > 0 } transcribeModel)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_MODEL") is { Length: > 0 } transcribeModel)
         {
             options = options with { TranscribeModel = transcribeModel };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_MODELS") is { Length: > 0 } transcribeModels)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_MODELS") is { Length: > 0 } transcribeModels)
         {
             options = options with { TranscribeModels = Names(transcribeModels) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_LANGUAGE") is { Length: > 0 } transcribeLanguage)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_LANGUAGE") is { Length: > 0 } transcribeLanguage)
         {
-            options = options with { TranscribeLanguages = Languages("TAWKMCP_TRANSCRIBE_LANGUAGE", transcribeLanguage, ref error) };
+            options = options with { TranscribeLanguages = Languages("CORVUS_TAWK_MCP_TRANSCRIBE_LANGUAGE", transcribeLanguage, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_MAX_LANGUAGES") is { Length: > 0 } transcribeMaxLanguages)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_MAX_LANGUAGES") is { Length: > 0 } transcribeMaxLanguages)
         {
-            options = options with { TranscribeMaxLanguages = Int("TAWKMCP_TRANSCRIBE_MAX_LANGUAGES", transcribeMaxLanguages, 1, 10, ref error) };
+            options = options with { TranscribeMaxLanguages = Int("CORVUS_TAWK_MCP_TRANSCRIBE_MAX_LANGUAGES", transcribeMaxLanguages, 1, 10, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_MAX_SECONDS") is { Length: > 0 } transcribeMaxSeconds)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_MAX_SECONDS") is { Length: > 0 } transcribeMaxSeconds)
         {
-            options = options with { TranscribeMaxSeconds = Int("TAWKMCP_TRANSCRIBE_MAX_SECONDS", transcribeMaxSeconds, 1, 86_400, ref error) };
+            options = options with { TranscribeMaxSeconds = Int("CORVUS_TAWK_MCP_TRANSCRIBE_MAX_SECONDS", transcribeMaxSeconds, 1, 86_400, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_TIMEOUT_S") is { Length: > 0 } transcribeTimeout)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S") is { Length: > 0 } transcribeTimeout)
         {
-            options = options with { TranscribeTimeoutS = Int("TAWKMCP_TRANSCRIBE_TIMEOUT_S", transcribeTimeout, 1, 3600, ref error) };
+            options = options with { TranscribeTimeoutS = Int("CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S", transcribeTimeout, 1, 3600, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_AUTO") is { Length: > 0 } transcribeAuto)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_AUTO") is { Length: > 0 } transcribeAuto)
         {
-            options = options with { TranscribeAuto = OnOff("TAWKMCP_TRANSCRIBE_AUTO", transcribeAuto, ref error) };
+            options = options with { TranscribeAuto = OnOff("CORVUS_TAWK_MCP_TRANSCRIBE_AUTO", transcribeAuto, ref error) };
         }
 
-        if (env("TAWKMCP_TRANSCRIBE_CONCURRENCY") is { Length: > 0 } transcribeConcurrency)
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_CONCURRENCY") is { Length: > 0 } transcribeConcurrency)
         {
-            options = options with { TranscribeConcurrency = Int("TAWKMCP_TRANSCRIBE_CONCURRENCY", transcribeConcurrency, 1, 8, ref error) };
+            options = options with { TranscribeConcurrency = Int("CORVUS_TAWK_MCP_TRANSCRIBE_CONCURRENCY", transcribeConcurrency, 1, 8, ref error) };
         }
 
-        if (env("TAWKMCP_CHANNEL") is { Length: > 0 } channel)
+        if (env("CORVUS_TAWK_MCP_CHANNEL") is { Length: > 0 } channel)
         {
-            options = options with { Channel = Channel("TAWKMCP_CHANNEL", channel, ref error) };
+            options = options with { Channel = Channel("CORVUS_TAWK_MCP_CHANNEL", channel, ref error) };
         }
 
         return options;
@@ -483,7 +483,7 @@ public static class TawkMcpOptionsBinder
     }
 
     private static TawkMcpOptions Unknown(TawkMcpOptions options, string arg, ref string? error) =>
-        Fail(options, $"Unknown argument: {arg}. Try tawk-mcp --help.", ref error);
+        Fail(options, $"Unknown argument: {arg}. Try corvus-tawk-mcp --help.", ref error);
 
     private static TawkMcpOptions Fail(TawkMcpOptions options, string message, ref string? error)
     {

@@ -12,7 +12,7 @@ public static class OkfActors
     public const string HumanPrefix = "human:";
     public const string ProcessPrefix = "process:";
 
-    public static string Tool(string version) => "tawk-mcp/" + version;
+    public static string Tool(string version) => "corvus-tawk-mcp/" + version;
 
     public static string Human(string id) => HumanPrefix + id;
 

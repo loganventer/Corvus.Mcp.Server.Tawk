@@ -4,9 +4,9 @@ using Corvus.Mcp.Server.Tawk.Core.Transcription;
 namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Transcription;
 
 /// <summary>
-/// Uses the transcriber the user runs while it answers, and the model inside tawk-mcp when it does not.
+/// Uses the transcriber the user runs while it answers, and the model inside corvus-tawk-mcp when it does not.
 /// A circuit breaker decides: failures open it, and after a cooldown one pass tries the user's transcriber
-/// again. When that works, tawk-mcp lets its own model go, so only one model is ever running.
+/// again. When that works, corvus-tawk-mcp lets its own model go, so only one model is ever running.
 /// </summary>
 public sealed class FailoverTranscriber(
     ITranscriber primary, ITranscriber fallback, ICircuitBreaker breaker, IWhisperModelHost host) : ITranscriber
@@ -30,7 +30,7 @@ public sealed class FailoverTranscriber(
             }
             catch (TranscriptionException)
             {
-                // The pass is not lost: it runs again on the model inside tawk-mcp.
+                // The pass is not lost: it runs again on the model inside corvus-tawk-mcp.
                 breaker.RecordFailure();
             }
         }

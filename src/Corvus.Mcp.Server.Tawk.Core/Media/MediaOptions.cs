@@ -1,6 +1,6 @@
 namespace Corvus.Mcp.Server.Tawk.Core.Media;
 
-/// <summary>Limits on the files tawk-mcp reads from tawk's media folder.</summary>
+/// <summary>Limits on the files corvus-tawk-mcp reads from tawk's media folder.</summary>
 public sealed record MediaOptions
 {
     public const int DefaultMaxImageBytes = 5 * 1024 * 1024;

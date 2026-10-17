@@ -27,7 +27,7 @@ public sealed class SqliteConnectionFactory(string path, ISchemaMigrator migrato
         ArgumentNullException.ThrowIfNull(environment);
         var data = environment("XDG_DATA_HOME");
         var root = string.IsNullOrWhiteSpace(data) ? System.IO.Path.Combine(home, ".local", "share") : data;
-        return System.IO.Path.Combine(root, "tawk-mcp", "memory.db");
+        return System.IO.Path.Combine(root, "corvus", "tawk-mcp", "memory.db");
     }
 
     public async Task<SqliteConnection> OpenAsync(CancellationToken cancellationToken)
@@ -92,7 +92,7 @@ public sealed class SqliteConnectionFactory(string path, ISchemaMigrator migrato
         }
 
         Directory.CreateDirectory(folder, PrivateFolder);
-        // Only a missing file is created here: opening one that another tawk-mcp has in use can be refused.
+        // Only a missing file is created here: opening one that another corvus-tawk-mcp has in use can be refused.
         if (!File.Exists(path))
         {
             var options = new FileStreamOptions { Mode = FileMode.OpenOrCreate, Access = FileAccess.Write, Share = FileShare.ReadWrite, UnixCreateMode = PrivateFile };

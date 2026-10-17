@@ -5,7 +5,7 @@ using Corvus.Mcp.Server.Tawk.Core;
 namespace Corvus.Mcp.Server.Tawk.ResourceAccess;
 
 /// <summary>
-/// Keeps tawk-mcp connected to tawk: retries with backoff behind a circuit breaker, tries at once when the
+/// Keeps corvus-tawk-mcp connected to tawk: retries with backoff behind a circuit breaker, tries at once when the
 /// socket file appears or a request is waiting, and starts over whenever tawk goes away.
 /// </summary>
 public sealed partial class TawkConnectionSupervisor : BackgroundService

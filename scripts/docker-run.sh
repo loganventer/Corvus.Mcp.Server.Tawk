@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 image="tawk-mcp:0.15.10"
 name="tawk-mcp"
-port="${TAWKMCP_PORT:-8765}"
+port="${CORVUS_TAWK_MCP_PORT:-8765}"
 runtime="${XDG_RUNTIME_DIR:-$HOME/.local/state}"
 tawk_dir="$runtime/tawk"
 data_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp"
@@ -35,8 +35,8 @@ docker run -d --name "$name" --restart unless-stopped \
   -p "127.0.0.1:$port:8765" \
   -v "$tawk_dir:/run/tawk" \
   -v "$data_dir:/data" \
-  -e TAWK_CONTROL_SOCKET=/run/tawk/control.sock \
-  -e TAWKMCP_TOKEN_FILE=/data/token \
+  -e CORVUS_TAWK_CONTROL_SOCKET=/run/tawk/control.sock \
+  -e CORVUS_TAWK_MCP_TOKEN_FILE=/data/token \
   -e TZ="$timezone" \
   "$image" >/dev/null
 

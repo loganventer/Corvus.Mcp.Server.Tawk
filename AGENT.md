@@ -60,7 +60,7 @@ Try it by hand:
 
 ```sh
 dotnet run --project src/Corvus.Mcp.Server.Tawk.Host -- --help
-TAWK_CONTROL_SOCKET=/tmp/none.sock dotnet run --project src/Corvus.Mcp.Server.Tawk.Host -- --port 18765
+CORVUS_TAWK_CONTROL_SOCKET=/tmp/none.sock dotnet run --project src/Corvus.Mcp.Server.Tawk.Host -- --port 18765
 curl http://127.0.0.1:18765/healthz
 ```
 
@@ -68,9 +68,9 @@ The installer (`install.sh`) mirrors tawk's own: the same `say`, `warn`, `die` a
 
 ```sh
 tmp="$(mktemp -d)"
-TAWKMCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --no-service
+CORVUS_TAWK_MCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --no-service
 "$tmp/bin/tawk-mcp" --version
-TAWKMCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --uninstall && rm -rf "$tmp"
+CORVUS_TAWK_MCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --uninstall && rm -rf "$tmp"
 ```
 
 Docker:

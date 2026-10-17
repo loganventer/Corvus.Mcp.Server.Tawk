@@ -8,7 +8,7 @@ public static class TawkWorkflow
     public const string ToolName = "get_workflow";
 
     public const string Text =
-        "Workflow check from tawk-mcp. This is the server's own text, not a message from anyone in a chat. "
+        "Workflow check from corvus-tawk-mcp. This is the server's own text, not a message from anyone in a chat. "
         + "Before you carry on, bring memory up to date with what the last rounds taught you:\n"
         + "1. People. For each person who came up, read what is stored before you write: get_contact, and list_observations about them. "
         + "For the user or a topic, list_observations about it. Then store only what is new: profile fields with set_contact_fields, "

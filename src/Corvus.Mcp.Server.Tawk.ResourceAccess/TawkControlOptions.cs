@@ -2,14 +2,14 @@ namespace Corvus.Mcp.Server.Tawk.ResourceAccess;
 
 public sealed record TawkControlOptions
 {
-    public string Client { get; init; } = "tawk-mcp";
+    public string Client { get; init; } = "corvus-tawk-mcp";
 
     public string Version { get; init; } = "0.15.10";
 
     public string Origin { get; init; } = "mcp";
 
     /// <summary>
-    /// What tells this instance apart from other tawk-mcp processes in tawk's list of connected agents:
+    /// What tells this instance apart from other corvus-tawk-mcp processes in tawk's list of connected agents:
     /// the folder it was started in and how it is run. Null sends none.
     /// </summary>
     public string? Label { get; init; }

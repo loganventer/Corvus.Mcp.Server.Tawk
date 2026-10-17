@@ -15,12 +15,12 @@ public sealed class ElicitationConfirmation(
 
     public const string TawkFollowUp = "If you say yes, tawk will show its own warning so you can confirm once more.";
 
-    public const string MemoryFollowUp = "This only changes what tawk-mcp remembers on this computer. Nothing on WhatsApp changes.";
+    public const string MemoryFollowUp = "This only changes what corvus-tawk-mcp remembers on this computer. Nothing on WhatsApp changes.";
 
     public static ElicitationConfirmation For(McpServer? server) =>
         new(server?.ClientCapabilities?.Elicitation is null ? null : server.ElicitAsync);
 
-    /// <summary>For deleting tawk-mcp's own memory, where tawk has no second warning to show.</summary>
+    /// <summary>For deleting corvus-tawk-mcp's own memory, where tawk has no second warning to show.</summary>
     public static ElicitationConfirmation ForMemory(McpServer? server) =>
         new(server?.ClientCapabilities?.Elicitation is null ? null : server.ElicitAsync, MemoryFollowUp);
 

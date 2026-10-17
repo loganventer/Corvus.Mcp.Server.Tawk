@@ -40,7 +40,7 @@ public sealed class ChannelEventSink(
 
         // Someone coming online says nothing about the chat's history, so it neither points at it nor uses up the pointer.
         var pointsAtHistory = update.Event is not (PresenceEvent or SummaryWantedEvent or OwnerMessageEvent);
-        // A summary is written once, and the user is answered once: when several sessions share this tawk-mcp, the first that takes channel events does it.
+        // A summary is written once, and the user is answered once: when several sessions share this corvus-tawk-mcp, the first that takes channel events does it.
         var listeners = sessions.Sessions.Where(Wants);
         foreach (var session in update.Event is SummaryWantedEvent or OwnerMessageEvent ? listeners.Take(1) : listeners)
         {

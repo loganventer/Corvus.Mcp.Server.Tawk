@@ -9,7 +9,7 @@ namespace Corvus.Mcp.Server.Tawk.Tests.Integration;
 
 public class WorkflowTests
 {
-    private const string Opening = "Workflow check from tawk-mcp.";
+    private const string Opening = "Workflow check from corvus-tawk-mcp.";
     private McpHarness _harness = null!;
 
     [SetUp]
@@ -113,8 +113,8 @@ public class WorkflowTests
                 Assert.That(UserInstructionsFile.Read(big), Has.Length.EqualTo(UserInstructionsFile.MaxLength));
                 Assert.That(UserInstructionsFile.Read(Path.Combine(folder, "missing.md")), Is.Null);
                 Assert.That(UserInstructionsFile.Read(null), Is.Null);
-                Assert.That(UserInstructionsFile.DefaultPath(_ => null, "/home/u"), Is.EqualTo(Path.Combine("/home/u", ".config", "tawk-mcp", "instructions.md")));
-                Assert.That(UserInstructionsFile.DefaultPath(k => k == "XDG_CONFIG_HOME" ? "/cfg" : null, "/home/u"), Is.EqualTo(Path.Combine("/cfg", "tawk-mcp", "instructions.md")));
+                Assert.That(UserInstructionsFile.DefaultPath(_ => null, "/home/u"), Is.EqualTo(Path.Combine("/home/u", ".config", "corvus", "tawk-mcp", "instructions.md")));
+                Assert.That(UserInstructionsFile.DefaultPath(k => k == "XDG_CONFIG_HOME" ? "/cfg" : null, "/home/u"), Is.EqualTo(Path.Combine("/cfg", "corvus", "tawk-mcp", "instructions.md")));
             });
         }
         finally

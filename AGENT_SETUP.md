@@ -181,7 +181,7 @@ If nothing answers, start it by hand in a spare terminal with `tawk-mcp` and rea
 **If port 8765 is taken** by another program, run tawk-mcp on another port and use that port everywhere below:
 
 ```bash
-tawk-mcp --port 8766          # or set TAWKMCP_PORT=8766
+tawk-mcp --port 8766          # or set CORVUS_TAWK_MCP_PORT=8766
 ```
 
 For the service, add the port to the command the service runs (the `ExecStart` line on systemd, the program arguments in the LaunchAgent) and restart it.
@@ -281,7 +281,7 @@ claude --dangerously-load-development-channels server:tawk
 2. Start this one instance with that file:
 
    ```bash
-   TAWKMCP_ADMIN_TOKEN_FILE="${XDG_RUNTIME_DIR:-$HOME/.local/state}/tawk/admin.token" tawk-mcp --stdio
+   CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE="${XDG_RUNTIME_DIR:-$HOME/.local/state}/tawk/admin.token" tawk-mcp --stdio
    ```
 
    With `XDG_RUNTIME_DIR` set the file is `$XDG_RUNTIME_DIR/tawk/admin.token`; without it, `~/.local/state/tawk/admin.token`.

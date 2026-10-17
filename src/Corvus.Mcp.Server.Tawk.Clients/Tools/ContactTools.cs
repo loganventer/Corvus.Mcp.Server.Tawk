@@ -18,7 +18,7 @@ public sealed class ContactTools(IContactProfileManager profiles, IAccountScope 
         ToolResults.RunAsync(() => Task.FromResult(profiles.ListFields()));
 
     [McpServerTool(Name = "get_contact", ReadOnly = true, Idempotent = true, OpenWorld = false)]
-    [Description("Show what tawk-mcp remembers about a contact: categories, voice, fields with their source and confidence, and notes. "
+    [Description("Show what corvus-tawk-mcp remembers about a contact: categories, voice, fields with their source and confidence, and notes. "
         + "Read it before writing to someone." + ToolText.Memory + ToolText.Stored)]
     public Task<CallToolResult> GetContactAsync(
         [Description("The chat's jid or name.")] string chat,
@@ -28,7 +28,7 @@ public sealed class ContactTools(IContactProfileManager profiles, IAccountScope 
         ToolResults.RunAsync(accounts, account, () => profiles.GetContactAsync(chat, includeSensitive, cancellationToken));
 
     [McpServerTool(Name = "list_contacts", ReadOnly = true, Idempotent = true, OpenWorld = false)]
-    [Description("List contacts tawk-mcp has profiles for, optionally in a category or matching a name." + ToolText.Memory + ToolText.Stored)]
+    [Description("List contacts corvus-tawk-mcp has profiles for, optionally in a category or matching a name." + ToolText.Memory + ToolText.Stored)]
     public Task<CallToolResult> ListContactsAsync(
         [Description("Only contacts in this category or below it.")] string? category = null,
         [Description("Only contacts whose name or jid contains this.")] string? query = null,
@@ -80,7 +80,7 @@ public sealed class ContactTools(IContactProfileManager profiles, IAccountScope 
         ToolResults.RunAsync(accounts, account, () => profiles.SetCategoriesAsync(chat, categories, voice, cancellationToken));
 
     [McpServerTool(Name = "delete_contact", Destructive = true, ReadOnly = false, Idempotent = false, OpenWorld = false)]
-    [Description("Forget everything tawk-mcp has stored about a contact." + ToolText.Memory + ToolText.DeletesMemory)]
+    [Description("Forget everything corvus-tawk-mcp has stored about a contact." + ToolText.Memory + ToolText.DeletesMemory)]
     public Task<CallToolResult> DeleteContactAsync(
         McpServer? server,
         [Description("The chat's jid or name.")] string chat,

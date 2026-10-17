@@ -8,8 +8,8 @@ namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Sync;
 /// </summary>
 public static class GitSshEnvironment
 {
-    public const string Author = "tawk-mcp";
-    public const string AuthorEmail = "tawk-mcp@localhost";
+    public const string Author = "corvus-tawk-mcp";
+    public const string AuthorEmail = "corvus-tawk-mcp@localhost";
 
     public static IReadOnlyDictionary<string, string> For(SyncOptions options, Func<string, string?> environment)
     {

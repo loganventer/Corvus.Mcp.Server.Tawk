@@ -13,7 +13,7 @@ public static class UserInstructionsFile
         ArgumentNullException.ThrowIfNull(environment);
         var config = environment("XDG_CONFIG_HOME");
         var root = string.IsNullOrWhiteSpace(config) ? Path.Combine(home, ".config") : config;
-        return Path.Combine(root, "tawk-mcp", "instructions.md");
+        return Path.Combine(root, "corvus", "tawk-mcp", "instructions.md");
     }
 
     /// <summary>The file's text, cut to a sensible length, or null when there is no file or it cannot be read.</summary>

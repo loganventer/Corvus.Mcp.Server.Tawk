@@ -21,7 +21,7 @@ public sealed class ScheduleTools(IChatReadingManager reading, IMessageSendingMa
         ToolResults.RunAsync(accounts, account, () => reading.ListScheduledAsync(chat, cancellationToken));
 
     [McpServerTool(Name = "schedule_message", Destructive = false, ReadOnly = false, Idempotent = false, OpenWorld = true)]
-    [Description("Schedule a WhatsApp message to go out later from tawk. tawk-mcp moves the time by a random few seconds either way, "
+    [Description("Schedule a WhatsApp message to go out later from tawk. corvus-tawk-mcp moves the time by a random few seconds either way, "
         + "so it does not land on the exact minute." + ToolText.NeedsSend + " The user may edit the text while approving.")]
     public Task<CallToolResult> ScheduleMessageAsync(
         [Description(ToolText.Recipient)] string chat,

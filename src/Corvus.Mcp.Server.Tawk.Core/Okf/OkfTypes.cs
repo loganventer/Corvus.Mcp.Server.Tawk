@@ -1,6 +1,6 @@
 namespace Corvus.Mcp.Server.Tawk.Core.Okf;
 
-/// <summary>The concept types tawk-mcp writes. OKF registers none, so readers must accept others too.</summary>
+/// <summary>The concept types corvus-tawk-mcp writes. OKF registers none, so readers must accept others too.</summary>
 public static class OkfTypes
 {
     public const string Contact = "Contact";

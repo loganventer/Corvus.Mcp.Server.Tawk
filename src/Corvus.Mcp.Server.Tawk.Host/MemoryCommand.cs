@@ -6,7 +6,7 @@ using Corvus.Mcp.Server.Tawk.Managers.Sync;
 
 namespace Corvus.Mcp.Server.Tawk.Host;
 
-/// <summary>`tawk-mcp export-okf`, `import-okf` and `sync`: work on the memory database without serving MCP.</summary>
+/// <summary>`corvus-tawk-mcp export-okf`, `import-okf` and `sync`: work on the memory database without serving MCP.</summary>
 public static class MemoryCommand
 {
     public static async Task<int> RunAsync(TawkMcpOptions options, TextWriter output, CancellationToken cancellationToken = default)

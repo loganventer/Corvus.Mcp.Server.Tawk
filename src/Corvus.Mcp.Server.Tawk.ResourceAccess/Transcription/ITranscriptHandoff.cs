@@ -4,7 +4,7 @@ namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Transcription;
 
 /// <summary>
 /// Hands a finished transcript to tawk, which keeps it beside the voice note and shows it in the
-/// conversation. tawk-mcp itself still writes no transcript to disk.
+/// conversation. corvus-tawk-mcp itself still writes no transcript to disk.
 /// </summary>
 public interface ITranscriptHandoff
 {

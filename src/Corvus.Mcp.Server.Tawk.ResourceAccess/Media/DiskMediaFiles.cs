@@ -6,7 +6,7 @@ namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Media;
 public sealed class DiskMediaFiles : IMediaFiles
 {
     public const string Missing =
-        "tawk has the file, and tawk-mcp cannot read it where tawk keeps it. "
+        "tawk has the file, and corvus-tawk-mcp cannot read it where tawk keeps it. "
         + "In Docker, mount tawk's media folder read-only at the same path.";
 
     public void Check(string path, long maxBytes)

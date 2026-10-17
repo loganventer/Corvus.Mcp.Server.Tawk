@@ -12,7 +12,7 @@ public class MediaAndTranscriptionTests
     private string _folder = null!;
 
     [SetUp]
-    public void SetUp() => _folder = Directory.CreateTempSubdirectory("tawk-mcp-media").FullName;
+    public void SetUp() => _folder = Directory.CreateTempSubdirectory("corvus-tawk-mcp-media").FullName;
 
     [TearDown]
     public void TearDown() => Directory.Delete(_folder, recursive: true);
@@ -35,7 +35,7 @@ public class MediaAndTranscriptionTests
             Assert.That(result.IsError, Is.Not.True);
             Assert.That(image.MimeType, Is.EqualTo("image/jpeg"));
             Assert.That(image.DecodedData.ToArray(), Is.EqualTo(jpeg));
-            Assert.That(result.Content.OfType<TextContentBlock>().Select(b => b.Text), Has.None.Contains(_folder), "the path stays inside tawk-mcp");
+            Assert.That(result.Content.OfType<TextContentBlock>().Select(b => b.Text), Has.None.Contains(_folder), "the path stays inside corvus-tawk-mcp");
         });
     }
 

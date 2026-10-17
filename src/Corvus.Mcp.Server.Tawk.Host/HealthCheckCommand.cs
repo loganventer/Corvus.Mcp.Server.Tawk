@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace Corvus.Mcp.Server.Tawk.Host;
 
-/// <summary>`tawk-mcp healthcheck`: asks the running HTTP server for /healthz. Used by Docker, which has no curl.</summary>
+/// <summary>`corvus-tawk-mcp healthcheck`: asks the running HTTP server for /healthz. Used by Docker, which has no curl.</summary>
 public static class HealthCheckCommand
 {
     public static async Task<int> RunAsync(TawkMcpOptions options, TextWriter output)
@@ -21,7 +21,7 @@ public static class HealthCheckCommand
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            await output.WriteLineAsync($"tawk-mcp is not answering at {url}: {ex.Message}").ConfigureAwait(false);
+            await output.WriteLineAsync($"corvus-tawk-mcp is not answering at {url}: {ex.Message}").ConfigureAwait(false);
             return 1;
         }
     }

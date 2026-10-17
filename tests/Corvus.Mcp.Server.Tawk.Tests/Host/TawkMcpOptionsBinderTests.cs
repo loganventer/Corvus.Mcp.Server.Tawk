@@ -70,10 +70,10 @@ public class TawkMcpOptionsBinderTests
     public void Reads_the_environment()
     {
         var options = TawkMcpOptionsBinder.Bind([], Env(
-            ("TAWKMCP_TRANSPORT", "Http"), ("TAWKMCP_BIND", "0.0.0.0"), ("TAWKMCP_PORT", "9000"),
-            ("TAWKMCP_TOKEN_FILE", "/data/token"), ("TAWKMCP_BACKOFF_INITIAL_MS", "250"), ("TAWKMCP_BACKOFF_MAX_MS", "5000"),
-            ("TAWKMCP_BREAKER_THRESHOLD", "3"), ("TAWKMCP_BREAKER_COOLDOWN_S", "20"), ("TAWKMCP_REQUEST_TIMEOUT_S", "4"),
-            ("TAWKMCP_CHANNEL", "off")));
+            ("CORVUS_TAWK_MCP_TRANSPORT", "Http"), ("CORVUS_TAWK_MCP_BIND", "0.0.0.0"), ("CORVUS_TAWK_MCP_PORT", "9000"),
+            ("CORVUS_TAWK_MCP_TOKEN_FILE", "/data/token"), ("CORVUS_TAWK_MCP_BACKOFF_INITIAL_MS", "250"), ("CORVUS_TAWK_MCP_BACKOFF_MAX_MS", "5000"),
+            ("CORVUS_TAWK_MCP_BREAKER_THRESHOLD", "3"), ("CORVUS_TAWK_MCP_BREAKER_COOLDOWN_S", "20"), ("CORVUS_TAWK_MCP_REQUEST_TIMEOUT_S", "4"),
+            ("CORVUS_TAWK_MCP_CHANNEL", "off")));
 
         Assert.Multiple(() =>
         {
@@ -95,7 +95,7 @@ public class TawkMcpOptionsBinderTests
     {
         var options = TawkMcpOptionsBinder.Bind(
             ["--http", "--port", "8800", "--socket", "/tmp/c.sock", "--backoff-initial-ms", "100", "--channel", "on"],
-            Env(("TAWKMCP_PORT", "9000"), ("TAWKMCP_CHANNEL", "off")));
+            Env(("CORVUS_TAWK_MCP_PORT", "9000"), ("CORVUS_TAWK_MCP_CHANNEL", "off")));
 
         Assert.Multiple(() =>
         {
@@ -113,8 +113,8 @@ public class TawkMcpOptionsBinderTests
         Assert.Multiple(() =>
         {
             Assert.That(TawkMcpOptionsBinder.Bind(["--stdio"], Env()).Transport, Is.EqualTo(TransportKind.Stdio));
-            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("TAWKMCP_TRANSPORT", "stdio"))).Transport, Is.EqualTo(TransportKind.Stdio));
-            Assert.That(TawkMcpOptionsBinder.Bind(["--http"], Env(("TAWKMCP_TRANSPORT", "stdio"))).Transport, Is.EqualTo(TransportKind.Http));
+            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("CORVUS_TAWK_MCP_TRANSPORT", "stdio"))).Transport, Is.EqualTo(TransportKind.Stdio));
+            Assert.That(TawkMcpOptionsBinder.Bind(["--http"], Env(("CORVUS_TAWK_MCP_TRANSPORT", "stdio"))).Transport, Is.EqualTo(TransportKind.Http));
         });
     }
 
@@ -135,7 +135,7 @@ public class TawkMcpOptionsBinderTests
             Assert.That(TawkMcpOptionsBinder.Bind(["--port", "nope"], Env()).Error, Does.Contain("--port"));
             Assert.That(TawkMcpOptionsBinder.Bind(["--port"], Env()).Error, Does.Contain("needs a value"));
             Assert.That(TawkMcpOptionsBinder.Bind(["--frobnicate"], Env()).Error, Does.Contain("Unknown argument"));
-            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("TAWKMCP_CHANNEL", "maybe"))).Error, Does.Contain("auto, on or off"));
+            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("CORVUS_TAWK_MCP_CHANNEL", "maybe"))).Error, Does.Contain("auto, on or off"));
             Assert.That(TawkMcpOptionsBinder.Bind(["--backoff-initial-ms", "900", "--backoff-max-ms", "100"], Env()).Error, Does.Contain("maximum"));
         });
     }
@@ -143,7 +143,7 @@ public class TawkMcpOptionsBinderTests
     [Test]
     public void Memory_and_jitter_options_bind_from_flags_and_the_environment()
     {
-        var env = new Dictionary<string, string?> { ["TAWKMCP_MEMORY"] = "read", ["TAWKMCP_SCHEDULE_JITTER_S"] = "30" };
+        var env = new Dictionary<string, string?> { ["CORVUS_TAWK_MCP_MEMORY"] = "read", ["CORVUS_TAWK_MCP_SCHEDULE_JITTER_S"] = "30" };
         var fromEnv = TawkMcpOptionsBinder.Bind([], name => env.GetValueOrDefault(name));
         var fromFlags = TawkMcpOptionsBinder.Bind(["--memory", "off", "--data-file", "/tmp/m.db", "--schedule-jitter-s", "0"], _ => null);
 
@@ -165,8 +165,8 @@ public class TawkMcpOptionsBinderTests
     {
         var defaults = TawkMcpOptionsBinder.Bind([], Env());
         var fromEnv = TawkMcpOptionsBinder.Bind([], Env(
-            ("TAWKMCP_SYNC_KEY", "/k/id"), ("TAWKMCP_SYNC_REPO", "me/mem"), ("TAWKMCP_SYNC_BRANCH", "trunk"),
-            ("TAWKMCP_SYNC_INTERVAL_MINUTES", "30"), ("TAWKMCP_WORKFLOW_EVERY", "0"), ("TAWKMCP_INSTRUCTIONS_FILE", "/x/i.md")));
+            ("CORVUS_TAWK_MCP_SYNC_KEY", "/k/id"), ("CORVUS_TAWK_MCP_SYNC_REPO", "me/mem"), ("CORVUS_TAWK_MCP_SYNC_BRANCH", "trunk"),
+            ("CORVUS_TAWK_MCP_SYNC_INTERVAL_MINUTES", "30"), ("CORVUS_TAWK_MCP_WORKFLOW_EVERY", "0"), ("CORVUS_TAWK_MCP_INSTRUCTIONS_FILE", "/x/i.md")));
         var flags = TawkMcpOptionsBinder.Bind(
             ["export-okf", "/tmp/out", "--include-sensitive", "--sync-repo", "a/b", "--sync-interval-minutes", "5", "--workflow-every", "7"], Env());
 
@@ -232,8 +232,8 @@ public class TawkMcpOptionsBinderTests
         {
             Assert.That(TawkMcpOptionsBinder.Bind([], Env()).ChannelPlayed, Is.False);
             Assert.That(TawkMcpOptionsBinder.Bind(["--channel-played", "on"], Env()).ChannelPlayed, Is.True);
-            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("TAWKMCP_CHANNEL_PLAYED", "on"))).ChannelPlayed, Is.True);
-            Assert.That(TawkMcpOptionsBinder.Bind(["--channel-played", "off"], Env(("TAWKMCP_CHANNEL_PLAYED", "on"))).ChannelPlayed, Is.False);
+            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("CORVUS_TAWK_MCP_CHANNEL_PLAYED", "on"))).ChannelPlayed, Is.True);
+            Assert.That(TawkMcpOptionsBinder.Bind(["--channel-played", "off"], Env(("CORVUS_TAWK_MCP_CHANNEL_PLAYED", "on"))).ChannelPlayed, Is.False);
         });
     }
 
@@ -244,8 +244,8 @@ public class TawkMcpOptionsBinderTests
         {
             Assert.That(TawkMcpOptionsBinder.Bind([], Env()).ChannelPresence, Is.False);
             Assert.That(TawkMcpOptionsBinder.Bind(["--channel-presence", "on"], Env()).ChannelPresence, Is.True);
-            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("TAWKMCP_CHANNEL_PRESENCE", "on"))).ChannelPresence, Is.True);
-            Assert.That(TawkMcpOptionsBinder.Bind(["--channel-presence", "off"], Env(("TAWKMCP_CHANNEL_PRESENCE", "on"))).ChannelPresence, Is.False);
+            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("CORVUS_TAWK_MCP_CHANNEL_PRESENCE", "on"))).ChannelPresence, Is.True);
+            Assert.That(TawkMcpOptionsBinder.Bind(["--channel-presence", "off"], Env(("CORVUS_TAWK_MCP_CHANNEL_PRESENCE", "on"))).ChannelPresence, Is.False);
         });
     }
 }

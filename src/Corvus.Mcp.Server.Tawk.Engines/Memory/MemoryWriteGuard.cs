@@ -8,7 +8,7 @@ public sealed class MemoryWriteGuard(MemoryMode mode) : IMemoryWriteGuard
     {
         if (mode != MemoryMode.Write)
         {
-            throw new MemoryException("tawk-mcp's memory is read-only (--memory read), so nothing was changed.");
+            throw new MemoryException("corvus-tawk-mcp's memory is read-only (--memory read), so nothing was changed.");
         }
     }
 }

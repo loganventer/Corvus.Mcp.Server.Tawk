@@ -9,7 +9,7 @@ public class DiskMediaFilesTests
     private string _folder = null!;
 
     [SetUp]
-    public void SetUp() => _folder = Directory.CreateTempSubdirectory("tawk-mcp-media").FullName;
+    public void SetUp() => _folder = Directory.CreateTempSubdirectory("corvus-tawk-mcp-media").FullName;
 
     [TearDown]
     public void TearDown() => Directory.Delete(_folder, recursive: true);

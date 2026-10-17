@@ -3,7 +3,7 @@ namespace Corvus.Mcp.Server.Tawk.Core;
 public sealed class TawkControlException : Exception
 {
     public const string NotRunningMessage =
-        "tawk is not running, or its control socket is off (Settings > Automation > Control socket). tawk-mcp will connect as soon as it is.";
+        "tawk is not running, or its control socket is off (Settings > Automation > Control socket). corvus-tawk-mcp will connect as soon as it is.";
 
     public TawkControlException()
         : this(new ControlError("unknown", "The tawk control request failed."))

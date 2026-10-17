@@ -5,7 +5,7 @@ using Corvus.Mcp.Server.Tawk.Managers.Transcription;
 namespace Corvus.Mcp.Server.Tawk.Host;
 
 /// <summary>
-/// `tawk-mcp fetch-model NAME`: downloads a Whisper model for transcribing in process, ahead of time.
+/// `corvus-tawk-mcp fetch-model NAME`: downloads a Whisper model for transcribing in process, ahead of time.
 /// A transcription that needs a model that is not here fetches it too, so this only saves the first wait.
 /// </summary>
 public static class FetchModelCommand

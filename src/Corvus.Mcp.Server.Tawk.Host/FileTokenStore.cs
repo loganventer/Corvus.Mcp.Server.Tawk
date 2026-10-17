@@ -15,7 +15,7 @@ public sealed class FileTokenStore(string path) : ITokenStore
         ArgumentNullException.ThrowIfNull(environment);
         var config = environment("XDG_CONFIG_HOME");
         var root = string.IsNullOrWhiteSpace(config) ? Path.Combine(home, ".config") : config;
-        return Path.Combine(root, "tawk-mcp", "token");
+        return Path.Combine(root, "corvus", "tawk-mcp", "token");
     }
 
     public static string NewToken() => Base64Url(RandomNumberGenerator.GetBytes(32));

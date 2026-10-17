@@ -20,11 +20,11 @@ public class ControlLineCodecTests
     [Test]
     public void Encodes_the_hello_request_exactly_as_the_example()
     {
-        var args = new JsonObject { ["client"] = "tawk-mcp", ["version"] = "0.1.0", ["protocol"] = 1, ["origin"] = "mcp" };
+        var args = new JsonObject { ["client"] = "corvus-tawk-mcp", ["version"] = "0.1.0", ["protocol"] = 1, ["origin"] = "mcp" };
 
         Assert.That(
             _codec.EncodeRequest("1", "hello", args),
-            Is.EqualTo("""{"id":"1","op":"hello","args":{"client":"tawk-mcp","version":"0.1.0","protocol":1,"origin":"mcp"}}"""));
+            Is.EqualTo("""{"id":"1","op":"hello","args":{"client":"corvus-tawk-mcp","version":"0.1.0","protocol":1,"origin":"mcp"}}"""));
     }
 
     [Test]

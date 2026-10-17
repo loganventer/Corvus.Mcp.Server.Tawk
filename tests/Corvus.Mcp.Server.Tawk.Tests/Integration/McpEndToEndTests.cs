@@ -120,7 +120,7 @@ public class McpEndToEndTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(text, Does.StartWith("tawk-mcp " + Corvus.Mcp.Server.Tawk.Host.TawkMcpComposition.Version));
+            Assert.That(text, Does.StartWith("corvus-tawk-mcp " + Corvus.Mcp.Server.Tawk.Host.TawkMcpComposition.Version));
             Assert.That(text, Does.Contain("tawk 0.6.4 (control protocol 1)"));
         });
     }

@@ -1,6 +1,6 @@
 namespace Corvus.Mcp.Server.Tawk.Managers.Transcription;
 
-/// <summary>The models tawk-mcp can load to transcribe in process. Only the user fetches one, by name.</summary>
+/// <summary>The models corvus-tawk-mcp can load to transcribe in process. Only the user fetches one, by name.</summary>
 public interface ITranscriptionModelManager
 {
     /// <summary>

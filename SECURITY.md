@@ -93,11 +93,11 @@ Message text, chat names, previews, about texts and status text are written by o
 - flattens and shortens names in channel event headers;
 - says in every tool description and in its server instructions that this text is untrusted.
 
-These reduce the risk; they cannot remove it, because a model may still be persuaded. What limits the harm is that nothing happens to your account without you: every send waits for your approval in tawk, destructive operations need two confirmations, and with `access = read` nothing can be written at all. Channel events put incoming messages in front of the model without you asking, so leave `TAWKMCP_CHANNEL=off` or `access = read` if that worries you.
+These reduce the risk; they cannot remove it, because a model may still be persuaded. What limits the harm is that nothing happens to your account without you: every send waits for your approval in tawk, destructive operations need two confirmations, and with `access = read` nothing can be written at all. Channel events put incoming messages in front of the model without you asking, so leave `CORVUS_TAWK_MCP_CHANNEL=off` or `access = read` if that worries you.
 
 ## Approving its own sends
 
-With `TAWKMCP_ADMIN_TOKEN_FILE` set and tawk's access at `admin`, the model can carry out its own sends through `approve_pending`. That removes the check that otherwise stops a misled model: you no longer see a message before it goes. What remains is narrower:
+With `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` set and tawk's access at `admin`, the model can carry out its own sends through `approve_pending`. That removes the check that otherwise stops a misled model: you no longer see a message before it goes. What remains is narrower:
 
 - It is off by default on both sides, and there is no default path to the token file. An instance without the file has no such tools.
 - tawk-mcp reads the token from the file each time and passes it to tawk; it is never returned to the model, logged or stored.
@@ -140,9 +140,9 @@ For `delete_message`, `delete_chat`, `clear_chat`, `block`, `remove_profile_phot
 
 ## HTTP mode
 
-- Kestrel binds 127.0.0.1 unless `TAWKMCP_BIND` or `--bind` says otherwise.
+- Kestrel binds 127.0.0.1 unless `CORVUS_TAWK_MCP_BIND` or `--bind` says otherwise.
 - Every request except `GET /healthz` needs `Authorization: Bearer <token>`, compared in constant time. `/healthz` shows only the connection state.
-- The token is 32 random bytes from the system's cryptographic generator, kept in `~/.config/tawk-mcp/token` (0600, folder 0700), or passed in `TAWKMCP_TOKEN`.
+- The token is 32 random bytes from the system's cryptographic generator, kept in `~/.config/tawk-mcp/token` (0600, folder 0700), or passed in `CORVUS_TAWK_MCP_TOKEN`.
 - Requests whose `Origin` is anything other than `http(s)://localhost` or `http(s)://127.0.0.1` get 403, so a web page cannot use your browser to reach tawk-mcp, even by DNS rebinding.
 - `/events` is behind the same token and origin check.
 

@@ -121,7 +121,7 @@ public static class TawkMcpComposition
         services.AddSingleton<ILiveUpdatesManager, LiveUpdatesManager>();
         services.AddSingleton<IApprovalManager, ApprovalManager>();
 
-        // Media: tawk says where a file is, and tawk-mcp only ever reads it.
+        // Media: tawk says where a file is, and corvus-tawk-mcp only ever reads it.
         services.AddSingleton(new MediaOptions());
         services.AddSingleton<ITawkMediaSource, TawkMediaSource>();
         services.AddSingleton<IMediaFiles, DiskMediaFiles>();
@@ -174,7 +174,7 @@ public static class TawkMcpComposition
         return services
             .AddMcpServer(server =>
             {
-                server.ServerInfo = new Implementation { Name = "tawk-mcp", Title = "tawk", Version = Version };
+                server.ServerInfo = new Implementation { Name = "corvus-tawk-mcp", Title = "Corvus Tawk", Version = Version };
                 server.ServerInstructions = TawkServerInstructions.Text
                     + TawkServerInstructions.Accounts
                     + (options.Memory == MemoryMode.Off ? string.Empty : TawkServerInstructions.Memory)
@@ -250,7 +250,7 @@ public static class TawkMcpComposition
             CultureInfo.InvariantCulture, $"{(folder.Length == 0 ? "/" : folder)} (stdio{ChannelClaims.LabelMark(options.Channel)}, pid {Environment.ProcessId})");
     }
 
-    /// <summary>The model files and their manager alone, for `tawk-mcp fetch-model`, which does not serve MCP.</summary>
+    /// <summary>The model files and their manager alone, for `corvus-tawk-mcp fetch-model`, which does not serve MCP.</summary>
     public static ServiceProvider BuildModels(TawkMcpOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -284,7 +284,7 @@ public static class TawkMcpComposition
     {
         services.AddSingleton(transcription);
 
-        // The model inside tawk-mcp: one host owns it, and one lock keeps it the only one on the machine.
+        // The model inside corvus-tawk-mcp: one host owns it, and one lock keeps it the only one on the machine.
         services.AddSingleton<IModelFiles, DiskModelFiles>();
         services.AddSingleton<IModelLock>(sp => new FileModelLock(
             Path.Combine(transcription.ModelDirectory, ".loaded.lock"), sp.GetRequiredService<TimeProvider>()));

@@ -22,7 +22,7 @@ public sealed class ContactProfileManager(
     TimeProvider clock,
     IAccountTag? accountTag = null) : IContactProfileManager
 {
-    private const string ProfileLabel = "a contact profile from tawk-mcp's memory, written by the user or by an agent that read their chats";
+    private const string ProfileLabel = "a contact profile from corvus-tawk-mcp's memory, written by the user or by an agent that read their chats";
     private const int MaxNoteLength = 2000;
 
     public string ListFields() => formatter.Fields(catalog.All);
@@ -172,7 +172,7 @@ public sealed class ContactProfileManager(
         }
 
         await MemoryConfirmations.EnsureAsync(
-            confirmation, $"forget everything tawk-mcp has stored about {target.Name}: every field, note and category", cancellationToken).ConfigureAwait(false);
+            confirmation, $"forget everything corvus-tawk-mcp has stored about {target.Name}: every field, note and category", cancellationToken).ConfigureAwait(false);
         await contacts.DeleteAsync(target.Jid, cancellationToken).ConfigureAwait(false);
         return $"Forgot everything about {target.Name}.";
     }

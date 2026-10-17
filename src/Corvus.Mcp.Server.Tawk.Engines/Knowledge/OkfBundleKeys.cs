@@ -1,6 +1,6 @@
 namespace Corvus.Mcp.Server.Tawk.Engines.Knowledge;
 
-/// <summary>The frontmatter keys a bundle uses: OKF's own, and the ones tawk-mcp adds as a producer.</summary>
+/// <summary>The frontmatter keys a bundle uses: OKF's own, and the ones corvus-tawk-mcp adds as a producer.</summary>
 internal static class OkfBundleKeys
 {
     public const string Version = "0.2";

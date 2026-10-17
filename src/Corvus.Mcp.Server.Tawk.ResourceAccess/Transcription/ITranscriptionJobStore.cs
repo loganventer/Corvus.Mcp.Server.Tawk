@@ -4,7 +4,7 @@ namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Transcription;
 
 /// <summary>
 /// The queue of transcription jobs and the recent ones that ended. Kept in memory only, a bounded number
-/// for a bounded time: tawk-mcp stores no messages.
+/// for a bounded time: corvus-tawk-mcp stores no messages.
 /// </summary>
 public interface ITranscriptionJobStore
 {

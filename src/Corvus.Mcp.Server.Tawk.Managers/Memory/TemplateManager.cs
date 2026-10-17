@@ -23,7 +23,7 @@ public sealed class TemplateManager(
     IMemoryWriteGuard guard,
     TimeProvider clock) : ITemplateManager
 {
-    private const string TemplateLabel = "a response template from tawk-mcp's memory, saved by the user or an agent";
+    private const string TemplateLabel = "a response template from corvus-tawk-mcp's memory, saved by the user or an agent";
     private const int MaxBodyLength = 4000;
 
     public async Task<string> ListAsync(string? category, CancellationToken cancellationToken)

@@ -1,7 +1,7 @@
 namespace Corvus.Mcp.Server.Tawk.Engines.Memory;
 
 /// <summary>
-/// The profile fields tawk-mcp knows. Contact details follow JSContact (RFC 9553); communication fields follow politeness
+/// The profile fields corvus-tawk-mcp knows. Contact details follow JSContact (RFC 9553); communication fields follow politeness
 /// and accommodation research; personality is kept to coarse bands because inferring it from chat is only weakly accurate.
 /// </summary>
 public static class StandardContactFields

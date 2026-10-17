@@ -56,7 +56,7 @@ public sealed class ChatTools(IChatReadingManager reading, IChatManagementManage
         ToolResults.RunAsync(accounts, account, () => reading.ChatInfoAsync(chat, cancellationToken));
 
     [McpServerTool(Name = "set_chat", Destructive = false, ReadOnly = false, Idempotent = true, OpenWorld = false)]
-    [Description("Mute, pin, archive or lock a chat. Locking hides the chat behind tawk's soft lock, which also hides it from tawk-mcp." + ToolText.NeedsManage)]
+    [Description("Mute, pin, archive or lock a chat. Locking hides the chat behind tawk's soft lock, which also hides it from corvus-tawk-mcp." + ToolText.NeedsManage)]
     public Task<CallToolResult> SetChatAsync(
         McpServer? server,
         [Description("The chat's jid or name.")] string chat,

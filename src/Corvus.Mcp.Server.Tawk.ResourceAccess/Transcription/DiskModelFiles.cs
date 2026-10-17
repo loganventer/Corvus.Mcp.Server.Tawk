@@ -11,12 +11,12 @@ public sealed class DiskModelFiles(TranscriptionOptions options) : IModelFiles
 
     public string Folder => options.ModelDirectory;
 
-    /// <summary>~/.local/share/tawk-mcp/models, or under $XDG_DATA_HOME when that is set.</summary>
+    /// <summary>~/.local/share/corvus/tawk-mcp/models, or under $XDG_DATA_HOME when that is set.</summary>
     public static string DefaultFolder(Func<string, string?> environment, string home)
     {
         ArgumentNullException.ThrowIfNull(environment);
         var data = environment("XDG_DATA_HOME") is { Length: > 0 } set ? set : Path.Combine(home, ".local", "share");
-        return Path.Combine(data, "tawk-mcp", "models");
+        return Path.Combine(data, "corvus", "tawk-mcp", "models");
     }
 
     public string? Find(string model)

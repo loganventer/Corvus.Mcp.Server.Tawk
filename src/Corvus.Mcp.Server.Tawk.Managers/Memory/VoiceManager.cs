@@ -21,7 +21,7 @@ public sealed class VoiceManager(
     IMemoryWriteGuard guard,
     TimeProvider clock) : IVoiceManager, IDraftGuidance
 {
-    private const string GuideLabel = "a voice guide from tawk-mcp's memory, saved by the user or an agent";
+    private const string GuideLabel = "a voice guide from corvus-tawk-mcp's memory, saved by the user or an agent";
 
     public async Task<string> ListVoicesAsync(CancellationToken cancellationToken) =>
         formatter.Voices(await voices.ListAsync(cancellationToken).ConfigureAwait(false));
@@ -214,7 +214,7 @@ public sealed class VoiceManager(
             return string.Empty;
         }
 
-        return "How the user writes to this person, from tawk-mcp's memory. Follow it, then call check_voice with the draft "
+        return "How the user writes to this person, from corvus-tawk-mcp's memory. Follow it, then call check_voice with the draft "
             + "and chat before showing it, and fix anything it flags. get_contact has more about the person.\n"
             + fence.Wrap(GuideLabel, formatter.Resolved(resolved));
     }

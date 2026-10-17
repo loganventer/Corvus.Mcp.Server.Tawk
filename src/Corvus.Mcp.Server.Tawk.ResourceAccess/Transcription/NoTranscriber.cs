@@ -5,7 +5,7 @@ namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Transcription;
 /// <summary>Stands in when the user turned transcription off: every pass is refused, saying so.</summary>
 public sealed class NoTranscriber : ITranscriber
 {
-    public const string Off = "Transcription is off: this tawk-mcp was started with --transcribe off. Only the user can turn it on.";
+    public const string Off = "Transcription is off: this corvus-tawk-mcp was started with --transcribe off. Only the user can turn it on.";
 
     public string Name => "off";
 

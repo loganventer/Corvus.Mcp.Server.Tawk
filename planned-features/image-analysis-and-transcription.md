@@ -106,7 +106,7 @@ A job is not a `TawkEvent` that tawk sent, so the sink needs a second way in. Pl
 
 Two levels. The user sets what exists and the defaults, when starting tawk-mcp. The agent picks among those per call.
 
-Set by the user (flags, with matching `TAWKMCP_*` variables):
+Set by the user (flags, with matching `CORVUS_TAWK_MCP_*` variables):
 
 | Flag | Meaning | Default |
 | --- | --- | --- |

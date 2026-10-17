@@ -9,7 +9,7 @@ namespace Corvus.Mcp.Server.Tawk.Clients.Resources;
 
 /// <summary>
 /// Sends notifications/resources/updated to subscribed sessions when a chat changes, and for every
-/// subscription after tawk-mcp reconnects to tawk, since messages may have arrived meanwhile.
+/// subscription after corvus-tawk-mcp reconnects to tawk, since messages may have arrived meanwhile.
 /// </summary>
 public sealed partial class ResourceUpdatePump(IResourceSubscriptionRegistry registry, ILogger<ResourceUpdatePump> logger) : IEventSink
 {

@@ -88,7 +88,7 @@ public sealed partial class LiveUpdatesManager : ILiveUpdatesManager
         _notification.Header(message.Chat, message.Message) + "\n"
         + _fence.Wrap("a new WhatsApp message", _transcript.FormatMessage(message.Message));
 
-    // The request is tawk-mcp's own text; the message it is about is fenced like any other.
+    // The request is corvus-tawk-mcp's own text; the message it is about is fenced like any other.
     private string Describe(SummaryWantedEvent wanted) =>
         SummaryRequestText.For(wanted.Message.Id, wanted.MaxChars) + "\n"
         + _fence.Wrap("the WhatsApp message to summarise", _transcript.FormatMessage(wanted.Message));

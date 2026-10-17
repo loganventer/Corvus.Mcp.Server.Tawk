@@ -16,7 +16,7 @@ public sealed class MemoryParts : IDisposable
     public MemoryParts(MemoryMode mode = MemoryMode.Write)
     {
         Folder = Path.Combine(Path.GetTempPath(), "tawk-memory-" + Guid.NewGuid().ToString("N")[..8]);
-        Connections = new SqliteConnectionFactory(Path.Combine(Folder, "tawk-mcp", "memory.db"), new SqliteSchemaMigrator());
+        Connections = new SqliteConnectionFactory(Path.Combine(Folder, "corvus-tawk-mcp", "memory.db"), new SqliteSchemaMigrator());
         Categories = new SqliteCategoryStore(Connections, Clock);
         Voices = new SqliteVoiceStore(Connections, Clock);
         Contacts = new SqliteContactStore(Connections, Producer, Clock);

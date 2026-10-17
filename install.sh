@@ -26,7 +26,7 @@ DOCKER=0
 UNINSTALL=0
 ASSUME_YES=0
 DOTNET_MAJOR=10
-TAWK_INSTALLER="https://raw.githubusercontent.com/loganventer/tawk/main/install.sh"
+CORVUS_TAWK_INSTALLER="https://raw.githubusercontent.com/loganventer/tawk/main/install.sh"
 
 say()  { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m!!\033[0m %s\n' "$*" >&2; }
@@ -80,7 +80,7 @@ PLIST="$HOME/Library/LaunchAgents/com.loganventer.tawk-mcp.plist"
 PLIST_LABEL="com.loganventer.tawk-mcp"
 CRON_MARK="# tawk-mcp: start at boot (added by install.sh)"
 ME="${USER:-$(id -un)}"
-TOKEN_FILE="${TAWKMCP_TOKEN_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp/token}"
+TOKEN_FILE="${CORVUS_TAWK_MCP_TOKEN_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp/token}"
 
 if [ "$UNINSTALL" -eq 1 ]; then
     if [ -f "$UNIT" ]; then
@@ -258,7 +258,7 @@ if [ "$DOCKER" -eq 1 ]; then
     The bearer token appears in ${XDG_CONFIG_HOME:-$HOME/.config}/tawk-mcp/token once it has started.
     With --restart unless-stopped, Docker starts it again at boot whenever the Docker service starts at boot.
 RUN
-    have tawk || warn "tawk itself is not installed. Install it with: curl -fsSL $TAWK_INSTALLER | bash"
+    have tawk || warn "tawk itself is not installed. Install it with: curl -fsSL $CORVUS_TAWK_INSTALLER | bash"
     exit 0
 fi
 
@@ -399,7 +399,7 @@ say "the bearer token for HTTP clients is in $TOKEN_FILE (tawk-mcp print-token s
 
 # Voice notes are transcribed inside tawk-mcp. The default model is fetched now so the first one does
 # not wait for a download (about 1.6 GB); another model chosen in tawk is fetched the first time it is needed.
-MODEL_DIR="${TAWKMCP_TRANSCRIBE_MODEL_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/tawk-mcp/models}"
+MODEL_DIR="${CORVUS_TAWK_MCP_TRANSCRIBE_MODEL_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/tawk-mcp/models}"
 DEFAULT_MODEL=large-v3-turbo
 if [ -f "$MODEL_DIR/ggml-$DEFAULT_MODEL.bin" ]; then
     say "transcription model: $DEFAULT_MODEL is already in $MODEL_DIR"
@@ -415,7 +415,7 @@ fi
 
 if ! have tawk; then
     warn "tawk itself is not installed. tawk-mcp needs a running tawk; install it with:"
-    echo "    curl -fsSL $TAWK_INSTALLER | bash"
+    echo "    curl -fsSL $CORVUS_TAWK_INSTALLER | bash"
 fi
 
 say "done. Next steps:"

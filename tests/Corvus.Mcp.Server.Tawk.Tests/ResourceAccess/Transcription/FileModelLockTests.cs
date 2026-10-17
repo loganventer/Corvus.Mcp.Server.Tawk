@@ -7,7 +7,7 @@ public class FileModelLockTests
     private string _folder = null!;
 
     [SetUp]
-    public void SetUp() => _folder = Directory.CreateTempSubdirectory("tawk-mcp-models").FullName;
+    public void SetUp() => _folder = Directory.CreateTempSubdirectory("corvus-tawk-mcp-models").FullName;
 
     [TearDown]
     public void TearDown() => Directory.Delete(_folder, recursive: true);

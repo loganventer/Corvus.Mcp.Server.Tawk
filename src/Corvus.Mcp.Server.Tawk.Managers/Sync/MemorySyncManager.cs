@@ -24,13 +24,13 @@ public sealed class MemorySyncManager(
     {
         if (!options.Enabled)
         {
-            return new SyncReport(SyncOutcome.Disabled, "Memory sync is off: it needs a repository (TAWKMCP_SYNC_REPO), reached over SSH with a key that may write to it.");
+            return new SyncReport(SyncOutcome.Disabled, "Memory sync is off: it needs a repository (CORVUS_TAWK_MCP_SYNC_REPO), reached over SSH with a key that may write to it.");
         }
 
         using var held = syncLock.TryAcquire();
         if (held is null)
         {
-            return new SyncReport(SyncOutcome.Busy, "Another tawk-mcp on this machine is syncing; this one skipped the cycle.");
+            return new SyncReport(SyncOutcome.Busy, "Another corvus-tawk-mcp on this machine is syncing; this one skipped the cycle.");
         }
 
         try

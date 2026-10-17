@@ -22,7 +22,7 @@ public static class OggFiles
         head[9] = 1;
         BinaryPrimitives.WriteUInt16LittleEndian(head.AsSpan(10), 312);
         BinaryPrimitives.WriteUInt32LittleEndian(head.AsSpan(12), SampleRate);
-        var vendor = Encoding.ASCII.GetBytes("tawk-mcp tests");
+        var vendor = Encoding.ASCII.GetBytes("corvus-tawk-mcp tests");
         var tags = new byte[8 + 4 + vendor.Length + 4];
         "OpusTags"u8.CopyTo(tags);
         BinaryPrimitives.WriteUInt32LittleEndian(tags.AsSpan(8), (uint)vendor.Length);

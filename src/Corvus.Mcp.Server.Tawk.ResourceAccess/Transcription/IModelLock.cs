@@ -1,7 +1,7 @@
 namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Transcription;
 
 /// <summary>
-/// One loaded model for the whole machine. Several tawk-mcp processes may run at once, one for each agent
+/// One loaded model for the whole machine. Several corvus-tawk-mcp processes may run at once, one for each agent
 /// session, and only the one holding this may have a model in memory.
 /// </summary>
 public interface IModelLock

@@ -215,7 +215,7 @@ public sealed partial class WhisperModelHost : IWhisperModelHost, IAsyncDisposab
         var path = await PathAsync(model, progress, cancellationToken).ConfigureAwait(false);
         progress.Report(new TranscriptionProgress(TranscriptionStage.LoadingModel));
         _held = await _lock.AcquireAsync(_options.LockWait, cancellationToken).ConfigureAwait(false)
-            ?? throw new TranscriptionException("transcriber busy: another tawk-mcp on this computer is transcribing");
+            ?? throw new TranscriptionException("transcriber busy: another corvus-tawk-mcp on this computer is transcribing");
         _runtime.Ensure();
         _factory = await Task.Run(() => WhisperFactory.FromPath(path), cancellationToken).ConfigureAwait(false);
         _loaded = model;

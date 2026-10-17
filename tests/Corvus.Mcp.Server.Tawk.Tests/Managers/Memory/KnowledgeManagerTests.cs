@@ -48,7 +48,7 @@ public class KnowledgeManagerTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(concept.GeneratedBy, Is.EqualTo("tawk-mcp/test"));
+            Assert.That(concept.GeneratedBy, Is.EqualTo("corvus-tawk-mcp/test"));
             Assert.That(concept.Verified, Is.Empty);
             Assert.That(OkfExtras.Read(concept), Is.EqualTo(new ObservationDetails(FactSource.Inferred, 0.6, false, "m1, m2")));
             Assert.That(listed, Does.Contain("(inferred, 0.60, until ").And.Contain("about Neal Titus #general: Seems to prefer voice notes."));

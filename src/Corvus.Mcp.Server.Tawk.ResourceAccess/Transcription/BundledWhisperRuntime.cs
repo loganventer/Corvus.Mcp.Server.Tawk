@@ -5,7 +5,7 @@ using Whisper.net.LibraryLoader;
 namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Transcription;
 
 /// <summary>
-/// A published tawk-mcp is one file, and its program assembly carries the native libraries for its own
+/// A published corvus-tawk-mcp is one file, and its program assembly carries the native libraries for its own
 /// platform as resources (only the program is built knowing the platform). They
 /// are unpacked into a private folder beside the models, named for this build so an update unpacks afresh,
 /// and Whisper is pointed at them. The same on Linux, macOS and Windows.
@@ -80,7 +80,7 @@ public sealed class BundledWhisperRuntime(Assembly program, TranscriptionOptions
             Directory.CreateDirectory(target);
             var path = Path.Combine(target, parts[1]);
 
-            // A file of the right size is already unpacked, perhaps by another tawk-mcp that is using it now.
+            // A file of the right size is already unpacked, perhaps by another corvus-tawk-mcp that is using it now.
             if (File.Exists(path) && new FileInfo(path).Length == resource.Length)
             {
                 continue;

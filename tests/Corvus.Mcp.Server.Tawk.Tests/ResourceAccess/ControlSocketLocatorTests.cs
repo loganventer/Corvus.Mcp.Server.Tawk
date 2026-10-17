@@ -12,7 +12,7 @@ public class ControlSocketLocatorTests
     {
         var locator = new ControlSocketLocator(null, Env(("XDG_RUNTIME_DIR", "/run/user/1000")), "/home/me");
 
-        Assert.That(locator.Locate(), Is.EqualTo("/run/user/1000/tawk/control.sock"));
+        Assert.That(locator.Locate(), Is.EqualTo("/run/user/1000/corvus/tawk/control.sock"));
     }
 
     [Test]
@@ -20,13 +20,13 @@ public class ControlSocketLocatorTests
     {
         var locator = new ControlSocketLocator(null, Env(), "/home/me");
 
-        Assert.That(locator.Locate(), Is.EqualTo("/home/me/.local/state/tawk/control.sock"));
+        Assert.That(locator.Locate(), Is.EqualTo("/home/me/.local/state/corvus/tawk/control.sock"));
     }
 
     [Test]
     public void The_environment_variable_overrides_the_default()
     {
-        var locator = new ControlSocketLocator(null, Env(("XDG_RUNTIME_DIR", "/run/user/1000"), ("TAWK_CONTROL_SOCKET", "/run/tawk/control.sock")), "/home/me");
+        var locator = new ControlSocketLocator(null, Env(("XDG_RUNTIME_DIR", "/run/user/1000"), ("CORVUS_TAWK_CONTROL_SOCKET", "/run/tawk/control.sock")), "/home/me");
 
         Assert.That(locator.Locate(), Is.EqualTo("/run/tawk/control.sock"));
     }
@@ -34,7 +34,7 @@ public class ControlSocketLocatorTests
     [Test]
     public void The_socket_flag_overrides_everything()
     {
-        var locator = new ControlSocketLocator("/tmp/x.sock", Env(("TAWK_CONTROL_SOCKET", "/run/tawk/control.sock")), "/home/me");
+        var locator = new ControlSocketLocator("/tmp/x.sock", Env(("CORVUS_TAWK_CONTROL_SOCKET", "/run/tawk/control.sock")), "/home/me");
 
         Assert.That(locator.Locate(), Is.EqualTo("/tmp/x.sock"));
     }

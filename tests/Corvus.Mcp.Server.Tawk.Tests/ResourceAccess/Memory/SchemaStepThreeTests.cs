@@ -89,7 +89,7 @@ public class SchemaStepThreeTests
     public void An_observation_carries_its_account_among_its_producer_keys()
     {
         var extra = OkfExtras.Write(new ObservationDetails(FactSource.Inferred, 0.5, false, null) { Account = Work });
-        var concept = new OkfConcept("observations/x", OkfTypes.Observation, null, null, null, [], "tawk-mcp/0.3.0", Now, [], OkfStatus.Stable, null, [], extra, "text", Now);
+        var concept = new OkfConcept("observations/x", OkfTypes.Observation, null, null, null, [], "corvus-tawk-mcp/0.3.0", Now, [], OkfStatus.Stable, null, [], extra, "text", Now);
 
         Assert.Multiple(() =>
         {

@@ -3,7 +3,7 @@ using Corvus.Mcp.Server.Tawk.Core.Transcription;
 namespace Corvus.Mcp.Server.Tawk.ResourceAccess.Transcription;
 
 /// <summary>
-/// Owns the one Whisper model tawk-mcp has loaded: it loads on first use, every job and every language
+/// Owns the one Whisper model corvus-tawk-mcp has loaded: it loads on first use, every job and every language
 /// reuses it, a different model replaces it, and it is let go when idle. There are never two.
 /// </summary>
 public interface IWhisperModelHost

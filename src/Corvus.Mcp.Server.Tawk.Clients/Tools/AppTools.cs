@@ -18,7 +18,7 @@ public sealed class AppTools(IAppManager app, IAccountScope accounts)
         ToolResults.RunAsync(accounts, account, () => app.AppStatusAsync(cancellationToken));
 
     [McpServerTool(Name = "get_version", ReadOnly = true, Idempotent = true, OpenWorld = false)]
-    [Description("Show which version of tawk-mcp this is, and which version of tawk it is talking to. Use it to check that an update took hold.")]
+    [Description("Show which version of corvus-tawk-mcp this is, and which version of tawk it is talking to. Use it to check that an update took hold.")]
     public Task<CallToolResult> GetVersionAsync(CancellationToken cancellationToken = default) =>
         ToolResults.RunAsync(() => app.VersionAsync(cancellationToken));
 

@@ -8,7 +8,7 @@ public class DiskModelFilesTests
     private string _folder = null!;
 
     [SetUp]
-    public void SetUp() => _folder = Directory.CreateTempSubdirectory("tawk-mcp-models").FullName;
+    public void SetUp() => _folder = Directory.CreateTempSubdirectory("corvus-tawk-mcp-models").FullName;
 
     [TearDown]
     public void TearDown() => Directory.Delete(_folder, recursive: true);
@@ -24,7 +24,7 @@ public class DiskModelFilesTests
         {
             Assert.That(files.Find("small"), Is.EqualTo(Path.Combine(_folder, "ggml-small.bin")));
             Assert.That(files.Find("tiny"), Is.Null, "not installed");
-            Assert.That(files.Find("evil"), Is.Null, "not a model tawk-mcp knows");
+            Assert.That(files.Find("evil"), Is.Null, "not a model corvus-tawk-mcp knows");
             Assert.That(files.Find("../ggml-small"), Is.Null);
             Assert.That(files.Installed(), Is.EqualTo(new[] { "small" }));
         });
@@ -44,8 +44,8 @@ public class DiskModelFilesTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(DiskModelFiles.DefaultFolder(_ => null, "/home/logan"), Is.EqualTo("/home/logan/.local/share/tawk-mcp/models"));
-            Assert.That(DiskModelFiles.DefaultFolder(k => k == "XDG_DATA_HOME" ? "/data" : null, "/home/logan"), Is.EqualTo("/data/tawk-mcp/models"));
+            Assert.That(DiskModelFiles.DefaultFolder(_ => null, "/home/logan"), Is.EqualTo("/home/logan/.local/share/corvus/tawk-mcp/models"));
+            Assert.That(DiskModelFiles.DefaultFolder(k => k == "XDG_DATA_HOME" ? "/data" : null, "/home/logan"), Is.EqualTo("/data/corvus/tawk-mcp/models"));
         });
     }
 }

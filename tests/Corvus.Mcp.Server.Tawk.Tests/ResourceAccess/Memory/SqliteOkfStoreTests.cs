@@ -135,7 +135,7 @@ public class SqliteOkfStoreTests
             Assert.That(contact!.Title, Is.EqualTo("Anneke"));
             Assert.That(contact.Resource, Is.EqualTo("whatsapp:" + Jid));
             Assert.That(second, Is.Not.EqualTo(first));
-            Assert.That(observations.Select(o => o.GeneratedBy), Is.EqualTo(new[] { "human:self", "tawk-mcp/test" }));
+            Assert.That(observations.Select(o => o.GeneratedBy), Is.EqualTo(new[] { "human:self", "corvus-tawk-mcp/test" }));
             Assert.That(observations[0].Verified, Has.Count.EqualTo(1));
             Assert.That(observations[1].Verified, Is.Empty);
             Assert.That(notes.Select(n => (n.Text, n.Source)), Is.EqualTo(new[] { ("Likes rooibos.", FactSource.User), ("Seems tired lately.", FactSource.Inferred) }));
@@ -176,7 +176,7 @@ public class SqliteOkfStoreTests
     }
 
     private static OkfConcept Concept(string id, string type) =>
-        new(id, type, null, null, null, [], "tawk-mcp/test", Now, [], OkfStatus.Stable, null, [], "{}", string.Empty, Now);
+        new(id, type, null, null, null, [], "corvus-tawk-mcp/test", Now, [], OkfStatus.Stable, null, [], "{}", string.Empty, Now);
 
     private static OkfLink Link(string from, string to, string label) => new(from, to, label, null, FactSource.User, 1.0, Now);
 

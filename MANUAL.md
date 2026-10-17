@@ -344,7 +344,7 @@ If your MCP client cannot ask questions (it does not support MCP elicitation), t
 
 ## Approving its own sends
 
-Normally a send waits until you allow it in tawk. When you run an agent that should act while you are away, you can let this instance approve its own requests. Two things must be set, both by you: tawk's access must be `admin` with the chats switched on for it, and this instance must be started with `TAWKMCP_ADMIN_TOKEN_FILE` pointing at tawk's admin token file. [CONFIGURATION.md](CONFIGURATION.md#approving-its-own-sends) has the steps. Without the setting the two tools below do not exist.
+Normally a send waits until you allow it in tawk. When you run an agent that should act while you are away, you can let this instance approve its own requests. Two things must be set, both by you: tawk's access must be `admin` with the chats switched on for it, and this instance must be started with `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` pointing at tawk's admin token file. [CONFIGURATION.md](CONFIGURATION.md#approving-its-own-sends) has the steps. Without the setting the two tools below do not exist.
 
 How it goes:
 
@@ -428,7 +428,7 @@ An export is one Markdown file per concept, with YAML frontmatter (`type`, `titl
 
 tawk-mcp keeps the agent's memory habits going by itself. Once every 20 rounds (a tool call or an incoming message handed to the agent each count as one), it adds a workflow check to a tool result: record what was learned about people as profile fields or observations with the right source, record relations, refresh your voice with `learn_voice` where you wrote messages yourself, store follow-ups, and correct what turned out wrong. The check never sends, reacts or marks anything read. `get_workflow` shows it at any time.
 
-The interval is `TAWKMCP_WORKFLOW_EVERY` (0 turns it off). Your own standing instructions, from `~/.config/tawk-mcp/instructions.md`, are part of the server instructions and of every workflow check. See [CONFIGURATION.md](CONFIGURATION.md#instructions-for-agents).
+The interval is `CORVUS_TAWK_MCP_WORKFLOW_EVERY` (0 turns it off). Your own standing instructions, from `~/.config/tawk-mcp/instructions.md`, are part of the server instructions and of every workflow check. See [CONFIGURATION.md](CONFIGURATION.md#instructions-for-agents).
 
 ## Memory sync
 
@@ -489,7 +489,7 @@ what did I miss today?
 
 Unlike every other event, its text is not fenced as untrusted: tawk vouches that you typed it. The agent treats it as your instruction and answers with `send_message` into the same chat, which tawk sends at once without asking you. A send to anyone else still waits for you, and tawk puts that request to you in the same chat as a card you can answer with `y` or `n`.
 
-It needs the channel, so a client started with `--stdio` and channels on, as in the next section, and `--channel on` (or `TAWKMCP_CHANNEL=on`) so that tawk-mcp tells tawk this session listens; `scripts/claude-tawk` sets it. A session started without the channel says nothing of the kind, so tawk never hands your words to one that cannot hear them. In tawk's Agents list a listening session has "channel" in its label. With several sessions on one tawk-mcp, one of them is handed each message. The agent will not delete, block, change settings or your profile, or write to someone new because you asked from the phone: it says that those need the terminal.
+It needs the channel, so a client started with `--stdio` and channels on, as in the next section, and `--channel on` (or `CORVUS_TAWK_MCP_CHANNEL=on`) so that tawk-mcp tells tawk this session listens; `scripts/claude-tawk` sets it. A session started without the channel says nothing of the kind, so tawk never hands your words to one that cannot hear them. In tawk's Agents list a listening session has "channel" in its label. With several sessions on one tawk-mcp, one of them is handed each message. The agent will not delete, block, change settings or your profile, or write to someone new because you asked from the phone: it says that those need the terminal.
 
 ## Claude Code channel
 
@@ -519,10 +519,10 @@ The stdio instance connects to tawk by itself, next to any HTTP instance you run
 **`scripts/claude-tawk`** does the second line for you, with the rest set up. Link it into a directory on your `PATH` (`ln -s "$PWD/scripts/claude-tawk" ~/.local/bin/`) and run `claude-tawk`. It works on Linux and macOS; arguments are passed on to Claude Code. It:
 
 - finds Claude Code: `CLAUDE_BIN`, else the newest one the VS Code extension installed, else `claude` on your `PATH`
-- updates tawk-mcp by itself: when the checkout's upstream has a newer version, it is pulled, and the checkout is rebuilt with `install.sh --no-service` whenever it has a commit that has not been built yet. Only a clean fast-forward is taken, so local commits and uncommitted changes are left alone, and the script says so. `TAWK_MCP_SRC` names the checkout (default: the one the script is in), `TAWK_MCP_PULL=0` starts with the checkout as it is, and `TAWK_MCP_PULL_TIMEOUT` is how many seconds the remote gets to answer (default 10) before the start carries on without it
-- points `TAWKMCP_ADMIN_TOKEN_FILE` at tawk's `admin.token`, so the session can approve its own sends where you allowed that. `TAWK_MCP_ADMIN=0` leaves it out
+- updates tawk-mcp by itself: when the checkout's upstream has a newer version, it is pulled, and the checkout is rebuilt with `install.sh --no-service` whenever it has a commit that has not been built yet. Only a clean fast-forward is taken, so local commits and uncommitted changes are left alone, and the script says so. `CORVUS_TAWK_MCP_SRC` names the checkout (default: the one the script is in), `CORVUS_TAWK_MCP_PULL=0` starts with the checkout as it is, and `CORVUS_TAWK_MCP_PULL_TIMEOUT` is how many seconds the remote gets to answer (default 10) before the start carries on without it
+- points `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` at tawk's `admin.token`, so the session can approve its own sends where you allowed that. `CORVUS_TAWK_MCP_ADMIN=0` leaves it out
 - turns on the channel events for your own messages, read receipts, plays of voice notes, reactions, edits and deletes, scheduled sends and online status. tawk's own switches still decide what is handed over
-- loads the server registered as `tawk` (0.15.10; it was `tawk-channel` before); `TAWK_MCP_SERVER` names another, such as `TAWK_MCP_SERVER=tawk-channel` for a registration that still has the old name
+- loads the server registered as `tawk` (0.15.10; it was `tawk-channel` before); `CORVUS_TAWK_MCP_SERVER` names another, such as `CORVUS_TAWK_MCP_SERVER=tawk-channel` for a registration that still has the old name
 
 Claude Code shows a warning about development channels first; choose to continue. Your own messages are not pushed. On Team and Enterprise plans an admin must enable channels.
 
@@ -536,19 +536,19 @@ Context: this is the first event from this chat in this session. Only if you lac
 
 Later events from the same chat in that session carry no such line. The line comes after the fenced message text, so nothing a sender writes can pose as it.
 
-`TAWKMCP_CHANNEL` (or `--channel`) controls it: `auto` (the default) sends to clients that identify as Claude Code, `on` sends to every connected client, `off` sends nothing and stops declaring the capability.
+`CORVUS_TAWK_MCP_CHANNEL` (or `--channel`) controls it: `auto` (the default) sends to clients that identify as Claude Code, `on` sends to every connected client, `off` sends nothing and stops declaring the capability.
 
-By default only messages from other people arrive. Set `TAWKMCP_CHANNEL_OWN=on` (or `--channel-own on`) and the messages you send yourself arrive too, from tawk or from your phone, each marked `from_me="true"` in the tag. The agent is told they show what you said and how you write, and are never a request to reply. This is useful when the agent keeps your voice and your contacts' profiles up to date; leave it off if you would rather it saw your side only when it reads a chat.
+By default only messages from other people arrive. Set `CORVUS_TAWK_MCP_CHANNEL_OWN=on` (or `--channel-own on`) and the messages you send yourself arrive too, from tawk or from your phone, each marked `from_me="true"` in the tag. The agent is told they show what you said and how you write, and are never a request to reply. This is useful when the agent keeps your voice and your contacts' profiles up to date; leave it off if you would rather it saw your side only when it reads a chat.
 
-Set `TAWKMCP_CHANNEL_READ=on` (or `--channel-read on`) and read receipts arrive as well: an event with `type="read"` saying who read which of your messages. The agent is told these are information only. They do not count as rounds for the memory workflow.
+Set `CORVUS_TAWK_MCP_CHANNEL_READ=on` (or `--channel-read on`) and read receipts arrive as well: an event with `type="read"` saying who read which of your messages. The agent is told these are information only. They do not count as rounds for the memory workflow.
 
-Set `TAWKMCP_CHANNEL_PLAYED=on` (or `--channel-played on`) and plays arrive too (0.15.8): an event with `type="played"` saying who played which voice note or video you sent, with the exact date and time to the second (0.15.9). It needs tawk 0.27.0 or later with **Push played voice notes** on, it is not also sent as a read, and the time is when playback began, not how much was heard. The agent is told it is information only, and it does not count as a round.
+Set `CORVUS_TAWK_MCP_CHANNEL_PLAYED=on` (or `--channel-played on`) and plays arrive too (0.15.8): an event with `type="played"` saying who played which voice note or video you sent, with the exact date and time to the second (0.15.9). It needs tawk 0.27.0 or later with **Push played voice notes** on, it is not also sent as a read, and the time is when playback began, not how much was heard. The agent is told it is information only, and it does not count as a round.
 
-Three more kinds work the same way, each with its own option and each off by default: `TAWKMCP_CHANNEL_REACTIONS` (someone reacted to a message you sent, or took it back), `TAWKMCP_CHANNEL_EDITS` (someone changed or deleted a message they sent; an edit carries the new words, fenced as untrusted) and `TAWKMCP_CHANNEL_SCHEDULED` (a message you scheduled went out).
+Three more kinds work the same way, each with its own option and each off by default: `CORVUS_TAWK_MCP_CHANNEL_REACTIONS` (someone reacted to a message you sent, or took it back), `CORVUS_TAWK_MCP_CHANNEL_EDITS` (someone changed or deleted a message they sent; an edit carries the new words, fenced as untrusted) and `CORVUS_TAWK_MCP_CHANNEL_SCHEDULED` (a message you scheduled went out).
 
-Set `TAWKMCP_CHANNEL_PRESENCE=on` (or `--channel-presence on`) and online status arrives too: an event with `type="presence"` and `state="online"` or `state="offline"` when the person in a one-to-one chat comes online or leaves, with `last_seen` where they share it. It has no message id, it does not count as a round, and it is sent on a change, not over and over. tawk only knows this for a chat you have opened in tawk since it connected, and only for people who share it with you; the agent can ask about one person at a time with `get_online_status`, when you allow that in tawk. The agent is told to treat it as information about timing: not to tell the other person it saw them, not to write to someone because they came online, and not to keep a record of when people are online.
+Set `CORVUS_TAWK_MCP_CHANNEL_PRESENCE=on` (or `--channel-presence on`) and online status arrives too: an event with `type="presence"` and `state="online"` or `state="offline"` when the person in a one-to-one chat comes online or leaves, with `last_seen` where they share it. It has no message id, it does not count as a round, and it is sent on a change, not over and over. tawk only knows this for a chat you have opened in tawk since it connected, and only for people who share it with you; the agent can ask about one person at a time with `get_online_status`, when you allow that in tawk. The agent is told to treat it as information about timing: not to tell the other person it saw them, not to write to someone because they came online, and not to keep a record of when people are online.
 
-tawk has its own switch for every kind, under Settings, Automation, Agent events. Received and sent messages are on by default there; read receipts, plays of voice notes, reactions, edits and deletes, scheduled sends and online status are off. With one off, tawk does not hand those messages to tawk-mcp at all, so nothing here can turn them back on. A kind reaches the agent only when both sides have it on: tawk's switch for it, and the matching `TAWKMCP_CHANNEL_…` option here.
+tawk has its own switch for every kind, under Settings, Automation, Agent events. Received and sent messages are on by default there; read receipts, plays of voice notes, reactions, edits and deletes, scheduled sends and online status are off. With one off, tawk does not hand those messages to tawk-mcp at all, so nothing here can turn them back on. A kind reaches the agent only when both sides have it on: tawk's switch for it, and the matching `CORVUS_TAWK_MCP_CHANNEL_…` option here.
 
 Anyone who can message you can put text in front of the model this way. Keep `access = read` if you only want to be told, and remember every write still needs your approval in tawk.
 
@@ -651,7 +651,7 @@ Any other client that speaks streamable HTTP needs the URL and the header `Autho
 
 ### stdio
 
-With `--stdio` (or `TAWKMCP_TRANSPORT=stdio`) tawk-mcp speaks MCP on stdin and stdout, and the client starts it. No token is involved, logging goes to stderr only, and this is the transport Claude Code channels need.
+With `--stdio` (or `CORVUS_TAWK_MCP_TRANSPORT=stdio`) tawk-mcp speaks MCP on stdin and stdout, and the client starts it. No token is involved, logging goes to stderr only, and this is the transport Claude Code channels need.
 
 | Client | Setup |
 | --- | --- |
@@ -768,7 +768,7 @@ tawk-mcp starts whether or not tawk is running, connects when tawk comes up, and
 
 | Symptom | Cause and fix |
 | --- | --- |
-| "tawk is not running, or its control socket is off" | Start tawk and turn on Settings > Automation > Control socket. Check the socket path in the message matches where tawk puts it (`$XDG_RUNTIME_DIR/tawk/control.sock`); set `TAWK_CONTROL_SOCKET` if not. |
+| "tawk is not running, or its control socket is off" | Start tawk and turn on Settings > Automation > Control socket. Check the socket path in the message matches where tawk puts it (`$XDG_RUNTIME_DIR/tawk/control.sock`); set `CORVUS_TAWK_CONTROL_SOCKET` if not. |
 | "tawk has not answered N attempts" | tawk-mcp is pausing retries. It tries again when the time is up or as soon as the socket file appears. Restarting tawk is enough. |
 | "tawk does not allow this" | Raise `access` in tawk (`send` or `manage`), add the chat to `chats`, or accept that the setting cannot be changed from outside. |
 | "Nothing visible matches" | The chat or message does not exist, or it is locked, hidden or outside `chats`. |
@@ -781,4 +781,4 @@ tawk-mcp starts whether or not tawk is running, connects when tawk comes up, and
 | Docker: permission errors on `/data` | `~/.config/tawk-mcp` was created by Docker as root. Remove it, create it yourself with `mkdir -m 0700`, and start again. |
 | HTTP: 401 | Missing or wrong `Authorization: Bearer` header. `tawk-mcp print-token` shows the token. |
 | HTTP: 403 | The request carried a browser `Origin` that is not localhost. |
-| Channel events do not arrive | Channels need a stdio server: add `tawk-mcp --stdio`, start Claude Code with `--dangerously-load-development-channels server:<its name>`, and check `TAWKMCP_CHANNEL` is not `off`. |
+| Channel events do not arrive | Channels need a stdio server: add `tawk-mcp --stdio`, start Claude Code with `--dangerously-load-development-channels server:<its name>`, and check `CORVUS_TAWK_MCP_CHANNEL` is not `off`. |

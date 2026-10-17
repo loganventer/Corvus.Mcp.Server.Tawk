@@ -9,6 +9,11 @@ using Corvus.Mcp.Server.Tawk.Clients.Streaming;
 using Corvus.Mcp.Server.Tawk.Host;
 using Corvus.Mcp.Server.Tawk.Managers;
 
+if (LegacyCommandName.IsLegacy(LegacyCommandName.ReadArgv0()))
+{
+    await Console.Error.WriteLineAsync(LegacyCommandName.Notice);
+}
+
 var options = TawkMcpOptionsBinder.Bind(args, Environment.GetEnvironmentVariable);
 if (options.Error is not null)
 {
@@ -22,7 +27,7 @@ switch (options.Command)
         Console.WriteLine(HelpText.Text);
         return 0;
     case HostCommand.Version:
-        Console.WriteLine("tawk-mcp " + TawkMcpComposition.Version);
+        Console.WriteLine("corvus-tawk-mcp " + TawkMcpComposition.Version);
         return 0;
     case HostCommand.PrintToken:
         var store = TawkMcpComposition.CreateTokenStore(options);
@@ -59,7 +64,7 @@ var tokens = TawkMcpComposition.CreateTokenStore(options);
 tokens.GetOrCreate();
 var web = WebApplication.CreateBuilder(new WebApplicationOptions { Args = [] });
 ConfigureLogging(web.Logging);
-// Kestrel listens only where TAWKMCP_BIND and TAWKMCP_PORT say; this replaces any ASPNETCORE_URLS.
+// Kestrel listens only where CORVUS_TAWK_MCP_BIND and CORVUS_TAWK_MCP_PORT say; this replaces any ASPNETCORE_URLS.
 web.WebHost.UseUrls(new UriBuilder(Uri.UriSchemeHttp, IPAddress.Parse(options.Bind).ToString(), options.Port).Uri.ToString().TrimEnd('/'));
 web.Services.AddSingleton(tokens);
 // Sessions carry elicitation, resource subscriptions and channel events, which stateless HTTP cannot.
@@ -73,7 +78,7 @@ var events = new EventStreamEndpoint(
     app.Services.GetRequiredService<IEventStreamHub>(), app.Services.GetRequiredService<ILiveUpdatesManager>(), options.Heartbeat);
 app.MapGet(EventStreamEndpoint.Path, events.HandleAsync);
 app.MapMcp("/mcp");
-await Console.Error.WriteLineAsync($"tawk-mcp {TawkMcpComposition.Version} serving MCP at http://{options.Bind}:{options.Port}/mcp");
+await Console.Error.WriteLineAsync($"corvus-tawk-mcp {TawkMcpComposition.Version} serving MCP at http://{options.Bind}:{options.Port}/mcp");
 await app.RunAsync();
 return 0;
 

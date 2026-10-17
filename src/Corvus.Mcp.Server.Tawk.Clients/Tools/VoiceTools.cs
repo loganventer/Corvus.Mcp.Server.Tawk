@@ -15,7 +15,7 @@ public sealed class VoiceTools(IVoiceManager voices, IAccountScope accounts)
         + "greeting and signoff (none|optional|required).";
 
     [McpServerTool(Name = "list_voices", ReadOnly = true, Idempotent = true, OpenWorld = false)]
-    [Description("List the writing voices tawk-mcp knows." + ToolText.Memory)]
+    [Description("List the writing voices corvus-tawk-mcp knows." + ToolText.Memory)]
     public Task<CallToolResult> ListVoicesAsync(CancellationToken cancellationToken = default) =>
         ToolResults.RunAsync(() => voices.ListVoicesAsync(cancellationToken));
 

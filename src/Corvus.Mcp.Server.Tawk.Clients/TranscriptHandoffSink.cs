@@ -7,7 +7,7 @@ namespace Corvus.Mcp.Server.Tawk.Clients;
 
 /// <summary>
 /// When a transcription ends, hands each language's text to tawk, so the user reads it under the voice
-/// note and it outlives tawk-mcp's own short memory of the job.
+/// note and it outlives corvus-tawk-mcp's own short memory of the job.
 /// </summary>
 public sealed class TranscriptHandoffSink(ITranscriptHandoff handoff, IAccountScope accounts) : IEventSink
 {

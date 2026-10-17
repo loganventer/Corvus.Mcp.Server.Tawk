@@ -6,7 +6,7 @@ public interface IAppManager
 {
     Task<string> AppStatusAsync(CancellationToken cancellationToken);
 
-    /// <summary>Which tawk-mcp this is, and which tawk it is talking to when one is running.</summary>
+    /// <summary>Which corvus-tawk-mcp this is, and which tawk it is talking to when one is running.</summary>
     Task<string> VersionAsync(CancellationToken cancellationToken);
 
     /// <summary>The accounts agents may use, one to a line, with what they may do in each.</summary>

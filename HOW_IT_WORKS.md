@@ -21,9 +21,9 @@
 
 ## Start-up
 
-1. `Program` binds the options from `TAWKMCP_*` variables and the command line. A bad value stops it with exit code 2.
+1. `Program` binds the options from `CORVUS_TAWK_MCP_*` variables and the command line. A bad value stops it with exit code 2.
 2. `print-token`, `healthcheck`, `--version` and `--help` run and exit.
-3. Otherwise the composition root registers every service. By default `WebApplication` starts Kestrel on `TAWKMCP_BIND:TAWKMCP_PORT` (127.0.0.1:8765) with stateful streamable HTTP sessions, creating the bearer token first if there is none. With `--stdio` the generic host starts with the stdio transport and logs to stderr only.
+3. Otherwise the composition root registers every service. By default `WebApplication` starts Kestrel on `CORVUS_TAWK_MCP_BIND:CORVUS_TAWK_MCP_PORT` (127.0.0.1:8765) with stateful streamable HTTP sessions, creating the bearer token first if there is none. With `--stdio` the generic host starts with the stdio transport and logs to stderr only.
 4. Two hosted services start: the connection supervisor, which starts connecting to tawk, and the notification dispatcher, which starts reading tawk's events. Neither waits for tawk, so the MCP server is ready at once whether or not tawk is running.
 
 ## Connecting to tawk
@@ -217,9 +217,9 @@ Unread count changes (`{"evt":"chat"}`) update resources and go to `/events` as 
 
 `ChannelEventSink` ends a session's first channel event from each chat with a line naming the chat to read with `read_messages`, after the fenced text. `ChannelContextHints` remembers, per session, which chats have had one, and forgets a session when it ends. The line and the instructions both leave it to the agent: it gathers the history only when it lacks it.
 
-Which messages reach the channel is decided in two places. tawk sends a message event only when its push setting for that kind is on (received, or sent by the user). `ChannelEventSink` then passes on what other people sent, and what the user sent only when `TAWKMCP_CHANNEL_OWN` is on, marking each event with `from_me`. Read receipts, reactions, edits and deletes, scheduled sends and online status follow the same two steps, each with its own switch in tawk and its own option here, and none of them counts as a workflow round.
+Which messages reach the channel is decided in two places. tawk sends a message event only when its push setting for that kind is on (received, or sent by the user). `ChannelEventSink` then passes on what other people sent, and what the user sent only when `CORVUS_TAWK_MCP_CHANNEL_OWN` is on, marking each event with `from_me`. Read receipts, reactions, edits and deletes, scheduled sends and online status follow the same two steps, each with its own switch in tawk and its own option here, and none of them counts as a workflow round.
 
-Online status is the one event that is not about a message. tawk sends `presence` when the person in a one-to-one chat the user opened comes online or leaves; `ControlLineCodec` reads it into a `PresenceEvent`, `NotificationFormatter.Presence` writes one plain line for it ("Online status: Mom came online in \"Mom\"."), and `ChannelEventSink` sends it with `type="presence"`, a `state`, and `last_seen` where it is known, when `TAWKMCP_CHANNEL_PRESENCE` is on. It carries no message id, and it does not point at the chat's history or use up the chat's first-event pointer, since it says nothing about what was written. What arrives is what tawk knows from a chat the user opened, or from a lookup.
+Online status is the one event that is not about a message. tawk sends `presence` when the person in a one-to-one chat the user opened comes online or leaves; `ControlLineCodec` reads it into a `PresenceEvent`, `NotificationFormatter.Presence` writes one plain line for it ("Online status: Mom came online in \"Mom\"."), and `ChannelEventSink` sends it with `type="presence"`, a `state`, and `last_seen` where it is known, when `CORVUS_TAWK_MCP_CHANNEL_PRESENCE` is on. It carries no message id, and it does not point at the chat's history or use up the chat's first-event pointer, since it says nothing about what was written. What arrives is what tawk knows from a chat the user opened, or from a lookup.
 
 An agent can also ask. `get_online_status` (`PresenceTools`) goes to `PresenceManager`, which sends tawk's `presence` operation for one chat. tawk answers with what it knows and asks WhatsApp about that person, so the first answer is usually `unknown`; while tawk says it is watching, the manager waits through `IDelay` and asks again, up to `PresenceLookupOptions.Retries` times, and `PresenceFormatter` then says who is online, when someone offline was last seen, or why nothing is known. tawk refuses the operation unless the user switched on "Look up online status", and it never answers for a group or for a chat the agent may not use.
 
@@ -230,19 +230,19 @@ flowchart LR
     TP -- yes --> EVT["message event"]
     EVT --> OWN{"Sent by the user?"}
     OWN -- no --> CH["Channel event, from_me false"]
-    OWN -- yes --> OPT{"TAWKMCP_CHANNEL_OWN on?"}
+    OWN -- yes --> OPT{"CORVUS_TAWK_MCP_CHANNEL_OWN on?"}
     OPT -- yes --> CH2["Channel event, from_me true"]
     OPT -- no --> KEEP["Resources and the event stream only"]
     RD["Someone reads the user's message"] --> TR{"tawk: Push read receipts on?"}
     TR -- no --> NONE
     TR -- yes --> REVT["read event"]
-    REVT --> ROPT{"TAWKMCP_CHANNEL_READ on?"}
+    REVT --> ROPT{"CORVUS_TAWK_MCP_CHANNEL_READ on?"}
     ROPT -- yes --> CH3["Channel event, type read"]
     ROPT -- no --> KEEP2["The event stream only"]
     PL["Someone plays the user's voice note"] --> TP{"tawk: Push played voice notes on?"}
     TP -- no --> NONE
     TP -- yes --> PEVT["played event"]
-    PEVT --> POPT{"TAWKMCP_CHANNEL_PLAYED on?"}
+    PEVT --> POPT{"CORVUS_TAWK_MCP_CHANNEL_PLAYED on?"}
     POPT -- yes --> CH4["Channel event, type played"]
     POPT -- no --> KEEP3["The event stream only"]
 ```
@@ -343,7 +343,7 @@ While the circuit is open, tool calls fail at once with "tawk has not answered N
 
 ## A hung tawk
 
-A read that gets no answer within 10 seconds (`TAWKMCP_REQUEST_TIMEOUT_S`) fails with an Offline error saying tawk looks hung. The control client counts it as a breaker failure and drops the connection, and the supervisor reconnects as after any other loss. Writes are exempt, because they may be waiting for you.
+A read that gets no answer within 10 seconds (`CORVUS_TAWK_MCP_REQUEST_TIMEOUT_S`) fails with an Offline error saying tawk looks hung. The control client counts it as a breaker failure and drops the connection, and the supervisor reconnects as after any other loss. Writes are exempt, because they may be waiting for you.
 
 ## HTTP requests
 
@@ -398,7 +398,7 @@ flowchart TD
     EVENT["A message is delivered<br/>as a channel event"] --> COUNT
     COUNT --> WHICH{"Was it get_workflow?"}
     WHICH -- yes --> RESET["Start counting again"]
-    WHICH -- no --> DUE{"Rounds reached<br/>TAWKMCP_WORKFLOW_EVERY?"}
+    WHICH -- no --> DUE{"Rounds reached<br/>CORVUS_TAWK_MCP_WORKFLOW_EVERY?"}
     DUE -- no --> PLAIN["Result goes back as it is"]
     DUE -- yes --> FAILED{"Did the call fail,<br/>or was it a channel event?"}
     FAILED -- yes --> WAIT["The check rides on the next tool call that succeeds"]
@@ -406,4 +406,4 @@ flowchart TD
     ADD --> RESET
 ```
 
-Each tool call passes through a filter after it has run. The filter counts a round, and when the count reaches `TAWKMCP_WORKFLOW_EVERY` it adds the workflow text to the result as a second text block and starts again. A message delivered to the agent as a channel event counts as a round too, and the check then rides on the agent's next tool call. A failed call counts but never carries the check, and `get_workflow` resets the count. The text is fixed in the source, followed by the user's own instructions file; nothing from a chat or from memory is ever part of it.
+Each tool call passes through a filter after it has run. The filter counts a round, and when the count reaches `CORVUS_TAWK_MCP_WORKFLOW_EVERY` it adds the workflow text to the result as a second text block and starts again. A message delivered to the agent as a channel event counts as a round too, and the check then rides on the agent's next tool call. A failed call counts but never carries the check, and `get_workflow` resets the count. The text is fixed in the source, followed by the user's own instructions file; nothing from a chat or from memory is ever part of it.

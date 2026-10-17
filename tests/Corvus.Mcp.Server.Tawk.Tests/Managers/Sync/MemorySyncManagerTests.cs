@@ -255,7 +255,7 @@ public class MemorySyncManagerTests
         Assert.Multiple(() =>
         {
             Assert.That(newer.Outcome, Is.EqualTo(SyncOutcome.Failed));
-            Assert.That(newer.Message, Does.Contain("newer tawk-mcp"));
+            Assert.That(newer.Message, Does.Contain("newer corvus-tawk-mcp"));
             Assert.That(broken.Outcome, Is.EqualTo(SyncOutcome.Failed));
             Assert.That(_remote.Pushes, Is.Zero);
         });

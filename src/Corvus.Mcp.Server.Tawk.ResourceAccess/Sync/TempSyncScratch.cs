@@ -12,7 +12,7 @@ public sealed class TempSyncScratch : ISyncScratch
         {
             if (_folder is null)
             {
-                _folder = Path.Combine(Path.GetTempPath(), "tawk-mcp-sync-" + Guid.NewGuid().ToString("N"));
+                _folder = Path.Combine(Path.GetTempPath(), "corvus-tawk-mcp-sync-" + Guid.NewGuid().ToString("N"));
                 if (OperatingSystem.IsWindows())
                 {
                     Directory.CreateDirectory(_folder);

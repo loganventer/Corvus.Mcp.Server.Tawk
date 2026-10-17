@@ -1,9 +1,9 @@
 namespace Corvus.Mcp.Server.Tawk.Clients.Channels;
 
 /// <summary>
-/// What a tawk-mcp may tell tawk it will answer. tawk hands a summary request, and what the user writes in the
+/// What a corvus-tawk-mcp may tell tawk it will answer. tawk hands a summary request, and what the user writes in the
 /// owner's chat, to one session and waits for it; a session whose client takes no channel events would
-/// swallow them. In <see cref="ChannelMode.Auto"/> tawk-mcp only guesses that the client listens (it is Claude
+/// swallow them. In <see cref="ChannelMode.Auto"/> corvus-tawk-mcp only guesses that the client listens (it is Claude
 /// Code, which may or may not have been started with the channel), so it claims nothing. Only
 /// <see cref="ChannelMode.On"/>, set by whoever started the client with its channel, is a promise.
 /// </summary>

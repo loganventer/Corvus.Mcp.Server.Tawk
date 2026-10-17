@@ -9,7 +9,7 @@ public sealed partial class TranscriptionPolicy(TranscriptionOptions options) : 
     public const int MaxPromptLength = 500;
 
     public const string Off =
-        "Transcription is off: this tawk-mcp was started with --transcribe off. Only the user can turn it on, by starting it without that.";
+        "Transcription is off: this corvus-tawk-mcp was started with --transcribe off. Only the user can turn it on, by starting it without that.";
 
     public TranscriptionRequest Resolve(
         string messageId,

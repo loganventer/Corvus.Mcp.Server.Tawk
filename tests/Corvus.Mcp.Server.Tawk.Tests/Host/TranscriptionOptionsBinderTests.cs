@@ -31,8 +31,8 @@ public class TranscriptionOptionsBinderTests
         Assert.Multiple(() =>
         {
             Assert.That(TawkMcpOptionsBinder.Bind([], Env()).TranscribeMaxSeconds, Is.EqualTo(3600));
-            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("TAWKMCP_TRANSCRIBE_MAX_SECONDS", "900"))).TranscribeMaxSeconds, Is.EqualTo(900));
-            Assert.That(TawkMcpOptionsBinder.Bind(["--transcribe-max-seconds", "7200"], Env(("TAWKMCP_TRANSCRIBE_MAX_SECONDS", "900"))).TranscribeMaxSeconds, Is.EqualTo(7200));
+            Assert.That(TawkMcpOptionsBinder.Bind([], Env(("CORVUS_TAWK_MCP_TRANSCRIBE_MAX_SECONDS", "900"))).TranscribeMaxSeconds, Is.EqualTo(900));
+            Assert.That(TawkMcpOptionsBinder.Bind(["--transcribe-max-seconds", "7200"], Env(("CORVUS_TAWK_MCP_TRANSCRIBE_MAX_SECONDS", "900"))).TranscribeMaxSeconds, Is.EqualTo(7200));
         });
     }
 
@@ -60,7 +60,7 @@ public class TranscriptionOptionsBinderTests
     {
         var options = TawkMcpOptionsBinder.Bind(
             ["--transcribe-language", "en"],
-            Env(("TAWKMCP_TRANSCRIBE", "command"), ("TAWKMCP_TRANSCRIBE_COMMAND", "whisper {file}"), ("TAWKMCP_TRANSCRIBE_LANGUAGE", "af")));
+            Env(("CORVUS_TAWK_MCP_TRANSCRIBE", "command"), ("CORVUS_TAWK_MCP_TRANSCRIBE_COMMAND", "whisper {file}"), ("CORVUS_TAWK_MCP_TRANSCRIBE_LANGUAGE", "af")));
 
         Assert.Multiple(() =>
         {
@@ -129,7 +129,7 @@ public class TranscriptionOptionsBinderTests
     {
         var off = TawkMcpOptionsBinder.Bind(["--transcribe", "command", "--transcribe-command", "whisper {file}"], Env());
         var on = TawkMcpOptionsBinder.Bind(
-            ["--transcribe", "command", "--transcribe-command", "whisper {file}"], Env(("TAWKMCP_TRANSCRIBE_AUTO", "on")));
+            ["--transcribe", "command", "--transcribe-command", "whisper {file}"], Env(("CORVUS_TAWK_MCP_TRANSCRIBE_AUTO", "on")));
         var withoutEngine = TawkMcpOptionsBinder.Bind(["--transcribe", "off", "--transcribe-auto", "on"], Env());
 
         Assert.Multiple(() =>

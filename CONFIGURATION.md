@@ -57,54 +57,54 @@ Flags override environment variables, which override the defaults. A flag or a c
 
 | Flag | Environment variable | Default | Meaning |
 | --- | --- | --- | --- |
-| `--http`, `--stdio` | `TAWKMCP_TRANSPORT` (`http`, `stdio`) | `http` | How MCP clients connect: streamable HTTP, or stdio for a client that starts tawk-mcp itself |
-| `--port N` | `TAWKMCP_PORT` | `8765` | HTTP port |
-| `--bind ADDRESS` | `TAWKMCP_BIND` | `127.0.0.1` | HTTP bind address. The token is required whatever the address |
-| `--token-file PATH` | `TAWKMCP_TOKEN_FILE` | `~/.config/tawk-mcp/token` | Where the bearer token is kept |
-| | `TAWKMCP_TOKEN` | | Use this token and keep no file, for container secrets |
-| `--socket PATH` | `TAWK_CONTROL_SOCKET` | see [The control socket](#the-control-socket) | tawk's control socket |
-| `--channel auto\|on\|off` | `TAWKMCP_CHANNEL` | `auto` | Claude Code channel events: `auto` for clients that identify as Claude Code, `on` for every client, `off` for none. Only `on` tells tawk that this session answers what tawk asks of an agent (TL;DR summaries, and what you write in the owner's chat): set it for a client you start with its channel, as `scripts/claude-tawk` does. In `auto` tawk-mcp cannot know whether the client listens, so it promises nothing |
-| `--channel-own on\|off` | `TAWKMCP_CHANNEL_OWN` | `off` | Also send the messages you send yourself as channel events, marked `from_me`. Off, only what other people send arrives |
-| `--channel-read on\|off` | `TAWKMCP_CHANNEL_READ` | `off` | Also send read receipts for the messages you sent as channel events, with `type="read"`. tawk's **Push read receipts** must be on too |
-| `--channel-played on\|off` | `TAWKMCP_CHANNEL_PLAYED` | `off` | Also send when someone plays a voice note or video you sent as channel events, with `type="played"` (0.15.8). tawk's **Push played voice notes** (0.27.0) must be on too |
-| `--channel-reactions on\|off` | `TAWKMCP_CHANNEL_REACTIONS` | `off` | Also send reactions to your messages as channel events (`type="reaction"`). tawk's **Push reactions** must be on too |
-| `--channel-edits on\|off` | `TAWKMCP_CHANNEL_EDITS` | `off` | Also send other people's edits and deletes (`type="edit"`, `type="delete"`). tawk's **Push edits and deletes** must be on too |
-| `--channel-scheduled on\|off` | `TAWKMCP_CHANNEL_SCHEDULED` | `off` | Also send an event when a message you scheduled goes out (`type="scheduled_sent"`). tawk's **Push scheduled sends** must be on too |
-| `--channel-presence on\|off` | `TAWKMCP_CHANNEL_PRESENCE` | `off` | Also send an event when the person in a chat you have open in tawk comes online or leaves (`type="presence"`, with `state` and, where shared, `last_seen`). tawk's **Push online status** must be on too |
-| `--memory write\|read\|off` | `TAWKMCP_MEMORY` | `write` | Memory for voices, contacts and templates: `read` offers the tools but refuses changes, `off` removes them |
-| `--data-file PATH` | `TAWKMCP_DATA_FILE` | `~/.local/share/tawk-mcp/memory.db` | Where memory is kept |
-| `--sync-repo ADDRESS` | `TAWKMCP_SYNC_REPO` | none | The private git repository that holds the memory file: `owner/name` for one on GitHub, or an SSH address such as `git@github.com:owner/name.git` or `git@my-alias:owner/name.git`. See [Memory sync](#memory-sync) |
-| `--sync-key PATH` | `TAWKMCP_SYNC_KEY` | none | An SSH private key to use for sync. Without it SSH picks a key the usual way (your agent, `~/.ssh/config`, the default key files) |
-| `--sync-branch NAME` | `TAWKMCP_SYNC_BRANCH` | `main` | The branch |
-| `--sync-file PATH` | `TAWKMCP_SYNC_FILE` | `memory.db` | The file's path inside the repository |
-| `--sync-interval-minutes N` | `TAWKMCP_SYNC_INTERVAL_MINUTES` | `120` | Minutes between syncs (1 to 10080) |
-| `--workflow-every N` | `TAWKMCP_WORKFLOW_EVERY` | `20` | Rounds between memory workflow checks (0 to 10000, 0 turns them off). See [Instructions for agents](#instructions-for-agents) |
-| `--instructions-file PATH` | `TAWKMCP_INSTRUCTIONS_FILE` | `~/.config/tawk-mcp/instructions.md` | Your own standing instructions for agents |
-| `--admin-token-file PATH` | `TAWKMCP_ADMIN_TOKEN_FILE` | none | tawk's admin token file. Set per instance, never by default: with it this instance may approve its own queued sends while tawk's access is `admin`. See [Approving its own sends](#approving-its-own-sends) |
-| `--transcribe auto\|embedded\|http\|command\|off` | `TAWKMCP_TRANSCRIBE` | `auto` | How voice notes are transcribed. `auto` uses your transcriber at `--transcribe-url` while it answers, and otherwise one Whisper model loaded inside tawk-mcp, so it works with nothing else installed. `embedded` always uses the model inside. `http` and `command` use only your own transcriber. With `off` the tools stay listed and say transcription is off |
-| `--transcribe-model-dir DIR` | `TAWKMCP_TRANSCRIBE_MODEL_DIR` | `~/.local/share/tawk-mcp/models` | Where the models for the one inside are kept. A model that is not there is downloaded the first time it is needed; `tawk-mcp fetch-model NAME` fetches one ahead of time |
-| `--transcribe-idle-unload-m N` | `TAWKMCP_TRANSCRIBE_IDLE_UNLOAD_M` | `15` | Minutes with no job before the model inside is let go (0 keeps it loaded) |
-| `--transcribe-url ADDRESS` | `TAWKMCP_TRANSCRIBE_URL` | none | The transcriber for `http`: a server that speaks the OpenAI audio API (`/v1/audio/transcriptions`), such as whisper.cpp's server or faster-whisper-server. It must be on this machine unless the next flag is on |
-| `--transcribe-remote on\|off` | `TAWKMCP_TRANSCRIBE_REMOTE` | `off` | Allow a transcriber on another machine. Voice notes are then sent there |
-| `--transcribe-command TEXT` | `TAWKMCP_TRANSCRIBE_COMMAND` | none | The program for `command`, run once for each language with `{file}`, `{language}`, `{model}`, `{task}` and `{prompt}` filled in, no shell. What it prints is the transcript |
-| `--transcribe-model NAME` | `TAWKMCP_TRANSCRIBE_MODEL` | `large-v3-turbo` | The model, when tawk's settings do not name one |
-| `--transcribe-models A,B` | `TAWKMCP_TRANSCRIBE_MODELS` | none | Other models an agent may ask for by name |
-| `--transcribe-language A,B` | `TAWKMCP_TRANSCRIBE_LANGUAGE` | `auto` | The default languages, when tawk's settings do not name any. For a job an agent asks for, one transcription is made for each; for a voice note transcribed as it arrives, they are the languages the engine chooses among |
-| `--transcribe-auto on\|off` | `TAWKMCP_TRANSCRIBE_AUTO` | `off` | Transcribe every voice note others send, when tawk's settings have no such switch |
-| `--transcribe-max-languages N` | `TAWKMCP_TRANSCRIBE_MAX_LANGUAGES` | `3` | The most languages one call may ask for (1 to 10) |
-| `--transcribe-max-seconds N` | `TAWKMCP_TRANSCRIBE_MAX_SECONDS` | `3600` | The longest recording whose text is handed over |
-| `--transcribe-timeout-s N` | `TAWKMCP_TRANSCRIBE_TIMEOUT_S` | `300` | How long one language may take |
-| `--transcribe-concurrency N` | `TAWKMCP_TRANSCRIBE_CONCURRENCY` | `1` | Jobs running at once (1 to 8) |
-| `--schedule-jitter-s N` | `TAWKMCP_SCHEDULE_JITTER_S` | `60` | Scheduled messages move by a random amount up to this many seconds either way (0 to 3600, 0 turns it off) |
-| `--backoff-initial-ms N` | `TAWKMCP_BACKOFF_INITIAL_MS` | `500` | First wait between connection attempts (1 to 600000) |
-| `--backoff-max-ms N` | `TAWKMCP_BACKOFF_MAX_MS` | `30000` | Longest wait (1 to 3600000, not below the first) |
-| `--breaker-threshold N` | `TAWKMCP_BREAKER_THRESHOLD` | `5` | Failures in a row before retries pause (1 to 1000) |
-| `--breaker-cooldown-s N` | `TAWKMCP_BREAKER_COOLDOWN_S` | `60` | Length of the pause in seconds (0 to 86400) |
-| `--request-timeout-s N` | `TAWKMCP_REQUEST_TIMEOUT_S` | `10` | How long a read waits for tawk before tawk counts as hung (1 to 600) |
+| `--http`, `--stdio` | `CORVUS_TAWK_MCP_TRANSPORT` (`http`, `stdio`) | `http` | How MCP clients connect: streamable HTTP, or stdio for a client that starts tawk-mcp itself |
+| `--port N` | `CORVUS_TAWK_MCP_PORT` | `8765` | HTTP port |
+| `--bind ADDRESS` | `CORVUS_TAWK_MCP_BIND` | `127.0.0.1` | HTTP bind address. The token is required whatever the address |
+| `--token-file PATH` | `CORVUS_TAWK_MCP_TOKEN_FILE` | `~/.config/tawk-mcp/token` | Where the bearer token is kept |
+| | `CORVUS_TAWK_MCP_TOKEN` | | Use this token and keep no file, for container secrets |
+| `--socket PATH` | `CORVUS_TAWK_CONTROL_SOCKET` | see [The control socket](#the-control-socket) | tawk's control socket |
+| `--channel auto\|on\|off` | `CORVUS_TAWK_MCP_CHANNEL` | `auto` | Claude Code channel events: `auto` for clients that identify as Claude Code, `on` for every client, `off` for none. Only `on` tells tawk that this session answers what tawk asks of an agent (TL;DR summaries, and what you write in the owner's chat): set it for a client you start with its channel, as `scripts/claude-tawk` does. In `auto` tawk-mcp cannot know whether the client listens, so it promises nothing |
+| `--channel-own on\|off` | `CORVUS_TAWK_MCP_CHANNEL_OWN` | `off` | Also send the messages you send yourself as channel events, marked `from_me`. Off, only what other people send arrives |
+| `--channel-read on\|off` | `CORVUS_TAWK_MCP_CHANNEL_READ` | `off` | Also send read receipts for the messages you sent as channel events, with `type="read"`. tawk's **Push read receipts** must be on too |
+| `--channel-played on\|off` | `CORVUS_TAWK_MCP_CHANNEL_PLAYED` | `off` | Also send when someone plays a voice note or video you sent as channel events, with `type="played"` (0.15.8). tawk's **Push played voice notes** (0.27.0) must be on too |
+| `--channel-reactions on\|off` | `CORVUS_TAWK_MCP_CHANNEL_REACTIONS` | `off` | Also send reactions to your messages as channel events (`type="reaction"`). tawk's **Push reactions** must be on too |
+| `--channel-edits on\|off` | `CORVUS_TAWK_MCP_CHANNEL_EDITS` | `off` | Also send other people's edits and deletes (`type="edit"`, `type="delete"`). tawk's **Push edits and deletes** must be on too |
+| `--channel-scheduled on\|off` | `CORVUS_TAWK_MCP_CHANNEL_SCHEDULED` | `off` | Also send an event when a message you scheduled goes out (`type="scheduled_sent"`). tawk's **Push scheduled sends** must be on too |
+| `--channel-presence on\|off` | `CORVUS_TAWK_MCP_CHANNEL_PRESENCE` | `off` | Also send an event when the person in a chat you have open in tawk comes online or leaves (`type="presence"`, with `state` and, where shared, `last_seen`). tawk's **Push online status** must be on too |
+| `--memory write\|read\|off` | `CORVUS_TAWK_MCP_MEMORY` | `write` | Memory for voices, contacts and templates: `read` offers the tools but refuses changes, `off` removes them |
+| `--data-file PATH` | `CORVUS_TAWK_MCP_DATA_FILE` | `~/.local/share/tawk-mcp/memory.db` | Where memory is kept |
+| `--sync-repo ADDRESS` | `CORVUS_TAWK_MCP_SYNC_REPO` | none | The private git repository that holds the memory file: `owner/name` for one on GitHub, or an SSH address such as `git@github.com:owner/name.git` or `git@my-alias:owner/name.git`. See [Memory sync](#memory-sync) |
+| `--sync-key PATH` | `CORVUS_TAWK_MCP_SYNC_KEY` | none | An SSH private key to use for sync. Without it SSH picks a key the usual way (your agent, `~/.ssh/config`, the default key files) |
+| `--sync-branch NAME` | `CORVUS_TAWK_MCP_SYNC_BRANCH` | `main` | The branch |
+| `--sync-file PATH` | `CORVUS_TAWK_MCP_SYNC_FILE` | `memory.db` | The file's path inside the repository |
+| `--sync-interval-minutes N` | `CORVUS_TAWK_MCP_SYNC_INTERVAL_MINUTES` | `120` | Minutes between syncs (1 to 10080) |
+| `--workflow-every N` | `CORVUS_TAWK_MCP_WORKFLOW_EVERY` | `20` | Rounds between memory workflow checks (0 to 10000, 0 turns them off). See [Instructions for agents](#instructions-for-agents) |
+| `--instructions-file PATH` | `CORVUS_TAWK_MCP_INSTRUCTIONS_FILE` | `~/.config/tawk-mcp/instructions.md` | Your own standing instructions for agents |
+| `--admin-token-file PATH` | `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` | none | tawk's admin token file. Set per instance, never by default: with it this instance may approve its own queued sends while tawk's access is `admin`. See [Approving its own sends](#approving-its-own-sends) |
+| `--transcribe auto\|embedded\|http\|command\|off` | `CORVUS_TAWK_MCP_TRANSCRIBE` | `auto` | How voice notes are transcribed. `auto` uses your transcriber at `--transcribe-url` while it answers, and otherwise one Whisper model loaded inside tawk-mcp, so it works with nothing else installed. `embedded` always uses the model inside. `http` and `command` use only your own transcriber. With `off` the tools stay listed and say transcription is off |
+| `--transcribe-model-dir DIR` | `CORVUS_TAWK_MCP_TRANSCRIBE_MODEL_DIR` | `~/.local/share/tawk-mcp/models` | Where the models for the one inside are kept. A model that is not there is downloaded the first time it is needed; `tawk-mcp fetch-model NAME` fetches one ahead of time |
+| `--transcribe-idle-unload-m N` | `CORVUS_TAWK_MCP_TRANSCRIBE_IDLE_UNLOAD_M` | `15` | Minutes with no job before the model inside is let go (0 keeps it loaded) |
+| `--transcribe-url ADDRESS` | `CORVUS_TAWK_MCP_TRANSCRIBE_URL` | none | The transcriber for `http`: a server that speaks the OpenAI audio API (`/v1/audio/transcriptions`), such as whisper.cpp's server or faster-whisper-server. It must be on this machine unless the next flag is on |
+| `--transcribe-remote on\|off` | `CORVUS_TAWK_MCP_TRANSCRIBE_REMOTE` | `off` | Allow a transcriber on another machine. Voice notes are then sent there |
+| `--transcribe-command TEXT` | `CORVUS_TAWK_MCP_TRANSCRIBE_COMMAND` | none | The program for `command`, run once for each language with `{file}`, `{language}`, `{model}`, `{task}` and `{prompt}` filled in, no shell. What it prints is the transcript |
+| `--transcribe-model NAME` | `CORVUS_TAWK_MCP_TRANSCRIBE_MODEL` | `large-v3-turbo` | The model, when tawk's settings do not name one |
+| `--transcribe-models A,B` | `CORVUS_TAWK_MCP_TRANSCRIBE_MODELS` | none | Other models an agent may ask for by name |
+| `--transcribe-language A,B` | `CORVUS_TAWK_MCP_TRANSCRIBE_LANGUAGE` | `auto` | The default languages, when tawk's settings do not name any. For a job an agent asks for, one transcription is made for each; for a voice note transcribed as it arrives, they are the languages the engine chooses among |
+| `--transcribe-auto on\|off` | `CORVUS_TAWK_MCP_TRANSCRIBE_AUTO` | `off` | Transcribe every voice note others send, when tawk's settings have no such switch |
+| `--transcribe-max-languages N` | `CORVUS_TAWK_MCP_TRANSCRIBE_MAX_LANGUAGES` | `3` | The most languages one call may ask for (1 to 10) |
+| `--transcribe-max-seconds N` | `CORVUS_TAWK_MCP_TRANSCRIBE_MAX_SECONDS` | `3600` | The longest recording whose text is handed over |
+| `--transcribe-timeout-s N` | `CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S` | `300` | How long one language may take |
+| `--transcribe-concurrency N` | `CORVUS_TAWK_MCP_TRANSCRIBE_CONCURRENCY` | `1` | Jobs running at once (1 to 8) |
+| `--schedule-jitter-s N` | `CORVUS_TAWK_MCP_SCHEDULE_JITTER_S` | `60` | Scheduled messages move by a random amount up to this many seconds either way (0 to 3600, 0 turns it off) |
+| `--backoff-initial-ms N` | `CORVUS_TAWK_MCP_BACKOFF_INITIAL_MS` | `500` | First wait between connection attempts (1 to 600000) |
+| `--backoff-max-ms N` | `CORVUS_TAWK_MCP_BACKOFF_MAX_MS` | `30000` | Longest wait (1 to 3600000, not below the first) |
+| `--breaker-threshold N` | `CORVUS_TAWK_MCP_BREAKER_THRESHOLD` | `5` | Failures in a row before retries pause (1 to 1000) |
+| `--breaker-cooldown-s N` | `CORVUS_TAWK_MCP_BREAKER_COOLDOWN_S` | `60` | Length of the pause in seconds (0 to 86400) |
+| `--request-timeout-s N` | `CORVUS_TAWK_MCP_REQUEST_TIMEOUT_S` | `10` | How long a read waits for tawk before tawk counts as hung (1 to 600) |
 
 A value out of range or a flag tawk-mcp does not know stops it at start with a message on stderr and exit code 2.
 
-`ASPNETCORE_URLS` has no effect: HTTP mode listens only where `TAWKMCP_BIND` and `TAWKMCP_PORT` say.
+`ASPNETCORE_URLS` has no effect: HTTP mode listens only where `CORVUS_TAWK_MCP_BIND` and `CORVUS_TAWK_MCP_PORT` say.
 
 ## Commands
 
@@ -140,11 +140,11 @@ Sync keeps `memory.db` in step between your machines through a file in a git rep
        IdentitiesOnly yes
    ```
    and make sure the host is known: `ssh -T git@github-tawk-memory` should greet you by the repository's name.
-4. Set `TAWKMCP_SYNC_REPO=git@github-tawk-memory:owner/name.git` where tawk-mcp starts (the service file, the MCP client's `env`, or the container), on every machine that should share the memory. Instead of the alias you can set `TAWKMCP_SYNC_REPO=owner/name` and `TAWKMCP_SYNC_KEY=~/.ssh/tawk_memory_ed25519`.
+4. Set `CORVUS_TAWK_MCP_SYNC_REPO=git@github-tawk-memory:owner/name.git` where tawk-mcp starts (the service file, the MCP client's `env`, or the container), on every machine that should share the memory. Instead of the alias you can set `CORVUS_TAWK_MCP_SYNC_REPO=owner/name` and `CORVUS_TAWK_MCP_SYNC_KEY=~/.ssh/tawk_memory_ed25519`.
 
 tawk-mcp needs `git` and `ssh` on the PATH. It never prompts: a key with a passphrase works only through an SSH agent, and a host that is not in `known_hosts` is refused. Beside the database it keeps `memory.db.sync.git`, a small bare repository holding what it last fetched.
 
-A cycle runs when the server starts and then every `TAWKMCP_SYNC_INTERVAL_MINUTES`; `tawk-mcp sync` runs one by hand, and so does the `sync_memory` tool when you ask an agent to sync now. Each cycle looks up the branch's newest commit, fetches it and merges its file into the local database if it changed, and pushes only when this machine holds something the remote does not. Rows are matched by key: the stronger source wins (user, then contact, then imported, then inferred), then the newer change, and a delete on one machine removes the row on the others. Content is compared by a digest of the rows, so two machines with the same memory never push at each other. A push is never forced: if another machine got there first, the repository refuses it, and the cycle merges again and retries, three times at most. Other files in the repository are left as they are.
+A cycle runs when the server starts and then every `CORVUS_TAWK_MCP_SYNC_INTERVAL_MINUTES`; `tawk-mcp sync` runs one by hand, and so does the `sync_memory` tool when you ask an agent to sync now. Each cycle looks up the branch's newest commit, fetches it and merges its file into the local database if it changed, and pushes only when this machine holds something the remote does not. Rows are matched by key: the stronger source wins (user, then contact, then imported, then inferred), then the newer change, and a delete on one machine removes the row on the others. Content is compared by a digest of the rows, so two machines with the same memory never push at each other. A push is never forced: if another machine got there first, the repository refuses it, and the cycle merges again and retries, three times at most. Other files in the repository are left as they are.
 
 Sync runs only with `--memory write`. A lock file beside the database lets one tawk-mcp per machine sync at a time. A remote written by a newer tawk-mcp is left alone until this machine is updated. The first machine to sync creates the file.
 
@@ -153,7 +153,7 @@ Sync runs only with `--memory write`. A lock file beside the database lets one t
 By default every write waits for you in tawk. An instance may instead answer its own requests when both of these are set, each by you and neither by default:
 
 1. In tawk, Settings, Automation, **What they may do** is `admin`, and the chats are switched on under **Answering for itself**. tawk then writes an admin token to `admin.token` beside its control socket.
-2. This instance is given that file: `TAWKMCP_ADMIN_TOKEN_FILE=$XDG_RUNTIME_DIR/tawk/admin.token` (on a Mac, the folder `tawk --version` or `tawk doctor` reports for the control socket).
+2. This instance is given that file: `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE=$XDG_RUNTIME_DIR/tawk/admin.token` (on a Mac, the folder `tawk --version` or `tawk doctor` reports for the control socket).
 
 With the setting, a write that tawk queues for an answer comes back at once as waiting, with its request id, and two more tools appear: `list_pending` and `approve_pending`. Without it nothing changes: there are no such tools, and writes wait for you as before.
 
@@ -166,7 +166,7 @@ An instance with this setting can send as you without you seeing the message fir
 tawk-mcp tells a connected agent how to work, so nothing has to be installed on the agent's side:
 
 - **Server instructions** are sent when a client connects: that chat text is untrusted, how sending and approval work, and how to use memory and knowledge.
-- **The memory workflow** is added to a tool result once every `TAWKMCP_WORKFLOW_EVERY` rounds, 20 by default. A round is one tool call or one incoming message handed to the agent, counted together. The workflow tells the agent to record what it learned: profile fields, observations, relations, follow-ups, and the user's voice. `get_workflow` returns it at any time and starts the count again. It is only there with `--memory write`.
+- **The memory workflow** is added to a tool result once every `CORVUS_TAWK_MCP_WORKFLOW_EVERY` rounds, 20 by default. A round is one tool call or one incoming message handed to the agent, counted together. The workflow tells the agent to record what it learned: profile fields, observations, relations, follow-ups, and the user's voice. `get_workflow` returns it at any time and starts the count again. It is only there with `--memory write`.
 - **Your own standing instructions** come from a text file you write, `~/.config/tawk-mcp/instructions.md` by default (`$XDG_CONFIG_HOME` is used when set). It is read when the server starts, cut at 8000 characters, and added to the server instructions and to the workflow. Use it for rules such as "send only when I ask" or "reply to family in Afrikaans".
 
 That file is the only outside text that becomes instructions. Nothing from a chat and nothing stored in memory ever does.
@@ -176,7 +176,7 @@ That file is the only outside text that becomes instructions. Nothing from a cha
 tawk-mcp looks for tawk's socket in this order:
 
 1. `--socket PATH`
-2. `TAWK_CONTROL_SOCKET`
+2. `CORVUS_TAWK_CONTROL_SOCKET`
 3. `$XDG_RUNTIME_DIR/tawk/control.sock`
 4. `~/.local/state/tawk/control.sock`
 
@@ -186,7 +186,7 @@ tawk only accepts connections from a process running as the same user, so tawk-m
 
 HTTP mode requires `Authorization: Bearer <token>` on every request except `GET /healthz`. The token is compared in constant time.
 
-On first use tawk-mcp creates 32 random bytes, writes them base64url encoded (43 characters) to the token file with mode 0600, creating its folder with mode 0700, and keeps using that token. `tawk-mcp print-token` prints it. To change it, delete the file and restart tawk-mcp. `TAWKMCP_TOKEN` replaces the file entirely.
+On first use tawk-mcp creates 32 random bytes, writes them base64url encoded (43 characters) to the token file with mode 0600, creating its folder with mode 0700, and keeps using that token. `tawk-mcp print-token` prints it. To change it, delete the file and restart tawk-mcp. `CORVUS_TAWK_MCP_TOKEN` replaces the file entirely.
 
 Requests with an `Origin` header other than `http://localhost`, `https://localhost`, `http://127.0.0.1` or `https://127.0.0.1` (any port) are refused with 403.
 
@@ -200,19 +200,19 @@ The image sets:
 
 | Variable | Value | Why |
 | --- | --- | --- |
-| `TAWKMCP_TRANSPORT` | `Http` | The default already, set so the image never depends on it |
-| `TAWKMCP_BIND` | `0.0.0.0` | Inside the container; publish the port on `127.0.0.1` only |
-| `TAWKMCP_PORT` | `8765` | |
-| `TAWKMCP_TOKEN_FILE` | `/data/token` | `/data` is a volume; mount `~/.config/tawk-mcp` there to share the token with the host |
-| `TAWKMCP_DATA_FILE` | `/data/memory.db` | Memory lives in the same volume, so it survives a new container |
-| `TAWK_CONTROL_SOCKET` | `/run/tawk/control.sock` | Mount `$XDG_RUNTIME_DIR/tawk` at `/run/tawk` |
-| `ASPNETCORE_URLS` | `http://0.0.0.0:8765` | For tooling that reads it; tawk-mcp itself uses `TAWKMCP_BIND` and `TAWKMCP_PORT` |
+| `CORVUS_TAWK_MCP_TRANSPORT` | `Http` | The default already, set so the image never depends on it |
+| `CORVUS_TAWK_MCP_BIND` | `0.0.0.0` | Inside the container; publish the port on `127.0.0.1` only |
+| `CORVUS_TAWK_MCP_PORT` | `8765` | |
+| `CORVUS_TAWK_MCP_TOKEN_FILE` | `/data/token` | `/data` is a volume; mount `~/.config/tawk-mcp` there to share the token with the host |
+| `CORVUS_TAWK_MCP_DATA_FILE` | `/data/memory.db` | Memory lives in the same volume, so it survives a new container |
+| `CORVUS_TAWK_CONTROL_SOCKET` | `/run/tawk/control.sock` | Mount `$XDG_RUNTIME_DIR/tawk` at `/run/tawk` |
+| `ASPNETCORE_URLS` | `http://0.0.0.0:8765` | For tooling that reads it; tawk-mcp itself uses `CORVUS_TAWK_MCP_BIND` and `CORVUS_TAWK_MCP_PORT` |
 
 Containers run in UTC, and tawk-mcp shows and reads times in its machine's zone (message times in transcripts, the catch-up cutoff, follow-up dates). Pass your zone with `-e TZ=Africa/Johannesburg` or they are off by your offset; `scripts/docker-run.sh` passes this machine's zone for you, and `compose.yaml` takes it from `TZ`.
 
-For memory sync the image has `git` and an SSH client. Mount a folder holding the private key and a `known_hosts` file, and pass `-e TAWKMCP_SYNC_REPO=git@github.com:owner/name.git -e TAWKMCP_SYNC_KEY=/ssh/id_ed25519 -e GIT_SSH_COMMAND="ssh -i /ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o UserKnownHostsFile=/ssh/known_hosts"`. `compose.yaml` takes the repository from your environment and leaves sync off when it is not set. To use an instructions file, mount it and point `TAWKMCP_INSTRUCTIONS_FILE` at it.
+For memory sync the image has `git` and an SSH client. Mount a folder holding the private key and a `known_hosts` file, and pass `-e CORVUS_TAWK_MCP_SYNC_REPO=git@github.com:owner/name.git -e CORVUS_TAWK_MCP_SYNC_KEY=/ssh/id_ed25519 -e GIT_SSH_COMMAND="ssh -i /ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o UserKnownHostsFile=/ssh/known_hosts"`. `compose.yaml` takes the repository from your environment and leaves sync off when it is not set. To use an instructions file, mount it and point `CORVUS_TAWK_MCP_INSTRUCTIONS_FILE` at it.
 
-Run it with `--user "$(id -u):$(id -g)"` and `-p 127.0.0.1:8765:8765`. `TAWKMCP_TOKEN` can be passed instead of the token file, for example from a secret store. The other variables work in the container as anywhere else.
+Run it with `--user "$(id -u):$(id -g)"` and `-p 127.0.0.1:8765:8765`. `CORVUS_TAWK_MCP_TOKEN` can be passed instead of the token file, for example from a secret store. The other variables work in the container as anywhere else.
 
 ## MCP protocol revision
 
