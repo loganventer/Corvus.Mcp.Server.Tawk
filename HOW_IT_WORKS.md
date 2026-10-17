@@ -37,7 +37,7 @@ sequenceDiagram
 
     S->>C: ConnectOnceAsync
     C->>T: connect to control.sock
-    C->>T: {"id":"1","op":"hello","args":{"client":"tawk-mcp","version":"0.15.10","protocol":1,"origin":"mcp"}}
+    C->>T: {"id":"1","op":"hello","args":{"client":"corvus-tawk-mcp","version":"0.15.10","protocol":1,"origin":"mcp"}}
     T-->>C: {"id":"1","ok":true,"result":{"protocol":1,"tawk":"0.6.4","access":"send",...}}
     C-->>L: ConnectionStateEvent(Connected)
     C-->>S: hello
@@ -107,7 +107,7 @@ sequenceDiagram
     T-->>M: "Sent after you edited it in tawk ... On my way, 10 minutes"
 ```
 
-A write has no timeout on tawk-mcp's side while it waits for you; tawk answers `timed_out` after 2 minutes. If you decline, tawk answers `declined` and the tool says so. If tawk quits while the request waits, the request fails with a message saying the send may or may not have gone.
+A write has no timeout on corvus-tawk-mcp's side while it waits for you; tawk answers `timed_out` after 2 minutes. If you decline, tawk answers `declined` and the tool says so. If tawk quits while the request waits, the request fails with a message saying the send may or may not have gone.
 
 ## A send the agent approves itself
 
@@ -187,7 +187,7 @@ sequenceDiagram
     end
 ```
 
-The model sees the tool call and its result. It never sees the token, and the elicitation goes from tawk-mcp to your client directly, so the model can answer neither question. There is no confirm tool. If the client does not support elicitation, the gate cancels at once and the tool answers "This needs your confirmation, and your MCP client cannot ask you. Do it in tawk instead."
+The model sees the tool call and its result. It never sees the token, and the elicitation goes from corvus-tawk-mcp to your client directly, so the model can answer neither question. There is no confirm tool. If the client does not support elicitation, the gate cancels at once and the tool answers "This needs your confirmation, and your MCP client cannot ask you. Do it in tawk instead."
 
 ## New messages
 
@@ -226,7 +226,7 @@ An agent can also ask. `get_online_status` (`PresenceTools`) goes to `PresenceMa
 ```mermaid
 flowchart LR
     MSG["New message in tawk"] --> TP{"tawk: push switch on<br/>for this kind?"}
-    TP -- no --> NONE["Not sent to tawk-mcp"]
+    TP -- no --> NONE["Not sent to corvus-tawk-mcp"]
     TP -- yes --> EVT["message event"]
     EVT --> OWN{"Sent by the user?"}
     OWN -- no --> CH["Channel event, from_me false"]
@@ -270,7 +270,7 @@ sequenceDiagram
     Note over T: kept in tawk.db, drawn under the voice note
 ```
 
-A job an agent asked for with `transcribe_message` takes the same path from the queue on. The channel sink tells the agent the result as before; the handoff sink is one more listener of the same event, so nothing about a job changed. From 0.15.6 the text the agent receives ends with a short note of tawk-mcp's own, outside the fenced transcript, that speech recognition mishears: it asks the agent to fix what is clearly wrong (misheard words and names, punctuation) while staying as close as it can to what was said, and to mark a word it cannot tell with `[?]`. From 0.15.6 it also asks the agent to read the transcript as the language spoken (a non-word is a mishearing, replaced by the real word that sounds closest and fits) and to treat the pass in the speaker's language as the truer text. The note is left out when nothing was heard or the job failed. When the agent has cleaned the text it keeps it in tawk with the `set_transcript` tool (from 0.15.6): tawk replaces the transcript it holds for that language only, sends nothing to WhatsApp, and refuses a chat that is not transcribed or text that is too long. tawk-mcp writes none of it to disk. A tawk whose `hello` lists no `transcripts` feature is sent nothing.
+A job an agent asked for with `transcribe_message` takes the same path from the queue on. The channel sink tells the agent the result as before; the handoff sink is one more listener of the same event, so nothing about a job changed. From 0.15.6 the text the agent receives ends with a short note of corvus-tawk-mcp's own, outside the fenced transcript, that speech recognition mishears: it asks the agent to fix what is clearly wrong (misheard words and names, punctuation) while staying as close as it can to what was said, and to mark a word it cannot tell with `[?]`. From 0.15.6 it also asks the agent to read the transcript as the language spoken (a non-word is a mishearing, replaced by the real word that sounds closest and fits) and to treat the pass in the speaker's language as the truer text. The note is left out when nothing was heard or the job failed. When the agent has cleaned the text it keeps it in tawk with the `set_transcript` tool (from 0.15.6): tawk replaces the transcript it holds for that language only, sends nothing to WhatsApp, and refuses a chat that is not transcribed or text that is too long. corvus-tawk-mcp writes none of it to disk. A tawk whose `hello` lists no `transcripts` feature is sent nothing.
 
 ## A TL;DR summary
 
@@ -292,7 +292,7 @@ sequenceDiagram
     M->>T: decline_summary, only when hello names summary_decline
 ```
 
-tawk chooses the agent and the messages; tawk-mcp only carries the request and the answer. An agent that will not write a summary, for any reason (too short, nothing worth summarising, or it cannot), answers with `decline_summary`, so every request is answered exactly once and tawk does not ask again; a tawk from before 0.21.0 is sent nothing, and the agent is told it will be asked again. The request needs channel events, so a client without them is never asked. The message is untrusted data like any other: the words telling the agent what to write are tawk-mcp's own and sit outside the fence.
+tawk chooses the agent and the messages; corvus-tawk-mcp only carries the request and the answer. An agent that will not write a summary, for any reason (too short, nothing worth summarising, or it cannot), answers with `decline_summary`, so every request is answered exactly once and tawk does not ask again; a tawk from before 0.21.0 is sent nothing, and the agent is told it will be asked again. The request needs channel events, so a client without them is never asked. The message is untrusted data like any other: the words telling the agent what to write are corvus-tawk-mcp's own and sit outside the fence.
 
 ## Reconnecting
 

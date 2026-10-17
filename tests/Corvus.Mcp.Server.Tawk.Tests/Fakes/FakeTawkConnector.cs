@@ -9,7 +9,7 @@ public sealed class FakeTawkConnector(int failuresBeforeSuccess) : ITawkConnecto
     private TaskCompletionSource _disconnect = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private int _remainingFailures = failuresBeforeSuccess;
 
-    public string SocketPath => "/run/test/tawk/control.sock";
+    public string SocketPath => "/run/test/corvus/tawk/control.sock";
 
     public int Attempts { get; private set; }
 

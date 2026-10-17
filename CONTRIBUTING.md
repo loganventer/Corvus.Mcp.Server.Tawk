@@ -52,7 +52,7 @@ The tests need a Unix-like system (they use Unix domain sockets and file modes) 
 - The build with no warnings and the tests passing, on your own machine, before you open it.
 - A change that alters behaviour comes with a test.
 - Update the documentation the change touches: [MANUAL.md](MANUAL.md) and the tools table in [README.md](README.md) for a tool, [CONFIGURATION.md](CONFIGURATION.md) for a setting, [ARCHITECTURE.md](ARCHITECTURE.md) for a new component or interface.
-- tawk's [CONTROL.md](https://github.com/loganventer/tawk/blob/main/CONTROL.md) defines the protocol. When it and this code disagree, the document wins; a change that needs a new operation starts in tawk.
+- tawk's [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md) defines the protocol. When it and this code disagree, the document wins; a change that needs a new operation starts in tawk.
 
 ## Writing
 

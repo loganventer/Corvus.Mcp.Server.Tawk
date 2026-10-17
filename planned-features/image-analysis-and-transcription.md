@@ -1,14 +1,14 @@
-# Plan: Image Viewing and Voice Transcription in tawk-mcp
+# Plan: Image Viewing and Voice Transcription in corvus-tawk-mcp
 
-Checked against tawk-mcp `d3729ee` and tawk 0.8.1.
+Checked against corvus-tawk-mcp `d3729ee` and tawk 0.8.1.
 
 ## 1. Summary
 
 Two features, both built on one upstream change:
 
-- **Image viewing.** A tool returns a message's picture to the MCP client as an image content block, and the client's own model looks at it. tawk-mcp runs no vision model.
-- **Voice transcription.** A tool starts a transcription and returns at once. When the text is ready, tawk-mcp sends a channel event. How the audio is transcribed (engine, model, languages, task) is set by the user, and the agent may choose per call within what the user allowed. One call can ask for several languages and gets one transcription for each, for voice notes that mix languages. When no transcriber is running for tawk-mcp to connect to, it loads one model inside its own process and reuses that single instance for every job.
-- **Prerequisite.** tawk must say where a downloaded file is, and say when a download finishes. tawk-mcp does not read tawk's database or guess at its folders.
+- **Image viewing.** A tool returns a message's picture to the MCP client as an image content block, and the client's own model looks at it. corvus-tawk-mcp runs no vision model.
+- **Voice transcription.** A tool starts a transcription and returns at once. When the text is ready, corvus-tawk-mcp sends a channel event. How the audio is transcribed (engine, model, languages, task) is set by the user, and the agent may choose per call within what the user allowed. One call can ask for several languages and gets one transcription for each, for voice notes that mix languages. When no transcriber is running for corvus-tawk-mcp to connect to, it loads one model inside its own process and reuses that single instance for every job.
+- **Prerequisite.** tawk must say where a downloaded file is, and say when a download finishes. corvus-tawk-mcp does not read tawk's database or guess at its folders.
 
 ## 2. Where it sits
 
@@ -16,14 +16,14 @@ Two features, both built on one upstream change:
 MCP client (Claude Code, Claude Desktop, VS Code)
         |  MCP over HTTP or stdio, plus channel events
         v
-tawk-mcp (.NET 10)
+corvus-tawk-mcp (.NET 10)
   Clients -> Managers -> Engines -> ResourceAccess
         |                               |
         |  control socket               |  transcriber: a running one
         |  (one JSON object a line)     |  (HTTP endpoint or a command),
         v                               v  else one model in process
 tawk (C, ncurses)                 whisper server, faster-whisper, whisper CLI,
-                                  or Whisper.net inside tawk-mcp
+                                  or Whisper.net inside corvus-tawk-mcp
   tawk.db, media cache, whatsmeow or Baileys backend
 ```
 
@@ -33,8 +33,8 @@ The control protocol is line-delimited JSON (`{"id","op","args"}`), version 1. I
 
 - `control_codec_message` (tawk, `src/clients/control/control_codec.c`) writes `id`, `chat`, `sender`, `type`, `text` and the rest, and no `media_path`. `type` is one of `text`, `image`, `video`, `audio`, `document`, `sticker`, `other`. A voice note is `audio`, with no duration.
 - `download_media` answers `{}`. tawk's `on_media_ready` records the path and repaints the screen, and sends nothing over the control socket.
-- In tawk-mcp, `ChatMessage` has no path, `MessageManagementManager.DownloadMediaAsync` returns a fixed sentence, and `ToolResults.RunAsync` can only return text.
-- Channel events go out through `ChannelEventSink`, which takes a `LiveUpdate` built from a `TawkEvent` that tawk sent. Nothing tawk-mcp produces by itself reaches the channel yet.
+- In corvus-tawk-mcp, `ChatMessage` has no path, `MessageManagementManager.DownloadMediaAsync` returns a fixed sentence, and `ToolResults.RunAsync` can only return text.
+- Channel events go out through `ChannelEventSink`, which takes a `LiveUpdate` built from a `TawkEvent` that tawk sent. Nothing corvus-tawk-mcp produces by itself reaches the channel yet.
 
 ## 4. Step 0: the upstream change in tawk
 
@@ -42,17 +42,17 @@ Fields may be added to results and notifications without a new protocol version,
 
 1. `download_media` answers `{"path":"..."}` when the file is already there, and `{}` when the download has started.
 2. A new notification when a download finishes: `{"evt":"media_ready","chat":{...},"message_id":"...","path":"...","type":"audio"}`, sent under the same visibility rules as `message`.
-3. Optional, later: `duration_s` on audio messages, so tawk-mcp can refuse a two-hour recording before fetching it.
+3. Optional, later: `duration_s` on audio messages, so corvus-tawk-mcp can refuse a two-hour recording before fetching it.
 
-tawk already checks that a path lies inside its media folder before storing it. tawk-mcp repeats the check on its side (regular file, size limit) and never returns the path to the model.
+tawk already checks that a path lies inside its media folder before storing it. corvus-tawk-mcp repeats the check on its side (regular file, size limit) and never returns the path to the model.
 
 ### Ruled out: reading tawk.db directly
 
 The earlier draft offered this as a way to avoid changing tawk. It does not work:
 
-- `tawk.db` may be encrypted with SQLCipher, and tawk-mcp has no passphrase.
+- `tawk.db` may be encrypted with SQLCipher, and corvus-tawk-mcp has no passphrase.
 - `messages` is keyed by `(account_id, id)`, so a message id alone does not name a row.
-- Media lives in tawk's cache folder (`media.media_dir`, user-settable), and the database in its data folder. Neither is the runtime folder tawk-mcp knows.
+- Media lives in tawk's cache folder (`media.media_dir`, user-settable), and the database in its data folder. Neither is the runtime folder corvus-tawk-mcp knows.
 - It would pass by tawk's rules for locked, hidden and excluded chats, against "tawk is the authority" in `INTENT.md`.
 
 ## 5. Image viewing
@@ -94,7 +94,7 @@ meta:    type=transcript  status=done|partial|failed
 ```
 
 - The job sends one event, when all its passes have ended, however many languages were asked for. The agent gets every transcription together and can compare them.
-- Each transcript is what another person said, so each is fenced exactly like message text. The label lines and the header are written by tawk-mcp, outside the fences, so nothing spoken can pose as one.
+- Each transcript is what another person said, so each is fenced exactly like message text. The label lines and the header are written by corvus-tawk-mcp, outside the fences, so nothing spoken can pose as one.
 - `status` is `done` when every pass produced text, `partial` when some did, and `failed` when none did. A failed pass has a short reason (`no transcriber`, `too long`, `download failed`, `engine error`, `timed out`), never a stack trace.
 - The server-sent event stream gets a `transcript` event with the same fields, for programs that are not Claude Code.
 - `get_transcript(jobId)` is the fallback for clients without channels and for a session that reconnected. It answers `queued`, `running` (with the passes finished so far), or the final state with every transcript, laid out as in the event.
@@ -104,7 +104,7 @@ A job is not a `TawkEvent` that tawk sent, so the sink needs a second way in. Pl
 
 ### 6.3 Choosing how to transcribe
 
-Two levels. The user sets what exists and the defaults, when starting tawk-mcp. The agent picks among those per call.
+Two levels. The user sets what exists and the defaults, when starting corvus-tawk-mcp. The agent picks among those per call.
 
 Set by the user (flags, with matching `CORVUS_TAWK_MCP_*` variables):
 
@@ -114,7 +114,7 @@ Set by the user (flags, with matching `CORVUS_TAWK_MCP_*` variables):
 | `--transcribe-url` | The endpoint for `http`, speaking the OpenAI transcription API (`/v1/audio/transcriptions`), which whisper.cpp's server, faster-whisper-server and others offer | none |
 | `--transcribe-command` | The program for `command`, with `{file}`, `{language}`, `{model}` and `{task}` filled in; the text is read from its output | none |
 | `--transcribe-model` | The default model name | the engine's own |
-| `--transcribe-model-dir` | The folder of model files for the in-process engine | `~/.local/share/tawk-mcp/models` |
+| `--transcribe-model-dir` | The folder of model files for the in-process engine | `~/.local/share/corvus/tawk-mcp/models` |
 | `--transcribe-idle-unload-m` | Minutes without a job before the in-process model is unloaded. 0 keeps it loaded | 15 |
 | `--transcribe-models` | The model names an agent may ask for | only the default |
 | `--transcribe-language` | The default languages: one or more ISO 639-1 codes or `auto`, comma separated (for example `af,en`) | `auto` |
@@ -140,7 +140,7 @@ Rules:
 - When no `languages` are given and memory holds stated languages for the contact, those are used before the configured default.
 - `task`, `model` and `prompt` apply to every pass of the call. A different model for each language is two calls.
 
-Behind this sits one `ITranscriber` interface in `ResourceAccess` with an implementation per engine, bound in the composition root. Section 6.7 covers the in-process one and how tawk-mcp moves between a running transcriber and its own.
+Behind this sits one `ITranscriber` interface in `ResourceAccess` with an implementation per engine, bound in the composition root. Section 6.7 covers the in-process one and how corvus-tawk-mcp moves between a running transcriber and its own.
 
 ### 6.4 Several languages in one call
 
@@ -161,25 +161,25 @@ Not planned: cutting the audio into segments and detecting the language of each.
 
 WhatsApp voice notes are Opus in an Ogg container.
 
-- The `http` engines named above accept that directly, so tawk-mcp sends the file as it is.
+- The `http` engines named above accept that directly, so corvus-tawk-mcp sends the file as it is.
 - The `command` engine gets the file path, and converting it (for example with `ffmpeg`) is the command's business.
-- The in-process engine needs 16 kHz mono PCM. tawk-mcp decodes and resamples in managed code (`Concentus` with its Ogg reader), so no `ffmpeg` and no extra native library is needed for audio. Other containers (an `.m4a` forwarded as audio) are refused by this engine with `unsupported format`.
+- The in-process engine needs 16 kHz mono PCM. corvus-tawk-mcp decodes and resamples in managed code (`Concentus` with its Ogg reader), so no `ffmpeg` and no extra native library is needed for audio. Other containers (an `.m4a` forwarded as audio) are refused by this engine with `unsupported format`.
 
 ### 6.6 What is kept
 
-Since tawk-mcp 0.9.0 a finished transcript is also handed to tawk (0.13.0 or later), which keeps it in its own database and shows it under the voice note. What this section says still holds for tawk-mcp itself: it writes nothing to disk.
+Since corvus-tawk-mcp 0.9.0 a finished transcript is also handed to tawk (0.13.0 or later), which keeps it in its own database and shows it under the voice note. What this section says still holds for corvus-tawk-mcp itself: it writes nothing to disk.
 
-`INTENT.md` says tawk-mcp stores no messages. Transcripts follow that: finished jobs are held in memory only, a bounded number (default 50) for a bounded time (default 30 minutes), so `get_transcript` works, and they are gone on restart. Nothing is written to disk or to the log.
+`INTENT.md` says corvus-tawk-mcp stores no messages. Transcripts follow that: finished jobs are held in memory only, a bounded number (default 50) for a bounded time (default 30 minutes), so `get_transcript` works, and they are gone on restart. Nothing is written to disk or to the log.
 
 ### 6.7 The in-process model: one instance, reused
 
-**When it is used.** With `--transcribe embedded`, always. With `--transcribe auto`, whenever no running transcriber answers: no `--transcribe-url` was given, the endpoint refuses the connection, or it keeps failing. tawk-mcp then loads a Whisper model through `Whisper.net` (whisper.cpp) inside its own process. Nothing is spawned and no port is opened.
+**When it is used.** With `--transcribe embedded`, always. With `--transcribe auto`, whenever no running transcriber answers: no `--transcribe-url` was given, the endpoint refuses the connection, or it keeps failing. corvus-tawk-mcp then loads a Whisper model through `Whisper.net` (whisper.cpp) inside its own process. Nothing is spawned and no port is opened.
 
 **One instance, never two.** This is a hard rule, enforced at three levels:
 
 - **In the process.** A single model host owns the loaded model. It loads on first use, and every job and every language pass reuses it. Inference goes through the host one call at a time, so with this engine `--transcribe-concurrency` is treated as 1. Asking for a different model unloads the current one before the next is loaded. Two are never in memory together.
-- **Across tawk-mcp processes.** stdio mode can mean several tawk-mcp processes on one machine. A lock file next to the model folder, in the style of `FileSyncLock`, is held for as long as a model is loaded. A process that finds it held waits a bounded time, then fails the pass with `transcriber busy`. It does not load a second copy.
-- **Against a running transcriber.** tawk-mcp never loads its own model while the external one is answering, and unloads its own before sending work back to the external one.
+- **Across corvus-tawk-mcp processes.** stdio mode can mean several corvus-tawk-mcp processes on one machine. A lock file next to the model folder, in the style of `FileSyncLock`, is held for as long as a model is loaded. A process that finds it held waits a bounded time, then fails the pass with `transcriber busy`. It does not load a second copy.
+- **Against a running transcriber.** corvus-tawk-mcp never loads its own model while the external one is answering, and unloads its own before sending work back to the external one.
 
 **Reuse.** The model stays loaded between jobs, so the second voice note does not pay the load time again. After `--transcribe-idle-unload-m` minutes without a job it is unloaded and the lock released, and the next job loads it again.
 
@@ -188,10 +188,10 @@ Since tawk-mcp 0.9.0 a finished transcript is also handed to tawk (0.13.0 or lat
 - *Choosing a route.* A circuit breaker (the existing `ICircuitBreaker`) sits on the external transcriber. While it is closed, jobs go there. A refused connection or repeated failures open it, the in-process model takes over, and the pass that was in flight is retried there, so the job still ends `done`. After the cooldown one trial goes to the external transcriber, and on success work moves back and the in-process model is unloaded.
 - *The in-process model failing.* A failed load or a failed inference disposes the instance, waits by `IBackoffPolicy`, and loads again, once for each pass. A second failure fails that pass with `engine error` and leaves the host empty, so the next job starts clean. A pass that hits its timeout is cancelled and the instance is disposed, since a cancelled native call cannot be trusted afterwards.
 - *Never hang.* Loading, waiting for the lock and each inference all have bounds. The worker always moves on.
-- *Shutdown.* The host unloads the model and releases the lock when tawk-mcp stops. A lock left by a killed process is detected as stale and taken over.
-- *What it cannot survive.* A crash inside the native library takes the tawk-mcp process with it. systemd or Docker restarts it, the stale lock is cleared, and jobs in the queue are lost (section 6.6). An out-of-process transcriber is the safer choice for anyone who sees this.
+- *Shutdown.* The host unloads the model and releases the lock when corvus-tawk-mcp stops. A lock left by a killed process is detected as stale and taken over.
+- *What it cannot survive.* A crash inside the native library takes the corvus-tawk-mcp process with it. systemd or Docker restarts it, the stale lock is cleared, and jobs in the queue are lost (section 6.6). An out-of-process transcriber is the safer choice for anyone who sees this.
 
-**Where the model comes from.** tawk-mcp has no update checks and sends nothing anywhere by itself, so it never downloads a model silently. The model is a GGML file in `--transcribe-model-dir`, put there by the user or by `tawk-mcp fetch-model <name>`, a command the user runs on purpose. With no model file, an `auto` or `embedded` pass fails with `no model installed` and the one-line command to fix it. The names in the folder are the models an agent may ask for.
+**Where the model comes from.** corvus-tawk-mcp has no update checks and sends nothing anywhere by itself, so it never downloads a model silently. The model is a GGML file in `--transcribe-model-dir`, put there by the user or by `corvus-tawk-mcp fetch-model <name>`, a command the user runs on purpose. With no model file, an `auto` or `embedded` pass fails with `no model installed` and the one-line command to fix it. The names in the folder are the models an agent may ask for.
 
 **Cost.** `Whisper.net` and its CPU runtime add native libraries to the publish output and the image. A `base` model is about 150 MB on disk and `small` about 500 MB, with memory use somewhat above that. CPU is the default. GPU runtimes are a later option.
 
@@ -267,7 +267,7 @@ Every class, record, enum and interface above is its own file named after it, wi
 - The engine, or the pair behind the failover, is chosen once, in `TawkMcpComposition`, from `--transcribe`. Nothing below the composition root switches on the engine's name.
 - With `--transcribe off`, the tools, the worker and the transcriber are simply not bound, as with `--memory off`.
 - All new classes are `sealed`.
-- The one place a new type extends another is data: `MediaReadyEvent` and `TranscriptEvent` are sealed records under `TawkEvent`, like `MessageEvent` and `ReadEvent`, because `LiveUpdate` carries a `TawkEvent` and the sinks match on its kind. They hold no behaviour. `TawkEvent`'s summary is reworded to cover an event tawk-mcp raises itself.
+- The one place a new type extends another is data: `MediaReadyEvent` and `TranscriptEvent` are sealed records under `TawkEvent`, like `MessageEvent` and `ReadEvent`, because `LiveUpdate` carries a `TawkEvent` and the sinks match on its kind. They hold no behaviour. `TawkEvent`'s summary is reworded to cover an event corvus-tawk-mcp raises itself.
 
 ### 7.5 Separation of concerns
 
@@ -300,21 +300,21 @@ The in-process engine needs no reach to the host's loopback. Its model folder si
 ## 10. Order of work
 
 1. tawk: path in the `download_media` answer and the `media_ready` notification, with CONTROL.md.
-2. tawk-mcp: `media_ready` decoding, `IMediaFiles`, content blocks in `ToolResults`, `view_image`.
-3. tawk-mcp: the job queue, worker, `HttpTranscriber`, `transcribe_message`, the channel and stream events, `get_transcript`.
-4. tawk-mcp: `CommandTranscriber`, the per-call options and their checks, several languages, the contact language default.
-5. tawk-mcp: the in-process engine: decoder, model host, lock, `EmbeddedTranscriber`, `fetch-model`.
-6. tawk-mcp: `FailoverTranscriber` and `--transcribe auto`.
+2. corvus-tawk-mcp: `media_ready` decoding, `IMediaFiles`, content blocks in `ToolResults`, `view_image`.
+3. corvus-tawk-mcp: the job queue, worker, `HttpTranscriber`, `transcribe_message`, the channel and stream events, `get_transcript`.
+4. corvus-tawk-mcp: `CommandTranscriber`, the per-call options and their checks, several languages, the contact language default.
+5. corvus-tawk-mcp: the in-process engine: decoder, model host, lock, `EmbeddedTranscriber`, `fetch-model`.
+6. corvus-tawk-mcp: `FailoverTranscriber` and `--transcribe auto`.
 7. Docker mount, documents.
 
 Each step ships with tests in the existing style: the fake tawk server for the control side, a fake `ITranscriber` for jobs, and `ChannelDeliveryTests` for the event.
 
 ## 11. Open questions
 
-- **Access level.** tawk's source calls `download_media` a read, yet tawk-mcp lists it among writes and its tool says it needs `manage`. Viewing and transcribing should be possible at `read`. To settle with step 0.
+- **Access level.** tawk's source calls `download_media` a read, yet corvus-tawk-mcp lists it among writes and its tool says it needs `manage`. Viewing and transcribing should be possible at `read`. To settle with step 0.
 - **Image blocks in SDK 2.2.0.** The image content block type is assumed from the MCP specification and was not checked against the pinned `ModelContextProtocol` 2.2.0 package.
 - **Audio blocks.** MCP also defines an audio content block. Returning the voice note itself to a client whose model hears audio would need no transcriber. Worth a `listen_message` tool only once a client we use supports it.
-- **Whether "in process" may ever mean a child process.** This plan loads the model inside tawk-mcp, as asked. A supervised child (a whisper server tawk-mcp starts and restarts) would survive native crashes better, at the cost of a second program to ship. Kept out unless crashes prove to be a problem.
+- **Whether "in process" may ever mean a child process.** This plan loads the model inside corvus-tawk-mcp, as asked. A supervised child (a whisper server corvus-tawk-mcp starts and restarts) would survive native crashes better, at the cost of a second program to ship. Kept out unless crashes prove to be a problem.
 - **Packages.** `Whisper.net`, its runtime and `Concentus` are new dependencies, to be checked for licence and for a clean build under warnings as errors on .NET 10.
 - **Automatic transcription.** Transcribing every incoming voice note without being asked is left out. It can be a later flag built on the same queue.
 
@@ -323,27 +323,27 @@ Each step ships with tests in the existing style: the fake tawk server for the c
 These replace what the sections above say where they differ.
 
 - **The user's choices live in tawk's settings panel.** Settings, Automation, Voice note transcription holds the model (a list to choose from: `tiny`, `base`, `small`, `medium`, `large-v3-turbo`, `large-v3`), the default languages, and a switch for transcribing every voice note as it arrives. They are in `[automation]`, so an agent can read them and cannot change them.
-- **tawk's settings override tawk-mcp's.** For the model, the languages and the automatic switch, tawk's panel comes first. `--transcribe-model`, `--transcribe-language` and `--transcribe-auto` stand in only for a tawk that does not have these settings or is not running. The built-in values are last: `large-v3-turbo`, `auto`, off.
+- **tawk's settings override corvus-tawk-mcp's.** For the model, the languages and the automatic switch, tawk's panel comes first. `--transcribe-model`, `--transcribe-language` and `--transcribe-auto` stand in only for a tawk that does not have these settings or is not running. The built-in values are last: `large-v3-turbo`, `auto`, off.
 - **`large-v3-turbo` is the default**, until the user picks another. `tiny` was the first default and proved unusable for Afrikaans and for mixed languages.
 - **Automatic transcription is built**, as a switch, where section 11 had left it out. `AutoTranscriptionSink` offers each incoming voice note, and the switch is read as each one arrives, so a change in the panel takes hold within seconds.
 - **Two managers, not one.** `TranscriptionManager` takes requests and answers about jobs. `TranscriptionRunManager` runs them and announces the outcome. The automatic sink is an event sink that needs the first, and the second needs the event sinks, so one manager would have depended on itself.
 - **`ITranscriptionPreferences`** in resource access reads the choices with `get_settings` and keeps them for ten seconds.
 - **`download_media` also names the type and the chat** when the file is there: `{"path","type","chat":{"jid","name"}}`. The `media_ready` event carries the same.
-- **What stays in tawk-mcp's flags** is what belongs to the installation: the engine, the transcriber's address or command, whether it may be on another machine, the models an agent may ask for beyond the chosen one, and the limits.
+- **What stays in corvus-tawk-mcp's flags** is what belongs to the installation: the engine, the transcriber's address or command, whether it may be on another machine, the models an agent may ask for beyond the chosen one, and the limits.
 
-- **The in-process engine is the default.** `--transcribe auto` is the default mode: with no transcriber of the user's own it loads one Whisper model inside tawk-mcp. The tools are always listed, and with `--transcribe off` they say so.
-- **`get_transcription_progress` says how far a job is.** Every transcriber reports its steps through an `IProgress<TranscriptionProgress>`, the job store keeps the last one beside the job until the job ends, and the tool answers with the step and how long ago the job was asked for, never with any text. The model inside tawk-mcp tells the megabytes of a model downloaded so far and the share of the voice note heard; a transcriber the user runs only says that it has the file.
+- **The in-process engine is the default.** `--transcribe auto` is the default mode: with no transcriber of the user's own it loads one Whisper model inside corvus-tawk-mcp. The tools are always listed, and with `--transcribe off` they say so.
+- **`get_transcription_progress` says how far a job is.** Every transcriber reports its steps through an `IProgress<TranscriptionProgress>`, the job store keeps the last one beside the job until the job ends, and the tool answers with the step and how long ago the job was asked for, never with any text. The model inside corvus-tawk-mcp tells the megabytes of a model downloaded so far and the share of the voice note heard; a transcriber the user runs only says that it has the file.
 - **A missing model is downloaded** the first time a transcription needs it, and the installer fetches `large-v3-turbo`. This replaces the rule in section 6.7 that only the user fetches a model. The download carries on when the pass that started it runs out of time, and the next pass picks it up.
-- **The native libraries travel inside the program.** tawk-mcp is installed as one file, so the program assembly embeds the libraries for its own platform and unpacks them on first use into `~/.local/share/tawk-mcp/native/<build>/runtimes/<platform>`, where Whisper's loader looks.
+- **The native libraries travel inside the program.** corvus-tawk-mcp is installed as one file, so the program assembly embeds the libraries for its own platform and unpacks them on first use into `~/.local/share/corvus/tawk-mcp/native/<build>/runtimes/<platform>`, where Whisper's loader looks.
 
 ## 13. Where the work stands
 
 | Step | State |
 | --- | --- |
 | tawk: path in the `download_media` answer, `media_ready`, the settings and their submenu | Done on a branch, tests pass |
-| tawk-mcp: `view_image` | Done, tests pass |
-| tawk-mcp: job queue, worker, `http` and `command` engines, `transcribe_message`, `get_transcript`, channel and stream events | Done, tests pass |
-| tawk-mcp: several languages, per-call options, automatic transcription, settings read from tawk | Done, tests pass |
-| tawk-mcp: the in-process engine and failover (section 6.7) | Done on Linux, checked against a real voice note. macOS and Windows carry the same code and were not run |
-| tawk-mcp: the contact's language as a default | Not started |
+| corvus-tawk-mcp: `view_image` | Done, tests pass |
+| corvus-tawk-mcp: job queue, worker, `http` and `command` engines, `transcribe_message`, `get_transcript`, channel and stream events | Done, tests pass |
+| corvus-tawk-mcp: several languages, per-call options, automatic transcription, settings read from tawk | Done, tests pass |
+| corvus-tawk-mcp: the in-process engine and failover (section 6.7) | Done on Linux, checked against a real voice note. macOS and Windows carry the same code and were not run |
+| corvus-tawk-mcp: the contact's language as a default | Not started |
 | Docker mount, and the manual, configuration, intent and security documents | Not started |

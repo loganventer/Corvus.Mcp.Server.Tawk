@@ -13,7 +13,7 @@
 
 ## Overview
 
-tawk-mcp is a .NET 10 program built on the official MCP C# SDK (`ModelContextProtocol` and `ModelContextProtocol.AspNetCore` 2.2.0), arranged in [iDesign](https://www.idesign.net/) layers. The volatile parts (tawk's socket protocol, the MCP transport, the model-facing text) sit behind interfaces, so each can change without touching the rest. Every interface is bound to its implementation in exactly one place, `TawkMcpComposition` in the host.
+corvus-tawk-mcp is a .NET 10 program built on the official MCP C# SDK (`ModelContextProtocol` and `ModelContextProtocol.AspNetCore` 2.2.0), arranged in [iDesign](https://www.idesign.net/) layers. The volatile parts (tawk's socket protocol, the MCP transport, the model-facing text) sit behind interfaces, so each can change without touching the rest. Every interface is bound to its implementation in exactly one place, `TawkMcpComposition` in the host.
 
 Each class, record, enum and interface lives in its own file. Nullable reference types, the .NET analysers and warnings as errors are on for every project (`Directory.Build.props`).
 
@@ -21,7 +21,7 @@ Each class, record, enum and interface lives in its own file. Nullable reference
 
 | Layer | Project | Responsibility | May call |
 | --- | --- | --- | --- |
-| Host | `Corvus.Mcp.Server.Tawk.Host` (assembly `tawk-mcp`) | The composition root, the command line, streamable HTTP hosting (the default) and stdio hosting, the bearer token and origin middleware, `/events` and `/healthz` | Everything, to compose it |
+| Host | `Corvus.Mcp.Server.Tawk.Host` (assembly `corvus-tawk-mcp`) | The composition root, the command line, streamable HTTP hosting (the default) and stdio hosting, the bearer token and origin middleware, `/events` and `/healthz` | Everything, to compose it |
 | Clients | `Corvus.Mcp.Server.Tawk.Clients` | MCP tools, resources and prompts, resource subscriptions, the channel sink, the event stream hub, session tracking, the notification dispatcher | Managers |
 | Managers | `Corvus.Mcp.Server.Tawk.Managers` | Use cases: reading, sending, managing messages, chats, scheduled messages, statuses, the profile, settings and the app, online status lookups, and live updates; in `Memory`, categories, voices, contact profiles and templates | Engines, resource access |
 | Engines | `Corvus.Mcp.Server.Tawk.Engines` | Rules with no I/O: transcript and chat formatting, untrusted text fencing, catch-up and draft planning, notification headers, exponential backoff, the circuit breaker, schedule jitter; in `Memory`, style measuring, voice rules and scoring, voice resolution, guide import, the contact field catalog, template filling and memory formatting | Core |
@@ -119,9 +119,9 @@ flowchart LR
 
 ### Core
 
-Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/tawk/blob/main/CONTROL.md): `ChatSummary`, `ChatMessage` (with `ReplyRef` and `LinkCard`), `StatusItem`, `ScheduledItem`, `UnreadSummary`, `ChatInfo` and `GroupMember`, `HelloInfo`, and result records such as `MessagePage`, `SentMessage` and `ScheduledMessage`. They are read with `System.Text.Json` and a snake_case naming policy, and unknown fields are ignored, as the protocol requires.
+Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md): `ChatSummary`, `ChatMessage` (with `ReplyRef` and `LinkCard`), `StatusItem`, `ScheduledItem`, `UnreadSummary`, `ChatInfo` and `GroupMember`, `HelloInfo`, and result records such as `MessagePage`, `SentMessage` and `ScheduledMessage`. They are read with `System.Text.Json` and a snake_case naming policy, and unknown fields are ignored, as the protocol requires.
 
-`TawkEvent` is the root of the notifications: `SummaryWantedEvent` and `TranscriptWantedEvent` (tawk asking for the TL;DR of a long message, and for the transcript of an older voice note the user looked at), `MessageEvent`, `ChatUpdatedEvent`, `ByeEvent`, `ApprovalEvent`, `UnknownEvent`, and `ConnectionStateEvent`, which tawk-mcp raises itself when its connection changes. `ControlError` carries tawk's error (`code`, `message`, `candidates`, `retry_after`), `ControlErrorCode` names the codes, and `TawkControlException` is how every failure travels upwards.
+`TawkEvent` is the root of the notifications: `SummaryWantedEvent` and `TranscriptWantedEvent` (tawk asking for the TL;DR of a long message, and for the transcript of an older voice note the user looked at), `MessageEvent`, `ChatUpdatedEvent`, `ByeEvent`, `ApprovalEvent`, `UnknownEvent`, and `ConnectionStateEvent`, which corvus-tawk-mcp raises itself when its connection changes. `ControlError` carries tawk's error (`code`, `message`, `candidates`, `retry_after`), `ControlErrorCode` names the codes, and `TawkControlException` is how every failure travels upwards.
 
 ### Resource access
 
@@ -141,11 +141,11 @@ Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/tawk
 
 ### Engines
 
-- `TranscriptionNoticeFormatter` writes what an agent is told about a transcription job. From 0.15.4 it ends a transcript with `Guidance`, a note of tawk-mcp's own outside the fence: fix what speech recognition clearly got wrong, stay as close as you can to what was said, and mark a word you cannot tell with `[?]`; it is left out when nothing was heard.
+- `TranscriptionNoticeFormatter` writes what an agent is told about a transcription job. From 0.15.4 it ends a transcript with `Guidance`, a note of corvus-tawk-mcp's own outside the fence: fix what speech recognition clearly got wrong, stay as close as you can to what was said, and mark a word you cannot tell with `[?]`; it is left out when nothing was heard.
 - `TranscriptFormatter` writes `[2026-09-30 18:02] Mom: text` lines with reply, media, forward, deletion, link, edit, reaction and status markers, indenting extra lines. It is given an `IAudioDetailFormatter` (`AudioDetailFormatter`), which words the length of a voice note or video (`0:42`) and when one you sent was played, always as the full date and time to the second (`played 2026-10-13 13:58:42`), from the `PlayedAt` and `DurationS` tawk sends. `ChatDirectoryFormatter` does the same for chats, chat details and scheduled messages.
 - `UntrustedTextFence` wraps other people's text between fixed markers with a statement that it is data, and breaks up any run of angle brackets inside so the text cannot close the fence.
 - `CatchUpPlanner` and `DraftReplyPlanner` write the prompt instructions. `NotificationFormatter` writes the one-line header of a channel event, and the whole line for a read receipt, a play of a voice note, an activity or someone coming online. `PresenceFormatter` writes the answer to a lookup of someone's online status.
-- `SummaryRequestText` is what an agent is told when tawk asks for a TL;DR: tawk-mcp's own words, which go outside the fenced message.
+- `SummaryRequestText` is what an agent is told when tawk asks for a TL;DR: corvus-tawk-mcp's own words, which go outside the fenced message.
 - `ExponentialBackoffPolicy` and `CircuitBreaker` (closed, open, half-open) take an injected random source and `TimeProvider`. `RandomScheduleJitter` also takes a random source, and turns a schedule time into one shifted by whole seconds.
 - In `Memory`, measuring, judging and scoring are separate: `StyleFeatureExtractor` measures a draft, each `IVoiceRule` (forbidden patterns, case, emoji, length, language, address form, required markers, greeting and sign-off, learnt baseline) judges one thing, and `VoiceChecker` runs whichever rules are registered and scores the findings. `VoiceResolver` picks the variant for a category path and overlays its rules. `ContactFieldCatalog` holds `ContactFieldDefinition`s (from `StandardContactFields`) and checks values with one `IFieldValueValidator` per kind of value. `VoiceGuideImporter`, `StyleBaselineCalculator`, `TemplateRenderer` and `MemoryFormatter` do what their names say, and `MemoryWriteGuard` refuses changes in read-only mode.
 - In `Knowledge`, `KnowledgeFormatter` writes concepts and observations for a model, `KnowledgePrecedence` decides which of two versions is kept (stronger source, then newer), and `OkfBundleWriter` and `OkfBundleReader` turn concepts into Markdown files with YAML frontmatter and back. Reading uses YamlDotNet; writing is a small emitter that quotes anything YAML could misread.
@@ -189,7 +189,7 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 - Every reader of `ITawkControl.Events` gets its own unbounded channel. The live updates manager is the one reader in production, and hands each update to the sinks in turn; a failing sink is logged and skipped.
 - The event stream hub gives each `/events` subscriber its own bounded channel, which drops its oldest events if the reader stalls, and keeps the replay buffer under a lock.
 - The session registry keeps at most 64 sessions; past that the one heard from longest ago is let go with its subscriptions.
-- A sync cycle runs on its own background task and holds a lock file, so two tawk-mcp processes on one machine never sync at once.
+- A sync cycle runs on its own background task and holds a lock file, so two corvus-tawk-mcp processes on one machine never sync at once.
 - Tool calls run on the MCP SDK's request tasks and share the one connection.
 
 ## Design principles

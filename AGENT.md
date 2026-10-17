@@ -4,7 +4,7 @@ Read this before changing the repository. It covers the layout, the rules the co
 
 ## What this is
 
-tawk-mcp is an MCP server for [tawk](https://github.com/loganventer/tawk), a WhatsApp client for the terminal. It talks to a running tawk over tawk's control socket, whose protocol is defined in tawk's [CONTROL.md](https://github.com/loganventer/tawk/blob/main/CONTROL.md). Follow that document exactly; when it and this code disagree, the document wins.
+corvus-tawk-mcp is an MCP server for [tawk](https://github.com/loganventer/Corvus.App.Terminal.Tawk), a WhatsApp client for the terminal. It talks to a running tawk over tawk's control socket, whose protocol is defined in tawk's [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md). Follow that document exactly; when it and this code disagree, the document wins.
 
 ## Layout
 
@@ -17,7 +17,7 @@ src/Corvus.Mcp.Server.Tawk.ResourceAccess  codec, socket connection, control cli
 src/Corvus.Mcp.Server.Tawk.Engines         formatters, fence, planners, backoff, circuit breaker, schedule jitter; Memory/ voice rules, field catalog; Knowledge/ OKF bundles; Sync/ merge rules
 src/Corvus.Mcp.Server.Tawk.Managers        use cases, one manager per area, plus IEventSink; Memory/ voices, contacts, templates; Knowledge/; Sync/
 src/Corvus.Mcp.Server.Tawk.Clients         tools, resources, prompts, subscriptions, channel, event stream, dispatcher; Workflow/ the workflow check
-src/Corvus.Mcp.Server.Tawk.Host            composition root, Program, middleware, endpoints (assembly tawk-mcp)
+src/Corvus.Mcp.Server.Tawk.Host            composition root, Program, middleware, endpoints (assembly corvus-tawk-mcp)
 tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
 ```
 
@@ -69,14 +69,14 @@ The installer (`install.sh`) mirrors tawk's own: the same `say`, `warn`, `die` a
 ```sh
 tmp="$(mktemp -d)"
 CORVUS_TAWK_MCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --no-service
-"$tmp/bin/tawk-mcp" --version
+"$tmp/bin/corvus-tawk-mcp" --version
 CORVUS_TAWK_MCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --uninstall && rm -rf "$tmp"
 ```
 
 Docker:
 
 ```sh
-docker build -t tawk-mcp:0.15.10 .
+docker build -t corvus-tawk-mcp:0.15.10 .
 scripts/docker-run.sh
 ```
 

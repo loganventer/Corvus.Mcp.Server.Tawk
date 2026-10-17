@@ -54,14 +54,14 @@ public class ToolErrorMappingTests
     public async Task Not_running_passes_the_clear_message_through()
     {
         var parts = new TestParts();
-        parts.Control.Fail("list_chats", TawkControlException.NotRunning("/run/user/1000/tawk/control.sock"));
+        parts.Control.Fail("list_chats", TawkControlException.NotRunning("/run/user/1000/corvus/tawk/control.sock"));
 
         var result = await new ChatTools(parts.Reading, parts.Chats, new AmbientAccountScope()).ListChatsAsync();
 
         Assert.Multiple(() =>
         {
             Assert.That(result.IsError, Is.True);
-            Assert.That(ToolOutput.Text(result), Does.Contain("corvus-tawk-mcp will connect as soon as it is").And.Contain("/run/user/1000/tawk/control.sock"));
+            Assert.That(ToolOutput.Text(result), Does.Contain("corvus-tawk-mcp will connect as soon as it is").And.Contain("/run/user/1000/corvus/tawk/control.sock"));
         });
     }
 }
