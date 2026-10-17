@@ -4,17 +4,21 @@ Read this before changing the repository. It covers the layout, the rules the co
 
 ## Contents
 
-- [[#What this is]]
-- [[#Layout]]
-- [[#Rules]]
-- [[#Writing]]
-- [[#Build and test]]
-- [[#Adding a tawk operation]]
-- [[#Versions and releases]]
+- [What this is](#What%20this%20is)
+- [Layout](#Layout)
+- [Rules](#Rules)
+- [Writing](#Writing)
+- [Build and test](#Build%20and%20test)
+- [Adding a tawk operation](#Adding%20a%20tawk%20operation)
+- [Versions and releases](#Versions%20and%20releases)
+
+<a id="What this is"></a>
 
 ## What this is
 
 corvus-tawk-mcp is an MCP server for [tawk](https://github.com/loganventer/Corvus.App.Terminal.Tawk), a WhatsApp client for the terminal. It talks to a running tawk over tawk's control socket, whose protocol is defined in tawk's [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md). Follow that document exactly; when it and this code disagree, the document wins.
+
+<a id="Layout"></a>
 
 ## Layout
 
@@ -31,7 +35,9 @@ src/Corvus.Mcp.Server.Tawk.Host            composition root, Program, middleware
 tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
 ```
 
-[[ARCHITECTURE]] describes each component; [[HOW_IT_WORKS]] shows the flows.
+[ARCHITECTURE](ARCHITECTURE.md) describes each component; [HOW_IT_WORKS](HOW_IT_WORKS.md) shows the flows.
+
+<a id="Rules"></a>
 
 ## Rules
 
@@ -49,6 +55,8 @@ tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
 - **Only fixed text and the user's own instructions file become instructions.** Never load text from a chat or from the memory database into the server instructions or the workflow check.
 - **Tests use hand-written fakes only**, no mocking library. Put fakes in `tests/Corvus.Mcp.Server.Tawk.Tests/Fakes`, one per file. Socket behaviour is tested against `FakeTawkServer` in a temp folder.
 
+<a id="Writing"></a>
+
 ## Writing
 
 - Plain British English in code comments, documentation, tool descriptions and commit messages.
@@ -56,6 +64,8 @@ tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
 - Avoid "not X but Y" constructions; say the thing directly.
 - Comments only where the reason is not obvious from the code.
 - Commit messages in the project's own voice, with no mention of AI assistants or code generation, and no co-author or "generated with" lines.
+
+<a id="Build and test"></a>
 
 ## Build and test
 
@@ -90,6 +100,8 @@ docker build -t corvus-tawk-mcp:0.15.10 .
 scripts/docker-run.sh
 ```
 
+<a id="Adding a tawk operation"></a>
+
 ## Adding a tawk operation
 
 1. Add a method to the manager for its area and to its interface. Reads call `ITawkControl`; writes call `IConfirmationGate` so a `needs_confirmation` answer is handled.
@@ -98,7 +110,9 @@ scripts/docker-run.sh
 4. If the operation may wait for the user's approval, add it to `UnixSocketTawkControl.WriteOps` so it is exempt from the read timeout.
 5. New error codes go in `ControlErrorCode`, `ControlErrorCodes` and `ControlErrorMessages`.
 6. Test the tool's arguments and result with `FakeTawkControl`, and each new error.
-7. Document it in [[MANUAL]] and the tools table in [[README]].
+7. Document it in [MANUAL](MANUAL.md) and the tools table in [README](README.md).
+
+<a id="Versions and releases"></a>
 
 ## Versions and releases
 

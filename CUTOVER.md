@@ -6,17 +6,21 @@ This file lists every name that changed and the ordered steps to switch a live i
 
 ## Contents
 
-- [[#What changed]]
-  - [[#Repository and code]]
-  - [[#Commands]]
-  - [[#Environment variables]]
-  - [[#Paths]]
+- [What changed](#What%20changed)
+  - [Repository and code](#Repository%20and%20code)
+  - [Commands](#Commands)
+  - [Environment variables](#Environment%20variables)
+  - [Paths](#Paths)
   - [[#The MCP folder `~/.local/bin/mcp`]]
-  - [[#Services, registrations, images]]
-- [[#Switching a live install over]]
-- [[#Rolling back]]
+  - [Services, registrations, images](#Services,%20registrations,%20images)
+- [Switching a live install over](#Switching%20a%20live%20install%20over)
+- [Rolling back](#Rolling%20back)
+
+<a id="What changed"></a>
 
 ## What changed
+
+<a id="Repository and code"></a>
 
 ### Repository and code
 
@@ -33,6 +37,8 @@ This file lists every name that changed and the ordered steps to switch a live i
 | OKF actor for what it writes `tawk-mcp/<version>` | `corvus-tawk-mcp/<version>` (concepts already stored keep their old value) |
 | memory sync commit author `tawk-mcp <tawk-mcp@localhost>` | `corvus-tawk-mcp <corvus-tawk-mcp@localhost>` |
 
+<a id="Commands"></a>
+
 ### Commands
 
 | Old | New |
@@ -42,6 +48,8 @@ This file lists every name that changed and the ordered steps to switch a live i
 | `tawk` (Corvus Tawk itself; its own repository changes it) | `corvus-tawk` |
 
 `install.sh --legacy-links` makes **legacy symlinks** `~/.local/bin/tawk-mcp -> ~/.local/bin/mcp/corvus-tawk-mcp` and `~/.local/bin/claude-tawk -> corvus-claude`, so old registrations and aliases still start. Without the flag they are not made. Each prints a one-line deprecation notice on stderr when run under the old name. They are temporary: remove them once nothing uses the old names (step 10). `install.sh --uninstall` removes them if they are there.
+
+<a id="Environment variables"></a>
 
 ### Environment variables
 
@@ -54,6 +62,8 @@ There is no fallback: the old names are not read any more.
 | (none) | `CORVUS_TAWK_MCP_EXTRA_SERVERS`: more channels corvus-claude loads, default `corvus-schedule`; empty for none |
 | `TAWK_CONTROL_SOCKET` | `CORVUS_TAWK_CONTROL_SOCKET` |
 | `TAWKMCP_SYNC_SSH` (compose only) | `CORVUS_TAWK_MCP_SYNC_SSH` |
+
+<a id="Paths"></a>
 
 ### Paths
 
@@ -77,6 +87,8 @@ There is no fallback: the old names are not read any more.
 | launcher | `~/.local/bin/claude-tawk` -> `tawk-mcp/scripts/claude-tawk` | `~/.local/bin/corvus-claude` -> `Corvus.Mcp.Server.Tawk/scripts/corvus-claude` (old name: legacy link, with `--legacy-links`) |
 | temp folders | `tawk-mcp-build.*`, `tawk-mcp-publish.*`, `tawk-mcp-sync-*` | `corvus-tawk-mcp-build.*`, `corvus-tawk-mcp-publish.*`, `corvus-tawk-mcp-sync-*` |
 
+<a id="The MCP folder ~/.local/bin/mcp"></a>
+
 ### The MCP folder: `~/.local/bin/mcp`
 
 Every MCP server is now installed into one folder, `~/.local/bin/mcp`, apart from the commands people type, which stay in `~/.local/bin`. So `corvus-tawk-mcp` is `~/.local/bin/mcp/corvus-tawk-mcp`, and `corvus-claude` stays `~/.local/bin/corvus-claude`. `~/.local/bin/mcp` need not be on `PATH`: registrations, the systemd unit, the LaunchAgent and the crontab line name the program in full. `install.sh --mcp-dir DIR` picks another folder.
@@ -94,6 +106,8 @@ rm ~/.local/bin/corvus-tawk-mcp       # once nothing starts it any more
 
 Keep the `--env` options the old registration had (`claude mcp get corvus-tawk` shows them). Close and restart the `ct` sessions afterwards; each runs its own `--stdio` server. A unit written by hand from `contrib/systemd` needs its `ExecStart` changed to `%h/.local/bin/mcp/corvus-tawk-mcp`, then `systemctl --user daemon-reload && systemctl --user restart corvus-tawk-mcp`. `install.sh --uninstall` also removes the old file.
 
+<a id="Services, registrations, images"></a>
+
 ### Services, registrations, images
 
 | Old | New |
@@ -108,6 +122,8 @@ Keep the `--env` options the old registration had (`claude mcp get corvus-tawk` 
 | memory sync repository `loganventer/tawk-memory` | `loganventer/Corvus.Data.Sync.TawkMemory` |
 
 Registering a service with the new `install.sh` retires the old one (it would hold the same port): it stops, disables and removes `tawk-mcp.service`, unloads and removes the old LaunchAgent, or removes the old crontab line. `install.sh --no-service`, which `corvus-claude` uses, registers nothing and stops nothing.
+
+<a id="Switching a live install over"></a>
 
 ## Switching a live install over
 
@@ -161,6 +177,8 @@ Do the steps in this order. Commands assume the default folders and Linux.
     rm -f ~/.local/bin/tawk-mcp ~/.local/bin/claude-tawk
     rm -r ~/.config/tawk-mcp ~/.local/share/tawk-mcp
     ```
+
+<a id="Rolling back"></a>
 
 ## Rolling back
 

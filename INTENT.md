@@ -2,15 +2,19 @@
 
 ## Contents
 
-- [[#Purpose]]
-- [[#Scope]]
-- [[#Out of scope]]
-- [[#Boundary rules]]
-- [[#Relationship to tawk]]
+- [Purpose](#Purpose)
+- [Scope](#Scope)
+- [Out of scope](#Out%20of%20scope)
+- [Boundary rules](#Boundary%20rules)
+- [Relationship to tawk](#Relationship%20to%20tawk)
+
+<a id="Purpose"></a>
 
 ## Purpose
 
 corvus-tawk-mcp exists so that an AI model working for you, through an MCP client such as Claude Code, can help with WhatsApp the way you already use it in tawk: tell you what you missed, find things in your chats, draft replies, and, only when you say so, act. You stay in control. tawk decides what a client may see and do, every write waits for your approval in tawk, and anything destructive needs a second yes that the model cannot give.
+
+<a id="Scope"></a>
 
 ## Scope
 
@@ -29,6 +33,8 @@ In scope:
 - Streamable HTTP by default and stdio as the alternative, a systemd user service, and a Docker image, for Linux and macOS, with Windows through WSL.
 - Starting and running whether or not tawk is running, and recovering by itself when tawk comes and goes.
 
+<a id="Out of scope"></a>
+
 ## Out of scope
 
 - Talking to WhatsApp directly. corvus-tawk-mcp only ever talks to a running tawk.
@@ -38,6 +44,8 @@ In scope:
 - Unlocking locked chats, logging out, encryption, backups, Automation settings, settings that run programs, and folders and files: tawk keeps these out of reach, and corvus-tawk-mcp offers no way to them.
 - Confirming anything on the user's behalf. There is no confirm tool.
 - Choosing or calling a model. corvus-tawk-mcp serves MCP; which model reads the results is up to your client.
+
+<a id="Boundary rules"></a>
 
 ## Boundary rules
 
@@ -49,6 +57,8 @@ In scope:
 - **What is remembered stays yours.** Memory is a local file readable only by you. Every stored fact says who said it and how sure it is, an inference never overwrites what someone stated, and deleting anything asks you first.
 - **Never hang.** A tool call gets an answer within seconds whether tawk is up, down, restarting or hung, except while you are deciding on an approval.
 - **One way to build a thing.** iDesign layers, one type per file, interfaces bound only in the composition root, and warnings as errors.
+
+<a id="Relationship to tawk"></a>
 
 ## Relationship to tawk
 

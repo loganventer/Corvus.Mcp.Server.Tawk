@@ -1,14 +1,16 @@
 # Contributing
 
-Issues and pull requests are welcome. This page holds the rules the code follows and what a change needs before it is merged. [[ARCHITECTURE]] describes every layer and component, [[HOW_IT_WORKS]] shows the flows, and [[AGENT]] has the longer notes on layout, safety rules and adding a tawk operation. Read [[AGENT]] before a first change, whether you write the code yourself or a coding agent does.
+Issues and pull requests are welcome. This page holds the rules the code follows and what a change needs before it is merged. [ARCHITECTURE](ARCHITECTURE.md) describes every layer and component, [HOW_IT_WORKS](HOW_IT_WORKS.md) shows the flows, and [AGENT](AGENT.md) has the longer notes on layout, safety rules and adding a tawk operation. Read [AGENT](AGENT.md) before a first change, whether you write the code yourself or a coding agent does.
 
 ## Contents
 
-- [[#The rules]]
-- [[#Where code goes]]
-- [[#Build and test]]
-- [[#Pull requests]]
-- [[#Writing]]
+- [The rules](#The%20rules)
+- [Where code goes](#Where%20code%20goes)
+- [Build and test](#Build%20and%20test)
+- [Pull requests](#Pull%20requests)
+- [Writing](#Writing)
+
+<a id="The rules"></a>
 
 ## The rules
 
@@ -23,6 +25,8 @@ Every change keeps to these six. A pull request that breaks one is sent back, ho
 | Composition over inheritance | Behaviour is assembled from small services. Inheritance is kept to the SDK's `BackgroundService`, the exception type, and the closed families of event and frame records |
 | Separation of concerns | Formatting and fencing are engines (no I/O), protocol details and SQL are resource access, MCP details are clients, hosting is the host |
 
+<a id="Where code goes"></a>
+
 ## Where code goes
 
 | You are adding | It goes in |
@@ -35,6 +39,8 @@ Every change keeps to these six. A pull request that breaks one is sent back, ho
 | A binding, a command line option, middleware or an endpoint | `src/Corvus.Mcp.Server.Tawk.Host` |
 | A test or a fake | `tests/Corvus.Mcp.Server.Tawk.Tests`, fakes in `Fakes/`, one per file |
 
+<a id="Build and test"></a>
+
 ## Build and test
 
 ```sh
@@ -46,13 +52,17 @@ The build is strict: nullable enabled, `latest-recommended` analysers, warnings 
 
 The tests need a Unix-like system (they use Unix domain sockets and file modes) and run in a few seconds. They use hand-written fakes only, with no mocking library. There is no CI, so run them locally before pushing.
 
+<a id="Pull requests"></a>
+
 ## Pull requests
 
 - One change per pull request, with a title that says what it does.
 - The build with no warnings and the tests passing, on your own machine, before you open it.
 - A change that alters behaviour comes with a test.
-- Update the documentation the change touches: [[MANUAL]] and the tools table in [[README]] for a tool, [[CONFIGURATION]] for a setting, [[ARCHITECTURE]] for a new component or interface.
+- Update the documentation the change touches: [MANUAL](MANUAL.md) and the tools table in [README](README.md) for a tool, [CONFIGURATION](CONFIGURATION.md) for a setting, [ARCHITECTURE](ARCHITECTURE.md) for a new component or interface.
 - tawk's [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md) defines the protocol. When it and this code disagree, the document wins; a change that needs a new operation starts in tawk.
+
+<a id="Writing"></a>
 
 ## Writing
 

@@ -7,7 +7,7 @@
 
 # Corvus.Mcp.Server.Tawk
 
-Formerly tawk-mcp. The program is now `corvus-tawk-mcp`, its folders are under `corvus/tawk-mcp` and its variables start with `CORVUS_TAWK_MCP_`; [[CUTOVER]] switches an existing install over.
+Formerly tawk-mcp. The program is now `corvus-tawk-mcp`, its folders are under `corvus/tawk-mcp` and its variables start with `CORVUS_TAWK_MCP_`; [CUTOVER](CUTOVER.md) switches an existing install over.
 
 > **Disclaimer.** corvus-tawk-mcp and tawk are independent projects and are not affiliated with, endorsed by or connected to WhatsApp or Meta. tawk reaches WhatsApp through unofficial protocol libraries; use both at your own risk and in line with [WhatsApp's terms of service](https://www.whatsapp.com/legal/terms-of-service).
 
@@ -19,12 +19,14 @@ corvus-tawk-mcp talks to tawk over tawk's control socket, described in tawk's [C
 
 ## Contents
 
-- [[#Features]]
-- [[#Install]]
-- [[#Quick setup]]
-- [[#Tools]]
-- [[#Documentation]]
-- [[#Licence]]
+- [Features](#Features)
+- [Install](#Install)
+- [Quick setup](#Quick%20setup)
+- [Tools](#Tools)
+- [Documentation](#Documentation)
+- [Licence](#Licence)
+
+<a id="Features"></a>
 
 ## Features
 
@@ -48,6 +50,8 @@ corvus-tawk-mcp talks to tawk over tawk's control socket, described in tawk's [C
 - **Streamable HTTP by default**, on loopback with a bearer token; stdio when a client should start it; a Docker image; the installer registers it to start at boot.
 - **Untrusted text is fenced**: message text reaches the model inside clearly marked blocks it is told not to obey.
 
+<a id="Install"></a>
+
 ## Install
 
 With one command:
@@ -70,11 +74,13 @@ The installer builds corvus-tawk-mcp from source as one self-contained file, `~/
 
 Piped from GitHub, pass options after `bash -s --`, for example `curl -fsSL https://raw.githubusercontent.com/loganventer/Corvus.Mcp.Server.Tawk/main/install.sh | bash -s -- --no-service`.
 
-corvus-tawk-mcp needs [tawk](https://github.com/loganventer/Corvus.App.Terminal.Tawk) running beside it; the installer tells you if tawk is missing. In tawk, turn on **Settings > Automation > Control socket** and choose what agents may do under **Settings > Automation > Agent access**. What agents do shows in tawk's Agentic tab (click **🤖 Agentic** in the header, or press F3). [[QUICKSTART]] walks through it in five minutes.
+corvus-tawk-mcp needs [tawk](https://github.com/loganventer/Corvus.App.Terminal.Tawk) running beside it; the installer tells you if tawk is missing. In tawk, turn on **Settings > Automation > Control socket** and choose what agents may do under **Settings > Automation > Agent access**. What agents do shows in tawk's Agentic tab (click **🤖 Agentic** in the header, or press F3). [QUICKSTART](QUICKSTART.md) walks through it in five minutes.
+
+<a id="Quick setup"></a>
 
 ## Quick setup
 
-corvus-tawk-mcp serves MCP over streamable HTTP at `http://127.0.0.1:8765/mcp`. The installer starts it and registers it to start at boot ([[MANUAL#Keeping it running|MANUAL.md]]); with `--no-service`, start it yourself:
+corvus-tawk-mcp serves MCP over streamable HTTP at `http://127.0.0.1:8765/mcp`. The installer starts it and registers it to start at boot ([MANUAL.md](MANUAL.md#Keeping%20it%20running)); with `--no-service`, start it yourself:
 
 ```sh
 ~/.local/bin/mcp/corvus-tawk-mcp               # http://127.0.0.1:8765/mcp
@@ -122,9 +128,11 @@ claude mcp add --transport http corvus-tawk http://127.0.0.1:8765/mcp \
 scripts/docker-run.sh               # builds, runs as you, prints the token and a client snippet
 ```
 
-**stdio instead.** A client can also start corvus-tawk-mcp itself with `--stdio`, for example `claude mcp add corvus-tawk -- ~/.local/bin/mcp/corvus-tawk-mcp --stdio`. Claude Code channels, which push new messages into a session, need this; see [[MANUAL#Claude Code channel|MANUAL.md]].
+**stdio instead.** A client can also start corvus-tawk-mcp itself with `--stdio`, for example `claude mcp add corvus-tawk -- ~/.local/bin/mcp/corvus-tawk-mcp --stdio`. Claude Code channels, which push new messages into a session, need this; see [MANUAL.md](MANUAL.md#Claude%20Code%20channel).
 
-**Windows**: run tawk and corvus-tawk-mcp under WSL, and connect over HTTP through WSL2's localhost forwarding. See [[MANUAL#Windows|MANUAL.md]].
+**Windows**: run tawk and corvus-tawk-mcp under WSL, and connect over HTTP through WSL2's localhost forwarding. See [MANUAL.md](MANUAL.md#Windows).
+
+<a id="Tools"></a>
 
 ## Tools
 
@@ -150,23 +158,27 @@ scripts/docker-run.sh               # builds, runs as you, prints the token and 
 
 The last six areas are corvus-tawk-mcp's own memory and never touch WhatsApp, except `draft_template`, which puts text into tawk's input box like `draft_message`.
 
-With several WhatsApp accounts in tawk, the tools that reach WhatsApp take an optional `account`, and each account has its own level for agents, set in tawk. See [[MANUAL#Accounts|Accounts]].
+With several WhatsApp accounts in tawk, the tools that reach WhatsApp take an optional `account`, and each account has its own level for agents, set in tawk. See [Accounts](MANUAL.md#Accounts).
 
-Resources: `tawk://chats`, `tawk://chat/{jid}`, `tawk://account/{account}/chats`, `tawk://account/{account}/chat/{jid}`, `tawk://voices`, `tawk://voice/{name}`, `tawk://contact/{jid}` and `tawk://templates`. Prompts: `catch_up` and `draft_reply`. Every tool is described in [[MANUAL]].
+Resources: `tawk://chats`, `tawk://chat/{jid}`, `tawk://account/{account}/chats`, `tawk://account/{account}/chat/{jid}`, `tawk://voices`, `tawk://voice/{name}`, `tawk://contact/{jid}` and `tawk://templates`. Prompts: `catch_up` and `draft_reply`. Every tool is described in [MANUAL](MANUAL.md).
+
+<a id="Documentation"></a>
 
 ## Documentation
 
 | Document | What it covers |
 | --- | --- |
-| [[QUICKSTART]] | From nothing to asking "what did I miss?" in five minutes |
-| [[AGENT_SETUP]] | Instructions for an AI agent installing corvus-tawk-mcp and connecting a client, on Windows, Linux and macOS |
-| [[MANUAL]] | Every tool, resource and prompt, notifications, confirmations and troubleshooting |
-| [[CONFIGURATION]] | Every environment variable and argument, and the tawk settings that matter |
-| [[ARCHITECTURE]] | The layers and components |
-| [[HOW_IT_WORKS]] | What happens on a read, a send, a destructive request, a reconnect |
-| [[INTENT]] | Purpose, scope and boundary rules |
-| [[SECURITY]] | The threat model and how to report a problem |
-| [[AGENT]] | Notes for coding agents working on this repository |
+| [QUICKSTART](QUICKSTART.md) | From nothing to asking "what did I miss?" in five minutes |
+| [AGENT_SETUP](AGENT_SETUP.md) | Instructions for an AI agent installing corvus-tawk-mcp and connecting a client, on Windows, Linux and macOS |
+| [MANUAL](MANUAL.md) | Every tool, resource and prompt, notifications, confirmations and troubleshooting |
+| [CONFIGURATION](CONFIGURATION.md) | Every environment variable and argument, and the tawk settings that matter |
+| [ARCHITECTURE](ARCHITECTURE.md) | The layers and components |
+| [HOW_IT_WORKS](HOW_IT_WORKS.md) | What happens on a read, a send, a destructive request, a reconnect |
+| [INTENT](INTENT.md) | Purpose, scope and boundary rules |
+| [SECURITY](SECURITY.md) | The threat model and how to report a problem |
+| [AGENT](AGENT.md) | Notes for coding agents working on this repository |
+
+<a id="Licence"></a>
 
 ## Licence
 

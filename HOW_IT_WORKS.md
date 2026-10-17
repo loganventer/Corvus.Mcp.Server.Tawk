@@ -2,22 +2,24 @@
 
 ## Contents
 
-- [[#Start-up]]
-- [[#Connecting to tawk]]
-- [[#A read]]
-- [[#A call for one account]]
-- [[#A send with approval]]
-- [[#A send the agent approves itself]]
-- [[#A destructive request in two steps]]
-- [[#New messages]]
-- [[#A voice note's transcript]]
-- [[#A TL;DR summary]]
-- [[#Reconnecting]]
-- [[#The circuit breaker]]
-- [[#A hung tawk]]
-- [[#HTTP requests]]
-- [[#A memory sync]]
-- [[#The workflow check]]
+- [Start-up](#Start-up)
+- [Connecting to tawk](#Connecting%20to%20tawk)
+- [A read](#A%20read)
+- [A call for one account](#A%20call%20for%20one%20account)
+- [A send with approval](#A%20send%20with%20approval)
+- [A send the agent approves itself](#A%20send%20the%20agent%20approves%20itself)
+- [A destructive request in two steps](#A%20destructive%20request%20in%20two%20steps)
+- [New messages](#New%20messages)
+- [A voice note's transcript](#A%20voice%20note's%20transcript)
+- [A TL;DR summary](#A%20TL;DR%20summary)
+- [Reconnecting](#Reconnecting)
+- [The circuit breaker](#The%20circuit%20breaker)
+- [A hung tawk](#A%20hung%20tawk)
+- [HTTP requests](#HTTP%20requests)
+- [A memory sync](#A%20memory%20sync)
+- [The workflow check](#The%20workflow%20check)
+
+<a id="Start-up"></a>
 
 ## Start-up
 
@@ -25,6 +27,8 @@
 2. `print-token`, `healthcheck`, `--version` and `--help` run and exit.
 3. Otherwise the composition root registers every service. By default `WebApplication` starts Kestrel on `CORVUS_TAWK_MCP_BIND:CORVUS_TAWK_MCP_PORT` (127.0.0.1:8765) with stateful streamable HTTP sessions, creating the bearer token first if there is none. With `--stdio` the generic host starts with the stdio transport and logs to stderr only.
 4. Two hosted services start: the connection supervisor, which starts connecting to tawk, and the notification dispatcher, which starts reading tawk's events. Neither waits for tawk, so the MCP server is ready at once whether or not tawk is running.
+
+<a id="Connecting to tawk"></a>
 
 ## Connecting to tawk
 
@@ -48,7 +52,9 @@ sequenceDiagram
     S->>C: WaitForDisconnectAsync
 ```
 
-`hello` is always the first request on a connection, with origin `mcp`, which makes tawk ask you before every write. If the socket is missing, refuses the connection or is a stale file, the attempt fails and the supervisor waits (see [[#Reconnecting]]).
+`hello` is always the first request on a connection, with origin `mcp`, which makes tawk ask you before every write. If the socket is missing, refuses the connection or is a stale file, the attempt fails and the supervisor waits (see [Reconnecting](#Reconnecting)).
+
+<a id="A read"></a>
 
 ## A read
 
@@ -73,6 +79,8 @@ sequenceDiagram
 
 If tawk answers with an error, `ControlConnection` completes the request with a `TawkControlException`, and the tool turns it into an error result with a plain explanation, for example the candidates for an `ambiguous` name. Reading never marks anything as read.
 
+<a id="A call for one account"></a>
+
 ## A call for one account
 
 1. The model calls `send_message` with `account: "work"`.
@@ -83,6 +91,8 @@ If tawk answers with an error, `ControlConnection` completes the request with a 
 6. The scope closes when the call ends. Work outside a tool call, such as the subscription to live events, has no scope and names no account.
 
 Events come back the other way with `account` on them. `ControlLineCodec` puts it on the `TawkEvent`, and the notification text, the channel tag and the event stream each carry it from there.
+
+<a id="A send with approval"></a>
 
 ## A send with approval
 
@@ -108,6 +118,8 @@ sequenceDiagram
 ```
 
 A write has no timeout on corvus-tawk-mcp's side while it waits for you; tawk answers `timed_out` after 2 minutes. If you decline, tawk answers `declined` and the tool says so. If tawk quits while the request waits, the request fails with a message saying the send may or may not have gone.
+
+<a id="A send the agent approves itself"></a>
 
 ## A send the agent approves itself
 
@@ -150,6 +162,8 @@ sequenceDiagram
 
 A write that tawk answers at once (your own "for this session" allowance, say) is never parked. A parked request that you answer in tawk, or that times out, is reported once by `list_pending` and then let go. At most 64 are kept.
 
+<a id="A destructive request in two steps"></a>
+
 ## A destructive request in two steps
 
 ```mermaid
@@ -188,6 +202,8 @@ sequenceDiagram
 ```
 
 The model sees the tool call and its result. It never sees the token, and the elicitation goes from corvus-tawk-mcp to your client directly, so the model can answer neither question. There is no confirm tool. If the client does not support elicitation, the gate cancels at once and the tool answers "This needs your confirmation, and your MCP client cannot ask you. Do it in tawk instead."
+
+<a id="New messages"></a>
 
 ## New messages
 
@@ -247,6 +263,8 @@ flowchart LR
     POPT -- no --> KEEP3["The event stream only"]
 ```
 
+<a id="A voice note's transcript"></a>
+
 ## A voice note's transcript
 
 ```mermaid
@@ -272,6 +290,8 @@ sequenceDiagram
 
 A job an agent asked for with `transcribe_message` takes the same path from the queue on. The channel sink tells the agent the result as before; the handoff sink is one more listener of the same event, so nothing about a job changed. From 0.15.6 the text the agent receives ends with a short note of corvus-tawk-mcp's own, outside the fenced transcript, that speech recognition mishears: it asks the agent to fix what is clearly wrong (misheard words and names, punctuation) while staying as close as it can to what was said, and to mark a word it cannot tell with `[?]`. From 0.15.6 it also asks the agent to read the transcript as the language spoken (a non-word is a mishearing, replaced by the real word that sounds closest and fits) and to treat the pass in the speaker's language as the truer text. The note is left out when nothing was heard or the job failed. When the agent has cleaned the text it keeps it in tawk with the `set_transcript` tool (from 0.15.6): tawk replaces the transcript it holds for that language only, sends nothing to WhatsApp, and refuses a chat that is not transcribed or text that is too long. corvus-tawk-mcp writes none of it to disk. A tawk whose `hello` lists no `transcripts` feature is sent nothing.
 
+<a id="A TL;DR summary"></a>
+
 ## A TL;DR summary
 
 ```mermaid
@@ -293,6 +313,8 @@ sequenceDiagram
 ```
 
 tawk chooses the agent and the messages; corvus-tawk-mcp only carries the request and the answer. An agent that will not write a summary, for any reason (too short, nothing worth summarising, or it cannot), answers with `decline_summary`, so every request is answered exactly once and tawk does not ask again; a tawk from before 0.21.0 is sent nothing, and the agent is told it will be asked again. The request needs channel events, so a client without them is never asked. The message is untrusted data like any other: the words telling the agent what to write are corvus-tawk-mcp's own and sit outside the fence.
+
+<a id="Reconnecting"></a>
 
 ## Reconnecting
 
@@ -325,6 +347,8 @@ sequenceDiagram
 
 While tawk is away, a tool call waits up to 2 seconds for a connection and then answers with the not-running message and the socket path. When the socket's folder does not exist yet, the watcher watches the nearest existing parent and moves down as folders appear.
 
+<a id="The circuit breaker"></a>
+
 ## The circuit breaker
 
 ```mermaid
@@ -341,9 +365,13 @@ stateDiagram-v2
 
 While the circuit is open, tool calls fail at once with "tawk has not answered N attempts; next try in Xs (or as soon as its control socket appears)", `/healthz` reports `circuit_open`, and `/events` subscribers get `event: tawk` with `{"state":"circuit_open"}`.
 
+<a id="A hung tawk"></a>
+
 ## A hung tawk
 
 A read that gets no answer within 10 seconds (`CORVUS_TAWK_MCP_REQUEST_TIMEOUT_S`) fails with an Offline error saying tawk looks hung. The control client counts it as a breaker failure and drops the connection, and the supervisor reconnects as after any other loss. Writes are exempt, because they may be waiting for you.
+
+<a id="HTTP requests"></a>
 
 ## HTTP requests
 
@@ -361,6 +389,8 @@ flowchart LR
 ```
 
 `/events` starts with a `: connected` comment and the current `event: tawk` state, replays kept events after `Last-Event-ID`, then streams new ones, with a `: heartbeat` comment after 15 quiet seconds.
+
+<a id="A memory sync"></a>
 
 ## A memory sync
 
@@ -389,6 +419,8 @@ The merge takes each table in turn and matches rows by key. Where both sides hav
 The remote side is git over SSH. A version is the commit that holds the file. `GitMemoryRemote` keeps a bare repository beside the database, fetches only the newest commit into it, and builds the next commit there without a working copy, so the other files in the repository are carried along untouched. The push is a plain one: when another machine pushed first it is not a fast-forward, the repository refuses it, and the cycle starts again from the new commit.
 
 The digest is a SHA-256 over the rows and tombstones in a fixed order, not over the file's bytes, so two machines holding the same memory compare equal and neither pushes.
+
+<a id="The workflow check"></a>
 
 ## The workflow check
 

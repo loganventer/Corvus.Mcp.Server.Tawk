@@ -4,33 +4,35 @@ Checked against corvus-tawk-mcp `d3729ee` and tawk 0.8.1.
 
 ## Contents
 
-- [[#1. Summary]]
-- [[#2. Where it sits]]
-- [[#3. What the code says today]]
-- [[#4. Step 0 the upstream change in tawk]]
-  - [[#Ruled out reading tawk.db directly]]
-- [[#5. Image viewing]]
-- [[#6. Voice transcription]]
-  - [[#6.1 Fire and forget]]
-  - [[#6.2 The signal]]
-  - [[#6.3 Choosing how to transcribe]]
-  - [[#6.4 Several languages in one call]]
-  - [[#6.5 Audio format]]
-  - [[#6.6 What is kept]]
-  - [[#6.7 The in-process model one instance, reused]]
-- [[#7. Design]]
-  - [[#7.1 iDesign layers]]
-  - [[#7.2 SOLID]]
-  - [[#7.3 One type per file]]
-  - [[#7.4 Composition over inheritance]]
-  - [[#7.5 Separation of concerns]]
-  - [[#7.6 Other standing rules that apply]]
-- [[#8. Docker]]
-- [[#9. Documents to update]]
-- [[#10. Order of work]]
-- [[#11. Open questions]]
-- [[#12. Decisions made while building]]
-- [[#13. Where the work stands]]
+- [1. Summary](#1.%20Summary)
+- [2. Where it sits](#2.%20Where%20it%20sits)
+- [3. What the code says today](#3.%20What%20the%20code%20says%20today)
+- [4. Step 0 the upstream change in tawk](#4.%20Step%200%20the%20upstream%20change%20in%20tawk)
+  - [Ruled out reading tawk.db directly](#Ruled%20out%20reading%20tawk.db%20directly)
+- [5. Image viewing](#5.%20Image%20viewing)
+- [6. Voice transcription](#6.%20Voice%20transcription)
+  - [6.1 Fire and forget](#6.1%20Fire%20and%20forget)
+  - [6.2 The signal](#6.2%20The%20signal)
+  - [6.3 Choosing how to transcribe](#6.3%20Choosing%20how%20to%20transcribe)
+  - [6.4 Several languages in one call](#6.4%20Several%20languages%20in%20one%20call)
+  - [6.5 Audio format](#6.5%20Audio%20format)
+  - [6.6 What is kept](#6.6%20What%20is%20kept)
+  - [6.7 The in-process model one instance, reused](#6.7%20The%20in-process%20model%20one%20instance,%20reused)
+- [7. Design](#7.%20Design)
+  - [7.1 iDesign layers](#7.1%20iDesign%20layers)
+  - [7.2 SOLID](#7.2%20SOLID)
+  - [7.3 One type per file](#7.3%20One%20type%20per%20file)
+  - [7.4 Composition over inheritance](#7.4%20Composition%20over%20inheritance)
+  - [7.5 Separation of concerns](#7.5%20Separation%20of%20concerns)
+  - [7.6 Other standing rules that apply](#7.6%20Other%20standing%20rules%20that%20apply)
+- [8. Docker](#8.%20Docker)
+- [9. Documents to update](#9.%20Documents%20to%20update)
+- [10. Order of work](#10.%20Order%20of%20work)
+- [11. Open questions](#11.%20Open%20questions)
+- [12. Decisions made while building](#12.%20Decisions%20made%20while%20building)
+- [13. Where the work stands](#13.%20Where%20the%20work%20stands)
+
+<a id="1. Summary"></a>
 
 ## 1. Summary
 
@@ -39,6 +41,8 @@ Two features, both built on one upstream change:
 - **Image viewing.** A tool returns a message's picture to the MCP client as an image content block, and the client's own model looks at it. corvus-tawk-mcp runs no vision model.
 - **Voice transcription.** A tool starts a transcription and returns at once. When the text is ready, corvus-tawk-mcp sends a channel event. How the audio is transcribed (engine, model, languages, task) is set by the user, and the agent may choose per call within what the user allowed. One call can ask for several languages and gets one transcription for each, for voice notes that mix languages. When no transcriber is running for corvus-tawk-mcp to connect to, it loads one model inside its own process and reuses that single instance for every job.
 - **Prerequisite.** tawk must say where a downloaded file is, and say when a download finishes. corvus-tawk-mcp does not read tawk's database or guess at its folders.
+
+<a id="2. Where it sits"></a>
 
 ## 2. Where it sits
 
@@ -59,12 +63,16 @@ tawk (C, ncurses)                 whisper server, faster-whisper, whisper CLI,
 
 The control protocol is line-delimited JSON (`{"id","op","args"}`), version 1. It is not JSON-RPC.
 
+<a id="3. What the code says today"></a>
+
 ## 3. What the code says today
 
 - `control_codec_message` (tawk, `src/clients/control/control_codec.c`) writes `id`, `chat`, `sender`, `type`, `text` and the rest, and no `media_path`. `type` is one of `text`, `image`, `video`, `audio`, `document`, `sticker`, `other`. A voice note is `audio`, with no duration.
 - `download_media` answers `{}`. tawk's `on_media_ready` records the path and repaints the screen, and sends nothing over the control socket.
 - In corvus-tawk-mcp, `ChatMessage` has no path, `MessageManagementManager.DownloadMediaAsync` returns a fixed sentence, and `ToolResults.RunAsync` can only return text.
 - Channel events go out through `ChannelEventSink`, which takes a `LiveUpdate` built from a `TawkEvent` that tawk sent. Nothing corvus-tawk-mcp produces by itself reaches the channel yet.
+
+<a id="4. Step 0 the upstream change in tawk"></a>
 
 ## 4. Step 0: the upstream change in tawk
 
@@ -76,6 +84,8 @@ Fields may be added to results and notifications without a new protocol version,
 
 tawk already checks that a path lies inside its media folder before storing it. corvus-tawk-mcp repeats the check on its side (regular file, size limit) and never returns the path to the model.
 
+<a id="Ruled out reading tawk.db directly"></a>
+
 ### Ruled out: reading tawk.db directly
 
 The earlier draft offered this as a way to avoid changing tawk. It does not work:
@@ -83,7 +93,9 @@ The earlier draft offered this as a way to avoid changing tawk. It does not work
 - `tawk.db` may be encrypted with SQLCipher, and corvus-tawk-mcp has no passphrase.
 - `messages` is keyed by `(account_id, id)`, so a message id alone does not name a row.
 - Media lives in tawk's cache folder (`media.media_dir`, user-settable), and the database in its data folder. Neither is the runtime folder corvus-tawk-mcp knows.
-- It would pass by tawk's rules for locked, hidden and excluded chats, against "tawk is the authority" in [[INTENT]].
+- It would pass by tawk's rules for locked, hidden and excluded chats, against "tawk is the authority" in [INTENT](../INTENT.md).
+
+<a id="5. Image viewing"></a>
 
 ## 5. Image viewing
 
@@ -92,9 +104,13 @@ The earlier draft offered this as a way to avoid changing tawk. It does not work
 - **Limits:** a size limit (default 5 MB) with a clear error above it. No resizing in the first version.
 - **Plumbing:** `ToolResults` gains a way to return content blocks, and the manager returns a small result type (bytes, MIME type) in place of a string.
 - **Safety:** a picture can carry text meant for the model, and it cannot be fenced. The tool description and the server instructions say that what a picture shows is other people's content, the same as message text. The caption still goes through `UntrustedTextFence`.
-- **Not planned:** `analyze_image` with a local vision model. [[INTENT]] puts choosing and calling a model out of scope, and the client's model already sees the picture. It can be added later behind the same engine choice as transcription if someone needs pictures kept away from the client's model service.
+- **Not planned:** `analyze_image` with a local vision model. [INTENT](../INTENT.md) puts choosing and calling a model out of scope, and the client's model already sees the picture. It can be added later behind the same engine choice as transcription if someone needs pictures kept away from the client's model service.
+
+<a id="6. Voice transcription"></a>
 
 ## 6. Voice transcription
+
+<a id="6.1 Fire and forget"></a>
 
 ### 6.1 Fire and forget
 
@@ -105,6 +121,8 @@ The earlier draft offered this as a way to avoid changing tawk. It does not work
 3. When every pass has ended, the worker publishes the outcome as one channel event and on the event stream.
 
 A second request for the same message with the same options, including the same set of languages, joins the job already running and returns its id.
+
+<a id="6.2 The signal"></a>
 
 ### 6.2 The signal
 
@@ -131,6 +149,8 @@ meta:    type=transcript  status=done|partial|failed
 - A transcript event counts as a round for the workflow cadence, the same as a message.
 
 A job is not a `TawkEvent` that tawk sent, so the sink needs a second way in. Planned shape: a `TranscriptEvent` in `Core`, a `LiveUpdate` built from it by `TranscriptionManager` and handed to `IEventSink`, and one more arm in `ChannelEventSink.Meta`. The sink stays the only place that writes to the channel. Section 7 gives the full design.
+
+<a id="6.3 Choosing how to transcribe"></a>
 
 ### 6.3 Choosing how to transcribe
 
@@ -172,6 +192,8 @@ Rules:
 
 Behind this sits one `ITranscriber` interface in `ResourceAccess` with an implementation per engine, bound in the composition root. Section 6.7 covers the in-process one and how corvus-tawk-mcp moves between a running transcriber and its own.
 
+<a id="6.4 Several languages in one call"></a>
+
 ### 6.4 Several languages in one call
 
 Since 0.10.2 this holds for a job an agent asks for. A voice note transcribed as it arrives gets one transcript, in the language spoken, chosen among the languages the user switched on in tawk; see the manual, "The language spoken".
@@ -187,6 +209,8 @@ Whisper-style engines handle one language for each run. Told a voice note is Afr
 
 Not planned: cutting the audio into segments and detecting the language of each. It needs voice activity detection and per-segment language scoring, which is a feature of its own. The decoder that the in-process engine brings (section 6.5) makes it possible later.
 
+<a id="6.5 Audio format"></a>
+
 ### 6.5 Audio format
 
 WhatsApp voice notes are Opus in an Ogg container.
@@ -195,11 +219,15 @@ WhatsApp voice notes are Opus in an Ogg container.
 - The `command` engine gets the file path, and converting it (for example with `ffmpeg`) is the command's business.
 - The in-process engine needs 16 kHz mono PCM. corvus-tawk-mcp decodes and resamples in managed code (`Concentus` with its Ogg reader), so no `ffmpeg` and no extra native library is needed for audio. Other containers (an `.m4a` forwarded as audio) are refused by this engine with `unsupported format`.
 
+<a id="6.6 What is kept"></a>
+
 ### 6.6 What is kept
 
 Since corvus-tawk-mcp 0.9.0 a finished transcript is also handed to tawk (0.13.0 or later), which keeps it in its own database and shows it under the voice note. What this section says still holds for corvus-tawk-mcp itself: it writes nothing to disk.
 
-[[INTENT]] says corvus-tawk-mcp stores no messages. Transcripts follow that: finished jobs are held in memory only, a bounded number (default 50) for a bounded time (default 30 minutes), so `get_transcript` works, and they are gone on restart. Nothing is written to disk or to the log.
+[INTENT](../INTENT.md) says corvus-tawk-mcp stores no messages. Transcripts follow that: finished jobs are held in memory only, a bounded number (default 50) for a bounded time (default 30 minutes), so `get_transcript` works, and they are gone on restart. Nothing is written to disk or to the log.
+
+<a id="6.7 The in-process model one instance, reused"></a>
 
 ### 6.7 The in-process model: one instance, reused
 
@@ -225,9 +253,13 @@ Since corvus-tawk-mcp 0.9.0 a finished transcript is also handed to tawk (0.13.0
 
 **Cost.** `Whisper.net` and its CPU runtime add native libraries to the publish output and the image. A `base` model is about 150 MB on disk and `small` about 500 MB, with memory use somewhat above that. CPU is the default. GPU runtimes are a later option.
 
+<a id="7. Design"></a>
+
 ## 7. Design
 
-The feature follows the rules in [[AGENT]] without exception. This section says how each one applies, so a review can check the code against it.
+The feature follows the rules in [AGENT](../AGENT.md) without exception. This section says how each one applies, so a review can check the code against it.
+
+<a id="7.1 iDesign layers"></a>
 
 ### 7.1 iDesign layers
 
@@ -277,6 +309,8 @@ How the calls run:
 - The transcription manager needs a media file and so does the viewing manager. Neither calls the other. Both use `ITawkControl` and `IMediaFiles` from resource access.
 - The one upward call, manager to channel, goes through `IEventSink`, an interface the manager layer already owns.
 
+<a id="7.2 SOLID"></a>
+
 ### 7.2 SOLID
 
 - **Single responsibility.** Each type in the table has one reason to change. The queue's bounds change in the job store, the allowed languages in the policy, the wire format in a transcriber, the wording in the formatter.
@@ -285,9 +319,13 @@ How the calls run:
 - **Interface segregation.** New behaviour gets new, small interfaces. `INotificationFormatter`, `ITawkControl` and `IMessageManagementManager` are left as they are: the path arrives in the existing `download_media` answer and on the existing event stream.
 - **Dependency inversion.** Managers and clients depend only on the interfaces above. Concrete types are named only in `TawkMcpComposition`.
 
+<a id="7.3 One type per file"></a>
+
 ### 7.3 One type per file
 
 Every class, record, enum and interface above is its own file named after it, with no nested types. That includes the two enums and the exception. Fakes for the tests (`FakeTranscriber`, `FakeMediaFiles`, `FakeTranscriptionJobStore`) go in `tests/Corvus.Mcp.Server.Tawk.Tests/Fakes`, one per file, hand-written.
+
+<a id="7.4 Composition over inheritance"></a>
 
 ### 7.4 Composition over inheritance
 
@@ -299,6 +337,8 @@ Every class, record, enum and interface above is its own file named after it, wi
 - All new classes are `sealed`.
 - The one place a new type extends another is data: `MediaReadyEvent` and `TranscriptEvent` are sealed records under `TawkEvent`, like `MessageEvent` and `ReadEvent`, because `LiveUpdate` carries a `TawkEvent` and the sinks match on its kind. They hold no behaviour. `TawkEvent`'s summary is reworded to cover an event corvus-tawk-mcp raises itself.
 
+<a id="7.5 Separation of concerns"></a>
+
 ### 7.5 Separation of concerns
 
 - **I/O against rules.** Engines stay free of I/O. The sniffer is given bytes, the policy is given options and a request. Reading files, calling HTTP and running a process live only in resource access.
@@ -308,11 +348,15 @@ Every class, record, enum and interface above is its own file named after it, wi
 - **Trust.** Fencing happens in one place, the notice formatter through `IUntrustedTextFence`, so no caller can forget it.
 - **Configuration.** Flags are parsed in the host into `TranscriptionOptions`, a core record. Lower layers never read the environment.
 
+<a id="7.6 Other standing rules that apply"></a>
+
 ### 7.6 Other standing rules that apply
 
 - **Never hang.** Waiting for `media_ready`, the HTTP call and the command each have a bound, and the worker moves on when one is hit.
 - **Strict build.** Nullable on, analysers at `latest-recommended`, warnings as errors, nothing suppressed in code.
 - **`ToolResults`** gains one method that returns content blocks. Its existing text methods are untouched.
+
+<a id="8. Docker"></a>
 
 ## 8. Docker
 
@@ -320,12 +364,16 @@ The container mounts only tawk's runtime folder and `/data`. To read a file tawk
 
 The in-process engine needs no reach to the host's loopback. Its model folder sits in the `/data` volume, so a model survives a new container. The image grows by the `Whisper.net` runtime and ships with no model in it.
 
+<a id="9. Documents to update"></a>
+
 ## 9. Documents to update
 
-- [[INTENT]]: scope gains viewing pictures and transcribing voice notes with a transcriber the user runs; "Choosing or calling a model" is narrowed to say the one exception; the folders and files line notes the media folder is read, never written.
-- [[SECURITY]]: pictures and transcripts as untrusted content, the loopback rule, the extra mount, and what `--transcribe-remote on` gives up.
-- [[MANUAL]], [[CONFIGURATION]], [[README]], [[AGENT_SETUP]]: the tools, the flags, the channel event.
+- [INTENT](../INTENT.md): scope gains viewing pictures and transcribing voice notes with a transcriber the user runs; "Choosing or calling a model" is narrowed to say the one exception; the folders and files line notes the media folder is read, never written.
+- [SECURITY](../SECURITY.md): pictures and transcripts as untrusted content, the loopback rule, the extra mount, and what `--transcribe-remote on` gives up.
+- [MANUAL](../MANUAL.md), [CONFIGURATION](../CONFIGURATION.md), [README](../README.md), [AGENT_SETUP](../AGENT_SETUP.md): the tools, the flags, the channel event.
 - `TawkServerInstructions`: transcription answers later through the channel; do not call again while a job runs.
+
+<a id="10. Order of work"></a>
 
 ## 10. Order of work
 
@@ -339,6 +387,8 @@ The in-process engine needs no reach to the host's loopback. Its model folder si
 
 Each step ships with tests in the existing style: the fake tawk server for the control side, a fake `ITranscriber` for jobs, and `ChannelDeliveryTests` for the event.
 
+<a id="11. Open questions"></a>
+
 ## 11. Open questions
 
 - **Access level.** tawk's source calls `download_media` a read, yet corvus-tawk-mcp lists it among writes and its tool says it needs `manage`. Viewing and transcribing should be possible at `read`. To settle with step 0.
@@ -347,6 +397,8 @@ Each step ships with tests in the existing style: the fake tawk server for the c
 - **Whether "in process" may ever mean a child process.** This plan loads the model inside corvus-tawk-mcp, as asked. A supervised child (a whisper server corvus-tawk-mcp starts and restarts) would survive native crashes better, at the cost of a second program to ship. Kept out unless crashes prove to be a problem.
 - **Packages.** `Whisper.net`, its runtime and `Concentus` are new dependencies, to be checked for licence and for a clean build under warnings as errors on .NET 10.
 - **Automatic transcription.** Transcribing every incoming voice note without being asked is left out. It can be a later flag built on the same queue.
+
+<a id="12. Decisions made while building"></a>
 
 ## 12. Decisions made while building
 
@@ -365,6 +417,8 @@ These replace what the sections above say where they differ.
 - **`get_transcription_progress` says how far a job is.** Every transcriber reports its steps through an `IProgress<TranscriptionProgress>`, the job store keeps the last one beside the job until the job ends, and the tool answers with the step and how long ago the job was asked for, never with any text. The model inside corvus-tawk-mcp tells the megabytes of a model downloaded so far and the share of the voice note heard; a transcriber the user runs only says that it has the file.
 - **A missing model is downloaded** the first time a transcription needs it, and the installer fetches `large-v3-turbo`. This replaces the rule in section 6.7 that only the user fetches a model. The download carries on when the pass that started it runs out of time, and the next pass picks it up.
 - **The native libraries travel inside the program.** corvus-tawk-mcp is installed as one file, so the program assembly embeds the libraries for its own platform and unpacks them on first use into `~/.local/share/corvus/tawk-mcp/native/<build>/runtimes/<platform>`, where Whisper's loader looks.
+
+<a id="13. Where the work stands"></a>
 
 ## 13. Where the work stands
 

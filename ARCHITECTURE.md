@@ -2,26 +2,30 @@
 
 ## Contents
 
-- [[#Overview]]
-- [[#Layers]]
-- [[#Component map]]
-- [[#Components]]
-  - [[#Core]]
-  - [[#Resource access]]
-  - [[#Engines]]
-  - [[#Managers]]
-  - [[#Clients]]
-  - [[#Host]]
-- [[#Composition root]]
-- [[#Concurrency]]
-- [[#Design principles]]
-- [[#Adding things]]
+- [Overview](#Overview)
+- [Layers](#Layers)
+- [Component map](#Component%20map)
+- [Components](#Components)
+  - [Core](#Core)
+  - [Resource access](#Resource%20access)
+  - [Engines](#Engines)
+  - [Managers](#Managers)
+  - [Clients](#Clients)
+  - [Host](#Host)
+- [Composition root](#Composition%20root)
+- [Concurrency](#Concurrency)
+- [Design principles](#Design%20principles)
+- [Adding things](#Adding%20things)
+
+<a id="Overview"></a>
 
 ## Overview
 
 corvus-tawk-mcp is a .NET 10 program built on the official MCP C# SDK (`ModelContextProtocol` and `ModelContextProtocol.AspNetCore` 2.2.0), arranged in [iDesign](https://www.idesign.net/) layers. The volatile parts (tawk's socket protocol, the MCP transport, the model-facing text) sit behind interfaces, so each can change without touching the rest. Every interface is bound to its implementation in exactly one place, `TawkMcpComposition` in the host.
 
 Each class, record, enum and interface lives in its own file. Nullable reference types, the .NET analysers and warnings as errors are on for every project (`Directory.Build.props`).
+
+<a id="Layers"></a>
 
 ## Layers
 
@@ -67,6 +71,8 @@ Solid arrows are calls; dotted arrows are construction and calls through an inte
 - The live updates manager hands updates to `IEventSink` implementations, which are clients.
 - The connection supervisor and control client use `ICircuitBreaker` and `IBackoffPolicy` from core; the engines implement them.
 - The confirmation gate asks the user through `IUserConfirmation` from core; the clients implement it with MCP elicitation.
+
+<a id="Component map"></a>
 
 ## Component map
 
@@ -121,13 +127,19 @@ flowchart LR
     CTRL --> CONN
 ```
 
+<a id="Components"></a>
+
 ## Components
+
+<a id="Core"></a>
 
 ### Core
 
 Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md): `ChatSummary`, `ChatMessage` (with `ReplyRef` and `LinkCard`), `StatusItem`, `ScheduledItem`, `UnreadSummary`, `ChatInfo` and `GroupMember`, `HelloInfo`, and result records such as `MessagePage`, `SentMessage` and `ScheduledMessage`. They are read with `System.Text.Json` and a snake_case naming policy, and unknown fields are ignored, as the protocol requires.
 
 `TawkEvent` is the root of the notifications: `SummaryWantedEvent` and `TranscriptWantedEvent` (tawk asking for the TL;DR of a long message, and for the transcript of an older voice note the user looked at), `MessageEvent`, `ChatUpdatedEvent`, `ByeEvent`, `ApprovalEvent`, `UnknownEvent`, and `ConnectionStateEvent`, which corvus-tawk-mcp raises itself when its connection changes. `ControlError` carries tawk's error (`code`, `message`, `candidates`, `retry_after`), `ControlErrorCode` names the codes, and `TawkControlException` is how every failure travels upwards.
+
+<a id="Resource access"></a>
 
 ### Resource access
 
@@ -145,6 +157,8 @@ Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/Corv
 - In `Memory`, `SqliteConnectionFactory` owns the database path, creates the file 0600 in a 0700 folder on first use, turns on WAL and runs `SqliteSchemaMigrator`, which applies numbered steps recorded in `PRAGMA user_version`. `ICategoryStore`, `IVoiceStore`, `IContactStore`, `ITemplateStore` and `IOkfStore` are the repositories: each persists one kind of memory with parameterised SQL through `Microsoft.Data.Sqlite`, and no SQL exists outside them. `IOkfStore` holds Open Knowledge Format concepts and links; `SqliteContactStore` keeps each contact's concept in step and serves notes from observation concepts. Every delete writes a row to `sync_tombstone` through `Tombstones`, and every write clears it. `IOkfBundleFiles` reads and writes a bundle folder on disk.
 - In `Sync`, `IMemorySnapshotStore` reads every synced row of a database (the local one, or a downloaded copy, which it first brings up to the current schema), applies a merge in one transaction and makes a consistent copy; `SyncTables` lists the tables with their keys and parents. `IMemoryRemote` is the remote file, implemented by `GitMemoryRemote`: it fetches into a bare repository beside the database, builds each commit there without a working copy, and pushes without force so a push that lost a race is refused. It runs git through `IGitRunner` (`ProcessGitRunner`, which starts the git program without a shell and stops it after a time limit), in the environment `GitSshEnvironment` builds so that neither git nor SSH can stop to ask a question. `SyncRepositoryAddress`, an engine, is the rule for what may be named as the repository: `owner/name` or an SSH address, never a web address. `ISyncStateStore`, `ISyncLock` and `ISyncScratch` keep the last version seen, the per-machine lock and the private temporary copies.
 
+<a id="Engines"></a>
+
 ### Engines
 
 - `TranscriptionNoticeFormatter` writes what an agent is told about a transcription job. From 0.15.4 it ends a transcript with `Guidance`, a note of corvus-tawk-mcp's own outside the fence: fix what speech recognition clearly got wrong, stay as close as you can to what was said, and mark a word you cannot tell with `[?]`; it is left out when nothing was heard.
@@ -156,6 +170,8 @@ Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/Corv
 - In `Memory`, measuring, judging and scoring are separate: `StyleFeatureExtractor` measures a draft, each `IVoiceRule` (forbidden patterns, case, emoji, length, language, address form, required markers, greeting and sign-off, learnt baseline) judges one thing, and `VoiceChecker` runs whichever rules are registered and scores the findings. `VoiceResolver` picks the variant for a category path and overlays its rules. `ContactFieldCatalog` holds `ContactFieldDefinition`s (from `StandardContactFields`) and checks values with one `IFieldValueValidator` per kind of value. `VoiceGuideImporter`, `StyleBaselineCalculator`, `TemplateRenderer` and `MemoryFormatter` do what their names say, and `MemoryWriteGuard` refuses changes in read-only mode.
 - In `Knowledge`, `KnowledgeFormatter` writes concepts and observations for a model, `KnowledgePrecedence` decides which of two versions is kept (stronger source, then newer), and `OkfBundleWriter` and `OkfBundleReader` turn concepts into Markdown files with YAML frontmatter and back. Reading uses YamlDotNet; writing is a small emitter that quotes anything YAML could misread.
 - In `Sync`, `MemoryMerger` holds the merge rules and `MemoryDigest` fingerprints the content. Both are pure: they see snapshots, never a database.
+
+<a id="Managers"></a>
 
 ### Managers
 
@@ -169,6 +185,8 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 
 `KnowledgeManager` records and shows observations and relations, with `KnowledgeSubjects` working out which concept a tool argument means. `OkfBundleManager` exports and imports bundles. `MemorySyncManager` runs one sync cycle: lock, read the remote version, merge, compare digests, push, retry on a lost race.
 
+<a id="Clients"></a>
+
 ### Clients
 
 - The tool classes (`[McpServerToolType]`) hold the 93 tools, and `ApprovalTools` adds `list_pending` and `approve_pending` only when an admin token file is configured; the memory tool classes and `MemoryResources` are left out when memory is off, leaving 59. Each tool calls one manager and turns `TawkControlException` into a tool error result through `ControlErrorMessages`, and `MemoryException` into one with its own message, so nothing crashes the call. `draft_template` is the one tool that uses two managers, filling the template and then drafting it. Write tools take `IProgress<ProgressNotificationValue>` and report "Waiting for approval in tawk". Tools that may need confirmation take the request's `McpServer` and build an `ElicitationConfirmation` from it.
@@ -180,13 +198,19 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 - `NotificationDispatcher` is the hosted service that runs the live updates manager. `MemorySyncService` is the one that runs a sync cycle at start and then every interval; it is registered only when a repository and a token are set.
 - In `Workflow`, `WorkflowCadence` counts rounds, `WorkflowReminder` is the tool call filter that adds `TawkWorkflow`'s fixed text to a result when it is due, and `ChannelEventSink` counts each message it delivers. `TawkServerInstructions` holds the server instructions.
 
+<a id="Host"></a>
+
 ### Host
 
 `Program` reads options (`TawkMcpOptionsBinder`: environment, then flags), runs a command (`print-token`, `healthcheck`, `sync`, `export-okf`, `import-okf`, `--version`, `--help`) or serves. The memory commands go through `MemoryCommand`, which composes only the memory services. `UserInstructionsFile` reads the user's own instructions once at start. By default it uses `WebApplication` with `WithHttpTransport` in stateful session mode (sessions carry elicitation, subscriptions and notifications), binds Kestrel where `CORVUS_TAWK_MCP_BIND` says, puts `OriginGuardMiddleware` and `BearerTokenMiddleware` in front, and maps `/mcp`, `/events` and `/healthz`. With `--stdio` it uses the generic host with `WithStdioServerTransport` and logs to stderr only. `FileTokenStore` and `FixedTokenStore` implement `ITokenStore`.
 
+<a id="Composition root"></a>
+
 ## Composition root
 
 `TawkMcpComposition.AddTawkMcp` registers every implementation against its interface, the two hosted services, and the MCP server: server info and instructions, the `claude/channel` experimental capability (unless the channel is off), the tool, resource and prompt types, the subscribe and unsubscribe handlers, and two incoming message filters. Nothing else in the solution creates a service.
+
+<a id="Concurrency"></a>
 
 ## Concurrency
 
@@ -198,6 +222,8 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 - A sync cycle runs on its own background task and holds a lock file, so two corvus-tawk-mcp processes on one machine never sync at once.
 - Tool calls run on the MCP SDK's request tasks and share the one connection.
 
+<a id="Design principles"></a>
+
 ## Design principles
 
 - **Dependency inversion.** Every dependency is an interface, bound in the composition root. Tests replace the lowest layer with hand-written fakes and a fake socket server.
@@ -205,6 +231,8 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 - **Separation of concerns.** Formatting and fencing are engines, protocol details are resource access, MCP details are clients, hosting is the host.
 - **Untrusted by default.** Anything written by other people is fenced before it reaches a model, in tool results, resources, prompts and channel events.
 - **Never hang.** Every wait has a bound except a write waiting for the user, which tawk itself ends after 2 minutes.
+
+<a id="Adding things"></a>
 
 ## Adding things
 

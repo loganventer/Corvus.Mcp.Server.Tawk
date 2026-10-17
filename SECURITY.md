@@ -2,29 +2,35 @@
 
 ## Contents
 
-- [[#Reporting a problem]]
-- [[#Supported versions]]
-- [[#What there is to protect]]
-- [[#Who might attack]]
-- [[#Controls]]
-- [[#Accounts]]
-- [[#Prompt injection]]
-- [[#Approving its own sends]]
-- [[#The owner's chat]]
-- [[#Memory]]
-- [[#The confirmation token]]
-- [[#HTTP mode]]
-- [[#Docker]]
-- [[#What leaves the machine]]
-- [[#What corvus-tawk-mcp does not protect against]]
+- [Reporting a problem](#Reporting%20a%20problem)
+- [Supported versions](#Supported%20versions)
+- [What there is to protect](#What%20there%20is%20to%20protect)
+- [Who might attack](#Who%20might%20attack)
+- [Controls](#Controls)
+- [Accounts](#Accounts)
+- [Prompt injection](#Prompt%20injection)
+- [Approving its own sends](#Approving%20its%20own%20sends)
+- [The owner's chat](#The%20owner's%20chat)
+- [Memory](#Memory)
+- [The confirmation token](#The%20confirmation%20token)
+- [HTTP mode](#HTTP%20mode)
+- [Docker](#Docker)
+- [What leaves the machine](#What%20leaves%20the%20machine)
+- [What corvus-tawk-mcp does not protect against](#What%20corvus-tawk-mcp%20does%20not%20protect%20against)
+
+<a id="Reporting a problem"></a>
 
 ## Reporting a problem
 
 Please report security problems privately through GitHub's [private vulnerability reporting](https://github.com/loganventer/Corvus.Mcp.Server.Tawk/security/advisories/new), rather than in a public issue. Include what you found, how to reproduce it, and the versions of corvus-tawk-mcp and tawk you used. You should hear back within a week. Fixes are released as a new version and noted in the release notes.
 
+<a id="Supported versions"></a>
+
 ## Supported versions
 
 Only the latest release gets security fixes.
+
+<a id="What there is to protect"></a>
 
 ## What there is to protect
 
@@ -33,6 +39,8 @@ Only the latest release gets security fixes.
 - tawk's settings.
 - corvus-tawk-mcp's memory: your voice guides, reply templates, and what you or an agent recorded about your contacts, who never agreed to be profiled.
 - The bearer token for HTTP mode, and the one-time confirmation tokens tawk hands out for destructive operations.
+
+<a id="Who might attack"></a>
 
 ## Who might attack
 
@@ -45,6 +53,8 @@ Only the latest release gets security fixes.
 | The model itself, misled or mistaken | Call any tool the client offers | Send, delete or change things you did not ask for |
 | Someone who messages you, through the model | Get text copied into memory | Plant instructions that a later session reads back |
 | Another program running as you | Everything you can | (out of scope, see below) |
+
+<a id="Controls"></a>
 
 ## Controls
 
@@ -72,6 +82,8 @@ Only the latest release gets security fixes.
 | Sensitive fields only from you, hidden unless asked for; stated facts beat inferences; inferences lapse | corvus-tawk-mcp | Wrong or intrusive guesses about people |
 | Deleting memory asks you by elicitation | corvus-tawk-mcp | A model wiping what you saved |
 
+<a id="Accounts"></a>
+
 ## Accounts
 
 Which accounts an agent may use, and how far, is decided in tawk, for each account, and enforced by tawk. corvus-tawk-mcp cannot widen it: it only names the account a call is for.
@@ -81,6 +93,8 @@ Which accounts an agent may use, and how far, is decided in tawk, for each accou
 - An event names its account in a line outside the fenced text, and the label is flattened to one plain line, so neither a message nor a label can pose as an instruction.
 - The model is told never to move a conversation to another of the user's numbers unasked. This is an instruction to the model and can fail like any other; the approval in tawk, which names the account, is the control.
 - Memory is shared across accounts. A fact learnt through one account can be read while working in another.
+
+<a id="Prompt injection"></a>
 
 ## Prompt injection
 
@@ -95,6 +109,8 @@ Message text, chat names, previews, about texts and status text are written by o
 
 These reduce the risk; they cannot remove it, because a model may still be persuaded. What limits the harm is that nothing happens to your account without you: every send waits for your approval in tawk, destructive operations need two confirmations, and with `access = read` nothing can be written at all. Channel events put incoming messages in front of the model without you asking, so leave `CORVUS_TAWK_MCP_CHANNEL=off` or `access = read` if that worries you.
 
+<a id="Approving its own sends"></a>
+
 ## Approving its own sends
 
 With `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` set and tawk's access at `admin`, the model can carry out its own sends through `approve_pending`. That removes the check that otherwise stops a misled model: you no longer see a message before it goes. What remains is narrower:
@@ -108,6 +124,8 @@ With `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` set and tawk's access at `admin`, the mo
 
 Do not set it on an instance that reads chats from people you do not trust, and do not set it on one that is reachable by anything but your own agent.
 
+<a id="The owner's chat"></a>
+
 ## The owner's chat
 
 When you name an owner's chat in tawk (0.15.0 or later), what you write there reaches the agent as your words. This is the one place where text from WhatsApp is an instruction.
@@ -119,6 +137,8 @@ When you name an owner's chat in tawk (0.15.0 or later), what you write there re
 - What you ask for from WhatsApp is carried out under the same rules as anything else the agent does: a send to another chat still waits for you, and destructive operations still need their two confirmations at the computer. The instructions tell the agent to refuse those when they are asked for from the phone.
 - When several sessions share one corvus-tawk-mcp, one of them is handed the message, so you are answered once.
 - tawk does not check which of your devices wrote a message, so anyone at a device linked to your number can instruct the agent. See tawk's SECURITY.md.
+
+<a id="Memory"></a>
 
 ## Memory
 
@@ -134,9 +154,13 @@ Profiles are about people who have not agreed to them. corvus-tawk-mcp refuses i
 
 **Instructions.** The server instructions and the workflow check are fixed text, plus the instructions file you write yourself. Nothing from a chat and nothing from memory is ever added to them, so a message cannot plant instructions that way. Anyone who can write to that file can instruct your agents, as with any other configuration file.
 
+<a id="The confirmation token"></a>
+
 ## The confirmation token
 
 For `delete_message`, `delete_chat`, `clear_chat`, `block`, `remove_profile_photo` and `cancel_scheduled`, tawk answers with a token that `confirm` accepts once, on the same connection, within 5 minutes. corvus-tawk-mcp keeps it in a local variable of the confirmation gate. It is never written to a tool result, a log line, a notification, the elicitation text or an error message (an error from tawk that happens to contain it has it replaced). corvus-tawk-mcp asks you through MCP elicitation, which goes from corvus-tawk-mcp to your client without passing through the model, and calls `confirm` only if you accept. If you decline, dismiss the question, or your client cannot ask, it calls `cancel_confirmation`. Tests check that the token appears nowhere a model or log could see it.
+
+<a id="HTTP mode"></a>
 
 ## HTTP mode
 
@@ -148,6 +172,8 @@ For `delete_message`, `delete_chat`, `clear_chat`, `block`, `remove_profile_phot
 
 Anyone who can read your token file can use corvus-tawk-mcp as you. Treat it like a password; delete the file to make a new one.
 
+<a id="Docker"></a>
+
 ## Docker
 
 - The container must run as your user (`--user "$(id -u):$(id -g)"`), because tawk accepts only its own user on the socket. Nothing in the image runs as root.
@@ -155,13 +181,17 @@ Anyone who can read your token file can use corvus-tawk-mcp as you. Treat it lik
 - The token stays mandatory whatever the bind address.
 - Mount only tawk's runtime folder (`$XDG_RUNTIME_DIR/corvus/tawk`) and the token folder. The container needs nothing else of yours.
 
+<a id="What leaves the machine"></a>
+
 ## What leaves the machine
 
 Transcribing happens on this computer and a transcript goes only to tawk and to the agent that asked. A TL;DR summary is different: it is written by the model of the agent you connected, so when you put a chat in TL;DR mode in tawk, the text of that chat's long messages goes to that model's service as each one is asked for, without a request from you for that message. corvus-tawk-mcp passes tawk's request on and adds nothing to it; switching the mode off in tawk stops it.
 
-corvus-tawk-mcp has no telemetry, no analytics and no update checks. It talks to tawk over a Unix socket and to MCP clients over loopback HTTP or stdio. The one thing it can send elsewhere is the memory file, to the git repository you name, over SSH, and only once you have set up [[#Memory|memory sync]] with a repository of your own. Without one it makes no outside connection at all.
+corvus-tawk-mcp has no telemetry, no analytics and no update checks. It talks to tawk over a Unix socket and to MCP clients over loopback HTTP or stdio. The one thing it can send elsewhere is the memory file, to the git repository you name, over SSH, and only once you have set up [memory sync](#Memory) with a repository of your own. Without one it makes no outside connection at all.
 
 Your MCP client, however, sends what corvus-tawk-mcp returns to its model service: message text, names, phone numbers in JIDs, statuses, and whatever memory it reads. Only connect clients you would trust with those chats, and use tawk's `chats` setting to limit what they can see.
+
+<a id="What corvus-tawk-mcp does not protect against"></a>
 
 ## What corvus-tawk-mcp does not protect against
 
