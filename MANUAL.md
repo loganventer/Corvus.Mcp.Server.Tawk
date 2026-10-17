@@ -1,33 +1,68 @@
 # Manual
 
-## Table of Contents
+## Contents
 
-- [How to read this manual](#how-to-read-this-manual)
-- [Installing](#installing)
-- [Naming chats](#naming-chats)
-- [Accounts](#accounts)
-- [What the model sees](#what-the-model-sees)
-- [Reading tools](#reading-tools)
-- [Sending tools](#sending-tools)
-- [Managing tools](#managing-tools)
-- [The two-step confirmation](#the-two-step-confirmation)
-- [Approving its own sends](#approving-its-own-sends)
-- [Memory tools](#memory-tools)
-- [Knowledge](#knowledge)
-- [The memory workflow](#the-memory-workflow)
-- [Memory sync](#memory-sync)
-- [Moving to another computer](#moving-to-another-computer)
-- [Resources](#resources)
-- [Prompts](#prompts)
-- [The owner's chat](#the-owners-chat)
-- [Claude Code channel](#claude-code-channel)
-- [The event stream](#the-event-stream)
-- [Connecting clients](#connecting-clients)
-- [Keeping it running](#keeping-it-running)
-- [Windows](#windows)
-- [Docker](#docker)
-- [When tawk is not running](#when-tawk-is-not-running)
-- [Troubleshooting](#troubleshooting)
+- [[#How to read this manual]]
+- [[#Installing]]
+- [[#Naming chats]]
+- [[#Accounts]]
+- [[#What the model sees]]
+- [[#Reading tools]]
+  - [[#`list_chats`]]
+  - [[#`read_messages`]]
+  - [[#`search_messages`]]
+  - [[#`unread_summary`]]
+  - [[#`get_chat_info`]]
+  - [[#`get_online_status`]]
+  - [[#`list_statuses`]]
+  - [[#`status_viewers`]]
+  - [[#`list_scheduled`]]
+  - [[#`list_backgrounds`, `list_themes`, `get_profile`, `get_settings`, `app_status`]]
+- [[#Sending tools]]
+  - [[#`draft_message`]]
+  - [[#`send_message`]]
+  - [[#`send_file`]]
+  - [[#`react`]]
+  - [[#`schedule_message`]]
+  - [[#`mark_read`]]
+- [[#Managing tools]]
+  - [[#TL;DR summaries]]
+  - [[#Labels, reminders and awaiting replies]]
+  - [[#Pictures and voice notes]]
+- [[#The two-step confirmation]]
+- [[#Approving its own sends]]
+  - [[#`list_pending`]]
+  - [[#`approve_pending`]]
+- [[#Memory tools]]
+  - [[#Audience categories]]
+  - [[#Voices]]
+  - [[#Contact profiles]]
+  - [[#Reply templates]]
+- [[#Knowledge]]
+- [[#The memory workflow]]
+- [[#Memory sync]]
+- [[#Moving to another computer]]
+- [[#Resources]]
+- [[#Prompts]]
+  - [[#`catch_up`]]
+  - [[#`draft_reply`]]
+- [[#The owner's chat]]
+- [[#Claude Code channel]]
+  - [[#Events and accounts]]
+- [[#The event stream]]
+- [[#Connecting clients]]
+  - [[#HTTP (the default)]]
+  - [[#stdio]]
+- [[#Keeping it running]]
+  - [[#Linux with systemd]]
+  - [[#macOS]]
+  - [[#WSL, or Linux without a systemd user session]]
+  - [[#Docker]]
+  - [[#Removing it]]
+- [[#Windows]]
+- [[#Docker]]
+- [[#When tawk is not running]]
+- [[#Troubleshooting]]
 
 ## How to read this manual
 
@@ -40,7 +75,7 @@ Each tool needs one of tawk's access levels, set in tawk under **Settings > Auto
 | `read` | Every reading tool. The default. |
 | `send` | Also sending, reacting, scheduling, drafting and marking as read. |
 | `manage` | Also editing and deleting messages, chat settings, statuses, your profile, tawk's settings and the app tools. |
-| `admin` | Everything in `manage`, and an instance given tawk's admin token file may approve its own sends. See [Approving its own sends](#approving-its-own-sends). |
+| `admin` | Everything in `manage`, and an instance given tawk's admin token file may approve its own sends. See [[#Approving its own sends]]. |
 
 Every write shows in tawk for you to approve before it happens, and the tool call waits while tawk asks. Your MCP client shows "Waiting for approval in tawk" as progress, if it displays progress.
 
@@ -56,7 +91,7 @@ or `./install.sh` from a checkout. The installer:
 2. finds the .NET 10 SDK, or offers to install it into `~/.dotnet` with Microsoft's `dotnet-install.sh`. It never uses sudo for that, asks first unless you pass `--yes`, and when it cannot ask it lists the package manager commands instead;
 3. clones the repository into a temporary folder when it is not run from a checkout, and removes it afterwards;
 4. publishes a self-contained single file for your system (linux-x64, linux-arm64, osx-x64 or osx-arm64) into `~/.local/bin/mcp/corvus-tawk-mcp` (`--mcp-dir` chooses another folder). That folder holds MCP servers only and need not be on your `PATH`: registrations name the program in full;
-5. registers corvus-tawk-mcp to start at boot and starts it (see [Keeping it running](#keeping-it-running)), unless you pass `--no-service`;
+5. registers corvus-tawk-mcp to start at boot and starts it (see [[#Keeping it running]]), unless you pass `--no-service`;
 6. runs `corvus-tawk-mcp --version`, creates the bearer token and says where it lives, and prints the `claude mcp add --transport http` line;
 7. tells you if tawk itself is missing, with tawk's one-line installer.
 
@@ -247,7 +282,7 @@ Marks a chat as read. This sends read receipts if you have them on in tawk.
 
 ## Managing tools
 
-These need `access = manage` (or `admin`). Each is shown to you in tawk to approve. The ones marked **two-step** also go through [the two-step confirmation](#the-two-step-confirmation).
+These need `access = manage` (or `admin`). Each is shown to you in tawk to approve. The ones marked **two-step** also go through [[#The two-step confirmation|the two-step confirmation]].
 
 | Tool | Arguments | Does |
 | --- | --- | --- |
@@ -284,7 +319,7 @@ These need `access = manage` (or `admin`). Each is shown to you in tawk to appro
 | `set_summary` | `messageId`, `text`, `model` | Hands tawk the summary of a long message, which tawk shows in place of the text until you unfold it. Nothing is sent to WhatsApp and you are not asked |
 | `decline_summary` | `messageId`, `reason` | Tells tawk a message needs no summary (`too_short`, `nothing_to_say` or `other`), so it is not asked for again, also after a restart. The agent is told to call it whenever it will not write a summary, for any reason, so a request is answered exactly once, with `set_summary` or this, and is never retried in a loop. Needs tawk 0.21.0 or later; nothing is sent to WhatsApp and you are not asked |
 
-In tawk you can put a chat in TL;DR mode on its contact card (tawk 0.14.0 or later). tawk then asks one agent for the summary of each message there, in the language the message is written in (every message of at least 40 characters from tawk 0.21.0, a floor you can change, or only those above a length you set), with a channel event of `type="summary_wanted"` carrying the message, fenced as untrusted, its `message_id` and a `max_chars`. Only a session started with `--channel on` is asked (see [The owner's chat](#the-owners-chat) for why). The agent answers by calling `set_summary`, or `decline_summary` for a message too short or empty of content for a summary to be shorter (tawk then does not ask for it again), at once and without asking you: switching TL;DR on for the chat is your go-ahead, and the server instructions, the request and the tool all say so (from 0.10.3; before that an agent could hold the request back and ask). If your agent still asks, add a line to your standing instructions (`~/.config/corvus/tawk-mcp/instructions.md`) telling it to answer `summary_wanted` events without asking. corvus-tawk-mcp writes no summary and calls no model: the model of the agent you connected does, so the text of those messages goes to that model's service. Which agent is asked is chosen in tawk's Agents list (your default agent); when several sessions share one corvus-tawk-mcp, the first that takes channel events writes it. This needs channel events, so a client without them is never asked. From 0.10.1 corvus-tawk-mcp tells tawk when it connects what it can do (`features` in its hello: `transcripts` unless transcription is off, `summaries` unless the channel is off), and tawk 0.14.1 asks only an agent that says it can, so a session still running an older corvus-tawk-mcp is passed over. tawk refuses a summary for a chat that is not in TL;DR mode.
+In tawk you can put a chat in TL;DR mode on its contact card (tawk 0.14.0 or later). tawk then asks one agent for the summary of each message there, in the language the message is written in (every message of at least 40 characters from tawk 0.21.0, a floor you can change, or only those above a length you set), with a channel event of `type="summary_wanted"` carrying the message, fenced as untrusted, its `message_id` and a `max_chars`. Only a session started with `--channel on` is asked (see [[#The owner's chat]] for why). The agent answers by calling `set_summary`, or `decline_summary` for a message too short or empty of content for a summary to be shorter (tawk then does not ask for it again), at once and without asking you: switching TL;DR on for the chat is your go-ahead, and the server instructions, the request and the tool all say so (from 0.10.3; before that an agent could hold the request back and ask). If your agent still asks, add a line to your standing instructions (`~/.config/corvus/tawk-mcp/instructions.md`) telling it to answer `summary_wanted` events without asking. corvus-tawk-mcp writes no summary and calls no model: the model of the agent you connected does, so the text of those messages goes to that model's service. Which agent is asked is chosen in tawk's Agents list (your default agent); when several sessions share one corvus-tawk-mcp, the first that takes channel events writes it. This needs channel events, so a client without them is never asked. From 0.10.1 corvus-tawk-mcp tells tawk when it connects what it can do (`features` in its hello: `transcripts` unless transcription is off, `summaries` unless the channel is off), and tawk 0.14.1 asks only an agent that says it can, so a session still running an older corvus-tawk-mcp is passed over. tawk refuses a summary for a chat that is not in TL;DR mode.
 
 ### Labels, reminders and awaiting replies
 
@@ -344,7 +379,7 @@ If your MCP client cannot ask questions (it does not support MCP elicitation), c
 
 ## Approving its own sends
 
-Normally a send waits until you allow it in tawk. When you run an agent that should act while you are away, you can let this instance approve its own requests. Two things must be set, both by you: tawk's access must be `admin` with the chats switched on for it, and this instance must be started with `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` pointing at tawk's admin token file. [CONFIGURATION.md](CONFIGURATION.md#approving-its-own-sends) has the steps. Without the setting the two tools below do not exist.
+Normally a send waits until you allow it in tawk. When you run an agent that should act while you are away, you can let this instance approve its own requests. Two things must be set, both by you: tawk's access must be `admin` with the chats switched on for it, and this instance must be started with `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` pointing at tawk's admin token file. [[CONFIGURATION#Approving its own sends|CONFIGURATION.md]] has the steps. Without the setting the two tools below do not exist.
 
 How it goes:
 
@@ -365,9 +400,9 @@ The agent is told to approve only what you asked for, in the conversation or in 
 
 ## Memory tools
 
-corvus-tawk-mcp can remember how you write, who your contacts are to you, and replies you use often, so a model can draft messages that sound like you. Memory is a private file on your computer (see [CONFIGURATION.md](CONFIGURATION.md#where-things-live)); nothing in it is sent to WhatsApp, and it leaves your computer only if you set up [memory sync](#memory-sync). It is on by default; `--memory read` keeps the tools but refuses changes, and `--memory off` removes them.
+corvus-tawk-mcp can remember how you write, who your contacts are to you, and replies you use often, so a model can draft messages that sound like you. Memory is a private file on your computer (see [[CONFIGURATION#Where things live|CONFIGURATION.md]]); nothing in it is sent to WhatsApp, and it leaves your computer only if you set up [[#Memory sync|memory sync]]. It is on by default; `--memory read` keeps the tools but refuses changes, and `--memory off` removes them.
 
-Writing to memory needs no approval, because nothing reaches WhatsApp. Deleting anything from it asks you directly in your MCP client, the same way as the first step of [the two-step confirmation](#the-two-step-confirmation). Everything read back from memory is fenced as untrusted, because an agent may have copied text from a chat into it.
+Writing to memory needs no approval, because nothing reaches WhatsApp. Deleting anything from it asks you directly in your MCP client, the same way as the first step of [[#The two-step confirmation|the two-step confirmation]]. Everything read back from memory is fenced as untrusted, because an agent may have copied text from a chat into it.
 
 ### Audience categories
 
@@ -428,11 +463,11 @@ An export is one Markdown file per concept, with YAML frontmatter (`type`, `titl
 
 corvus-tawk-mcp keeps the agent's memory habits going by itself. Once every 20 rounds (a tool call or an incoming message handed to the agent each count as one), it adds a workflow check to a tool result: record what was learned about people as profile fields or observations with the right source, record relations, refresh your voice with `learn_voice` where you wrote messages yourself, store follow-ups, and correct what turned out wrong. The check never sends, reacts or marks anything read. `get_workflow` shows it at any time.
 
-The interval is `CORVUS_TAWK_MCP_WORKFLOW_EVERY` (0 turns it off). Your own standing instructions, from `~/.config/corvus/tawk-mcp/instructions.md`, are part of the server instructions and of every workflow check. See [CONFIGURATION.md](CONFIGURATION.md#instructions-for-agents).
+The interval is `CORVUS_TAWK_MCP_WORKFLOW_EVERY` (0 turns it off). Your own standing instructions, from `~/.config/corvus/tawk-mcp/instructions.md`, are part of the server instructions and of every workflow check. See [[CONFIGURATION#Instructions for agents|CONFIGURATION.md]].
 
 ## Memory sync
 
-Memory can be kept in step between your machines through a private git repository of your own, using git over SSH with a key on each machine. It is off until you set a repository on a machine; there is no default destination, and there are no tokens. [CONFIGURATION.md](CONFIGURATION.md#memory-sync) has the setup and the merge rules. `corvus-tawk-mcp sync` runs one cycle and says what happened.
+Memory can be kept in step between your machines through a private git repository of your own, using git over SSH with a key on each machine. It is off until you set a repository on a machine; there is no default destination, and there are no tokens. [[CONFIGURATION#Memory sync|CONFIGURATION.md]] has the setup and the merge rules. `corvus-tawk-mcp sync` runs one cycle and says what happened.
 
 Sync runs by itself when corvus-tawk-mcp starts and then every two hours. To sync at once, ask your agent to sync memory: it calls `sync_memory`, which runs one cycle and says what was merged and pushed. The tool cannot set or change the repository, and in a session started without one it says that sync is off and does nothing. `corvus-tawk-mcp sync` does the same from a shell.
 
@@ -441,7 +476,7 @@ Sync runs by itself when corvus-tawk-mcp starts and then every two hours. To syn
 tawk moves one account to another computer by itself (`corvus-tawk --migrate-out` and `--migrate-in`, tawk 0.23.0 or later; see its manual). That carries your chats and the choices you made for them, and no agent can start it: corvus-tawk-mcp has no tool for it. What corvus-tawk-mcp remembers about you (your voices, contact profiles, notes and templates) lives on each computer apart from tawk's data, so it is moved on its own:
 
 - **Memory sync** (above) is the simplest: set the same private repository on the new computer, and what it holds is merged in when corvus-tawk-mcp starts.
-- **An OKF bundle** works without a repository: run `corvus-tawk-mcp export-okf FOLDER` on the old computer and `corvus-tawk-mcp import-okf FOLDER` on the new one (see [Memory tools](#memory-tools) for what a bundle holds and what `--include-sensitive` adds).
+- **An OKF bundle** works without a repository: run `corvus-tawk-mcp export-okf FOLDER` on the old computer and `corvus-tawk-mcp import-okf FOLDER` on the new one (see [[#Memory tools]] for what a bundle holds and what `--include-sensitive` adds).
 
 Memory is kept by chat and contact (their JID), not by the label of an account, so a moved account's contacts are recognised again once the chats are there. Install corvus-tawk-mcp on the new computer with its own `install.sh`; its bearer token is made there and is not carried over. When corvus-tawk-mcp runs in a container, give `send_file` a path that tawk itself can see, as on the old computer.
 
@@ -719,7 +754,7 @@ As a fallback it offers an `@reboot` line in your crontab, added only when you a
 
 ### Docker
 
-Docker serves HTTP too. The run line the installer and `scripts/docker-run.sh` use has `--restart unless-stopped`, and `compose.yaml` sets `restart: unless-stopped`, so Docker starts it again at boot whenever the Docker service itself starts at boot. See [Docker](#docker).
+Docker serves HTTP too. The run line the installer and `scripts/docker-run.sh` use has `--restart unless-stopped`, and `compose.yaml` sets `restart: unless-stopped`, so Docker starts it again at boot whenever the Docker service itself starts at boot. See [[#Docker]].
 
 ### Removing it
 
@@ -752,7 +787,7 @@ The script creates `$XDG_RUNTIME_DIR/corvus/tawk` and `~/.config/corvus/tawk-mcp
 
 With Compose: `UID=$(id -u) GID=$(id -g) docker compose up -d`, after creating the two folders yourself. Docker creates a missing bind folder owned by root, and then neither tawk nor corvus-tawk-mcp can use it.
 
-The container can start before tawk: it watches `/run/tawk` and connects when the socket appears. Its health check runs `corvus-tawk-mcp healthcheck`, which asks `/healthz`. Details of every variable are in [CONFIGURATION.md](CONFIGURATION.md#docker).
+The container can start before tawk: it watches `/run/tawk` and connects when the socket appears. Its health check runs `corvus-tawk-mcp healthcheck`, which asks `/healthz`. Details of every variable are in [[CONFIGURATION#Docker|CONFIGURATION.md]].
 
 ## When tawk is not running
 

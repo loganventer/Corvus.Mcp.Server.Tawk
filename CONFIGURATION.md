@@ -1,18 +1,20 @@
 # Configuration
 
-## Table of Contents
+## Contents
 
-- [Where things live](#where-things-live)
-- [Settings in tawk](#settings-in-tawk)
-- [Arguments and environment variables](#arguments-and-environment-variables)
-- [Commands](#commands)
-- [Memory sync](#memory-sync)
-- [Instructions for agents](#instructions-for-agents)
-- [The control socket](#the-control-socket)
-- [The bearer token](#the-bearer-token)
-- [Resilience](#resilience)
-- [Docker](#docker)
-- [MCP protocol revision](#mcp-protocol-revision)
+- [[#Where things live]]
+- [[#Settings in tawk]]
+  - [[#Accounts]]
+- [[#Arguments and environment variables]]
+- [[#Commands]]
+- [[#Memory sync]]
+- [[#Approving its own sends]]
+- [[#Instructions for agents]]
+- [[#The control socket]]
+- [[#The bearer token]]
+- [[#Resilience]]
+- [[#Docker]]
+- [[#MCP protocol revision]]
 
 ## Where things live
 
@@ -20,13 +22,13 @@
 | --- | --- |
 | `~/.local/bin/mcp/corvus-tawk-mcp` | The program, as `install.sh` puts it. `~/.local/bin/mcp` holds every MCP server and need not be on `PATH`; registrations and services name the program in full. `--prefix` changes the base (`PREFIX/bin/mcp`), `--mcp-dir` the folder itself |
 | `~/.local/bin/corvus-claude` | A link to `scripts/corvus-claude` in the checkout, made when `install.sh` runs from one: starts Claude Code with the channel on |
-| `~/.local/bin/tawk-mcp`, `~/.local/bin/claude-tawk` | Legacy links to `corvus-tawk-mcp` and `corvus-claude`, made only by `install.sh --legacy-links`, for old registrations and aliases; each prints a deprecation notice. See [CUTOVER.md](CUTOVER.md) |
+| `~/.local/bin/tawk-mcp`, `~/.local/bin/claude-tawk` | Legacy links to `corvus-tawk-mcp` and `corvus-claude`, made only by `install.sh --legacy-links`, for old registrations and aliases; each prints a deprecation notice. See [[CUTOVER]] |
 | `~/.config/systemd/user/corvus-tawk-mcp.service` | The user service the installer registers on Linux with systemd |
 | `~/Library/LaunchAgents/com.loganventer.corvus-tawk-mcp.plist` | The LaunchAgent the installer registers on macOS; its log is `~/Library/Logs/corvus-tawk-mcp.log` |
 | `~/.config/corvus/tawk-mcp/token` | The bearer token for HTTP mode (file 0600, folder 0700). `$XDG_CONFIG_HOME` is used instead of `~/.config` when set |
 | `~/.local/share/corvus/tawk-mcp/memory.db` | Memory: voices, contact profiles and templates (file 0600, folder 0700), created the first time memory is used. `$XDG_DATA_HOME` is used instead of `~/.local/share` when set |
 | `~/.local/share/corvus/tawk-mcp/memory.db.sync.json`, `memory.db.sync.lock` | What memory sync last saw, and its lock, beside the memory file. Only there when sync is set up |
-| `~/.config/corvus/tawk-mcp/instructions.md` | Your own standing instructions for agents, if you write the file. See [Instructions for agents](#instructions-for-agents) |
+| `~/.config/corvus/tawk-mcp/instructions.md` | Your own standing instructions for agents, if you write the file. See [[#Instructions for agents]] |
 | `$XDG_RUNTIME_DIR/corvus/tawk/control.sock` | tawk's control socket, owned by tawk. `~/.local/state/corvus/tawk/control.sock` when `XDG_RUNTIME_DIR` is not set |
 | `admin.token` beside the control socket | tawk's admin token, written by tawk only while its access is admin. `scripts/corvus-claude` hands its path to the session it starts |
 | `~/.local/share/corvus/tawk-mcp/models`, `native` | Whisper models for in-process transcription, and its native libraries, unpacked on first use |
@@ -67,7 +69,7 @@ Flags override environment variables, which override the defaults. A flag or a c
 | `--bind ADDRESS` | `CORVUS_TAWK_MCP_BIND` | `127.0.0.1` | HTTP bind address. The token is required whatever the address |
 | `--token-file PATH` | `CORVUS_TAWK_MCP_TOKEN_FILE` | `~/.config/corvus/tawk-mcp/token` | Where the bearer token is kept |
 | | `CORVUS_TAWK_MCP_TOKEN` | | Use this token and keep no file, for container secrets |
-| `--socket PATH` | `CORVUS_TAWK_CONTROL_SOCKET` | see [The control socket](#the-control-socket) | tawk's control socket |
+| `--socket PATH` | `CORVUS_TAWK_CONTROL_SOCKET` | see [[#The control socket]] | tawk's control socket |
 | `--channel auto\|on\|off` | `CORVUS_TAWK_MCP_CHANNEL` | `auto` | Claude Code channel events: `auto` for clients that identify as Claude Code, `on` for every client, `off` for none. Only `on` tells tawk that this session answers what tawk asks of an agent (TL;DR summaries, and what you write in the owner's chat): set it for a client you start with its channel, as `scripts/corvus-claude` does. In `auto` corvus-tawk-mcp cannot know whether the client listens, so it promises nothing |
 | `--channel-own on\|off` | `CORVUS_TAWK_MCP_CHANNEL_OWN` | `off` | Also send the messages you send yourself as channel events, marked `from_me`. Off, only what other people send arrives |
 | `--channel-read on\|off` | `CORVUS_TAWK_MCP_CHANNEL_READ` | `off` | Also send read receipts for the messages you sent as channel events, with `type="read"`. tawk's **Push read receipts** must be on too |
@@ -78,14 +80,14 @@ Flags override environment variables, which override the defaults. A flag or a c
 | `--channel-presence on\|off` | `CORVUS_TAWK_MCP_CHANNEL_PRESENCE` | `off` | Also send an event when the person in a chat you have open in tawk comes online or leaves (`type="presence"`, with `state` and, where shared, `last_seen`). tawk's **Push online status** must be on too |
 | `--memory write\|read\|off` | `CORVUS_TAWK_MCP_MEMORY` | `write` | Memory for voices, contacts and templates: `read` offers the tools but refuses changes, `off` removes them |
 | `--data-file PATH` | `CORVUS_TAWK_MCP_DATA_FILE` | `~/.local/share/corvus/tawk-mcp/memory.db` | Where memory is kept |
-| `--sync-repo ADDRESS` | `CORVUS_TAWK_MCP_SYNC_REPO` | none | The private git repository that holds the memory file: `owner/name` for one on GitHub, or an SSH address such as `git@github.com:owner/name.git` or `git@my-alias:owner/name.git`. See [Memory sync](#memory-sync) |
+| `--sync-repo ADDRESS` | `CORVUS_TAWK_MCP_SYNC_REPO` | none | The private git repository that holds the memory file: `owner/name` for one on GitHub, or an SSH address such as `git@github.com:owner/name.git` or `git@my-alias:owner/name.git`. See [[#Memory sync]] |
 | `--sync-key PATH` | `CORVUS_TAWK_MCP_SYNC_KEY` | none | An SSH private key to use for sync. Without it SSH picks a key the usual way (your agent, `~/.ssh/config`, the default key files) |
 | `--sync-branch NAME` | `CORVUS_TAWK_MCP_SYNC_BRANCH` | `main` | The branch |
 | `--sync-file PATH` | `CORVUS_TAWK_MCP_SYNC_FILE` | `memory.db` | The file's path inside the repository |
 | `--sync-interval-minutes N` | `CORVUS_TAWK_MCP_SYNC_INTERVAL_MINUTES` | `120` | Minutes between syncs (1 to 10080) |
-| `--workflow-every N` | `CORVUS_TAWK_MCP_WORKFLOW_EVERY` | `20` | Rounds between memory workflow checks (0 to 10000, 0 turns them off). See [Instructions for agents](#instructions-for-agents) |
+| `--workflow-every N` | `CORVUS_TAWK_MCP_WORKFLOW_EVERY` | `20` | Rounds between memory workflow checks (0 to 10000, 0 turns them off). See [[#Instructions for agents]] |
 | `--instructions-file PATH` | `CORVUS_TAWK_MCP_INSTRUCTIONS_FILE` | `~/.config/corvus/tawk-mcp/instructions.md` | Your own standing instructions for agents |
-| `--admin-token-file PATH` | `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` | none | tawk's admin token file. Set per instance, never by default: with it this instance may approve its own queued sends while tawk's access is `admin`. See [Approving its own sends](#approving-its-own-sends) |
+| `--admin-token-file PATH` | `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` | none | tawk's admin token file. Set per instance, never by default: with it this instance may approve its own queued sends while tawk's access is `admin`. See [[#Approving its own sends]] |
 | `--transcribe auto\|embedded\|http\|command\|off` | `CORVUS_TAWK_MCP_TRANSCRIBE` | `auto` | How voice notes are transcribed. `auto` uses your transcriber at `--transcribe-url` while it answers, and otherwise one Whisper model loaded inside corvus-tawk-mcp, so it works with nothing else installed. `embedded` always uses the model inside. `http` and `command` use only your own transcriber. With `off` the tools stay listed and say transcription is off |
 | `--transcribe-model-dir DIR` | `CORVUS_TAWK_MCP_TRANSCRIBE_MODEL_DIR` | `~/.local/share/corvus/tawk-mcp/models` | Where the models for the one inside are kept. A model that is not there is downloaded the first time it is needed; `corvus-tawk-mcp fetch-model NAME` fetches one ahead of time |
 | `--transcribe-idle-unload-m N` | `CORVUS_TAWK_MCP_TRANSCRIBE_IDLE_UNLOAD_M` | `15` | Minutes with no job before the model inside is let go (0 keeps it loaded) |

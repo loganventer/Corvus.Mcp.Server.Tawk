@@ -4,13 +4,25 @@ This repository was `tawk-mcp`. It is now `Corvus.Mcp.Server.Tawk`, part of the 
 
 This file lists every name that changed and the ordered steps to switch a live install over. The old names are listed here, in `scripts/migrate-from-legacy.sh`, and in the legacy-link code of `install.sh`. Other files use only the new names.
 
+## Contents
+
+- [[#What changed]]
+  - [[#Repository and code]]
+  - [[#Commands]]
+  - [[#Environment variables]]
+  - [[#Paths]]
+  - [[#The MCP folder `~/.local/bin/mcp`]]
+  - [[#Services, registrations, images]]
+- [[#Switching a live install over]]
+- [[#Rolling back]]
+
 ## What changed
 
 ### Repository and code
 
 | Old | New |
 | --- | --- |
-| folder `~/Documents/dev/tawk-mcp` | `~/Documents/dev/Corvus.Mcp.Server.Tawk` |
+| folder `~/Documents/Corvus/tawk-mcp` | `~/Documents/Corvus/Corvus.Mcp.Server.Tawk` |
 | `github.com/loganventer/tawk-mcp` | `github.com/loganventer/Corvus.Mcp.Server.Tawk` |
 | `TawkMcp.slnx` | `Corvus.Mcp.Server.Tawk.slnx` |
 | projects, folders, namespaces `Tawk.Mcp.<Layer>` | `Corvus.Mcp.Server.Tawk.<Layer>` (Core, ResourceAccess, Engines, Managers, Clients, Host, Tests) |
@@ -107,7 +119,7 @@ Do the steps in this order. Commands assume the default folders and Linux.
 
 3. **Build and install under the new names.** This installs `~/.local/bin/mcp/corvus-tawk-mcp`, links `corvus-claude`, and with `--legacy-links` makes the legacy links (the old `~/.local/bin/tawk-mcp` binary is replaced by a link). Leave `--legacy-links` out if nothing uses the old names:
    ```sh
-   cd ~/Documents/dev/Corvus.Mcp.Server.Tawk
+   cd ~/Documents/Corvus/Corvus.Mcp.Server.Tawk
    PATH="$HOME/.dotnet:$PATH" ./install.sh --no-service -y --legacy-links
    ```
    If you run the HTTP service, use `./install.sh -y` instead. It registers `corvus-tawk-mcp.service` and retires `tawk-mcp.service`.
@@ -155,8 +167,8 @@ Do the steps in this order. Commands assume the default folders and Linux.
 The old folders and the old checkout are left as they were, so a rollback needs no copying:
 
 1. Close the `ct` sessions.
-2. Run `./install.sh --no-service -y` in `~/Documents/dev/tawk-mcp`. It puts a real `tawk-mcp` back.
-3. Link the old launcher back with `ln -sfn ~/Documents/dev/tawk-mcp/scripts/claude-tawk ~/.local/bin/claude-tawk`.
+2. Run `./install.sh --no-service -y` in `~/Documents/Corvus/tawk-mcp`. It puts a real `tawk-mcp` back.
+3. Link the old launcher back with `ln -sfn ~/Documents/Corvus/tawk-mcp/scripts/claude-tawk ~/.local/bin/claude-tawk`.
 4. Re-register the server: `claude mcp remove corvus-tawk -s user && claude mcp add tawk --scope user --env TAWKMCP_SYNC_REPO=git@github-tawk-memory:loganventer/tawk-memory.git -- "$HOME/.local/bin/tawk-mcp" --stdio`.
 5. Restore the old `ct`.
 

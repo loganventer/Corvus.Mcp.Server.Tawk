@@ -2,6 +2,16 @@
 
 Read this before changing the repository. It covers the layout, the rules the code follows, and how to build and test.
 
+## Contents
+
+- [[#What this is]]
+- [[#Layout]]
+- [[#Rules]]
+- [[#Writing]]
+- [[#Build and test]]
+- [[#Adding a tawk operation]]
+- [[#Versions and releases]]
+
 ## What this is
 
 corvus-tawk-mcp is an MCP server for [tawk](https://github.com/loganventer/Corvus.App.Terminal.Tawk), a WhatsApp client for the terminal. It talks to a running tawk over tawk's control socket, whose protocol is defined in tawk's [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md). Follow that document exactly; when it and this code disagree, the document wins.
@@ -21,7 +31,7 @@ src/Corvus.Mcp.Server.Tawk.Host            composition root, Program, middleware
 tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
 ```
 
-[ARCHITECTURE.md](ARCHITECTURE.md) describes each component; [HOW_IT_WORKS.md](HOW_IT_WORKS.md) shows the flows.
+[[ARCHITECTURE]] describes each component; [[HOW_IT_WORKS]] shows the flows.
 
 ## Rules
 
@@ -88,7 +98,7 @@ scripts/docker-run.sh
 4. If the operation may wait for the user's approval, add it to `UnixSocketTawkControl.WriteOps` so it is exempt from the read timeout.
 5. New error codes go in `ControlErrorCode`, `ControlErrorCodes` and `ControlErrorMessages`.
 6. Test the tool's arguments and result with `FakeTawkControl`, and each new error.
-7. Document it in [MANUAL.md](MANUAL.md) and the tools table in [README.md](README.md).
+7. Document it in [[MANUAL]] and the tools table in [[README]].
 
 ## Versions and releases
 

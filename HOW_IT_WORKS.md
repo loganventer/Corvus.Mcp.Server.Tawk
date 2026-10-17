@@ -1,23 +1,23 @@
 # How It Works
 
-## Table of Contents
+## Contents
 
-- [Start-up](#start-up)
-- [Connecting to tawk](#connecting-to-tawk)
-- [A read](#a-read)
-- [A call for one account](#a-call-for-one-account)
-- [A send with approval](#a-send-with-approval)
-- [A send the agent approves itself](#a-send-the-agent-approves-itself)
-- [A destructive request in two steps](#a-destructive-request-in-two-steps)
-- [New messages](#new-messages)
-- [A voice note's transcript](#a-voice-notes-transcript)
-- [A TL;DR summary](#a-tldr-summary)
-- [Reconnecting](#reconnecting)
-- [The circuit breaker](#the-circuit-breaker)
-- [A hung tawk](#a-hung-tawk)
-- [HTTP requests](#http-requests)
-- [A memory sync](#a-memory-sync)
-- [The workflow check](#the-workflow-check)
+- [[#Start-up]]
+- [[#Connecting to tawk]]
+- [[#A read]]
+- [[#A call for one account]]
+- [[#A send with approval]]
+- [[#A send the agent approves itself]]
+- [[#A destructive request in two steps]]
+- [[#New messages]]
+- [[#A voice note's transcript]]
+- [[#A TL;DR summary]]
+- [[#Reconnecting]]
+- [[#The circuit breaker]]
+- [[#A hung tawk]]
+- [[#HTTP requests]]
+- [[#A memory sync]]
+- [[#The workflow check]]
 
 ## Start-up
 
@@ -48,7 +48,7 @@ sequenceDiagram
     S->>C: WaitForDisconnectAsync
 ```
 
-`hello` is always the first request on a connection, with origin `mcp`, which makes tawk ask you before every write. If the socket is missing, refuses the connection or is a stale file, the attempt fails and the supervisor waits (see [Reconnecting](#reconnecting)).
+`hello` is always the first request on a connection, with origin `mcp`, which makes tawk ask you before every write. If the socket is missing, refuses the connection or is a stale file, the attempt fails and the supervisor waits (see [[#Reconnecting]]).
 
 ## A read
 

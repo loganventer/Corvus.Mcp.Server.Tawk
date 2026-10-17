@@ -1,8 +1,17 @@
 # Quickstart
 
-Five minutes from nothing to asking your MCP client "what did I miss?". This uses Claude Code; the other clients are in [README.md](README.md#quick-setup).
+Five minutes from nothing to asking your MCP client "what did I miss?". This uses Claude Code; the other clients are in [[README#Quick setup|README.md]].
 
-Having an AI agent do the setup for you? Point it at [AGENT_SETUP.md](AGENT_SETUP.md), which covers Windows, Linux and macOS step by step.
+Having an AI agent do the setup for you? Point it at [[AGENT_SETUP]], which covers Windows, Linux and macOS step by step.
+
+## Contents
+
+- [[#1. Have tawk running and linked]]
+- [[#2. Turn on the control socket]]
+- [[#3. Install corvus-tawk-mcp]]
+- [[#4. Start it and add it to Claude Code]]
+- [[#5. Ask]]
+- [[#If it does not work]]
 
 ## 1. Have tawk running and linked
 
@@ -66,4 +75,4 @@ Nothing is marked as read. To let the model propose replies, set **Access** to `
 | The tools do not show in `/mcp` | Check corvus-tawk-mcp is running (`curl http://127.0.0.1:8765/healthz`) and that `claude mcp list` shows `corvus-tawk`. |
 | 401 from corvus-tawk-mcp | The token in the header is wrong or missing. Add the server again with `$(~/.local/bin/mcp/corvus-tawk-mcp print-token)`. |
 
-More in [MANUAL.md](MANUAL.md#troubleshooting).
+More in [[MANUAL#Troubleshooting|MANUAL.md]].

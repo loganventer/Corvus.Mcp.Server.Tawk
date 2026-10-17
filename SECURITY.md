@@ -1,22 +1,22 @@
 # Security
 
-## Table of Contents
+## Contents
 
-- [Reporting a problem](#reporting-a-problem)
-- [Supported versions](#supported-versions)
-- [What there is to protect](#what-there-is-to-protect)
-- [Who might attack](#who-might-attack)
-- [Controls](#controls)
-- [Accounts](#accounts)
-- [Prompt injection](#prompt-injection)
-- [Approving its own sends](#approving-its-own-sends)
-- [The owner's chat](#the-owners-chat)
-- [Memory](#memory)
-- [The confirmation token](#the-confirmation-token)
-- [HTTP mode](#http-mode)
-- [Docker](#docker)
-- [What leaves the machine](#what-leaves-the-machine)
-- [What corvus-tawk-mcp does not protect against](#what-corvus-tawk-mcp-does-not-protect-against)
+- [[#Reporting a problem]]
+- [[#Supported versions]]
+- [[#What there is to protect]]
+- [[#Who might attack]]
+- [[#Controls]]
+- [[#Accounts]]
+- [[#Prompt injection]]
+- [[#Approving its own sends]]
+- [[#The owner's chat]]
+- [[#Memory]]
+- [[#The confirmation token]]
+- [[#HTTP mode]]
+- [[#Docker]]
+- [[#What leaves the machine]]
+- [[#What corvus-tawk-mcp does not protect against]]
 
 ## Reporting a problem
 
@@ -159,7 +159,7 @@ Anyone who can read your token file can use corvus-tawk-mcp as you. Treat it lik
 
 Transcribing happens on this computer and a transcript goes only to tawk and to the agent that asked. A TL;DR summary is different: it is written by the model of the agent you connected, so when you put a chat in TL;DR mode in tawk, the text of that chat's long messages goes to that model's service as each one is asked for, without a request from you for that message. corvus-tawk-mcp passes tawk's request on and adds nothing to it; switching the mode off in tawk stops it.
 
-corvus-tawk-mcp has no telemetry, no analytics and no update checks. It talks to tawk over a Unix socket and to MCP clients over loopback HTTP or stdio. The one thing it can send elsewhere is the memory file, to the git repository you name, over SSH, and only once you have set up [memory sync](#memory) with a repository of your own. Without one it makes no outside connection at all.
+corvus-tawk-mcp has no telemetry, no analytics and no update checks. It talks to tawk over a Unix socket and to MCP clients over loopback HTTP or stdio. The one thing it can send elsewhere is the memory file, to the git repository you name, over SSH, and only once you have set up [[#Memory|memory sync]] with a repository of your own. Without one it makes no outside connection at all.
 
 Your MCP client, however, sends what corvus-tawk-mcp returns to its model service: message text, names, phone numbers in JIDs, statuses, and whatever memory it reads. Only connect clients you would trust with those chats, and use tawk's `chats` setting to limit what they can see.
 

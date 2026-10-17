@@ -2,6 +2,36 @@
 
 Checked against corvus-tawk-mcp `d3729ee` and tawk 0.8.1.
 
+## Contents
+
+- [[#1. Summary]]
+- [[#2. Where it sits]]
+- [[#3. What the code says today]]
+- [[#4. Step 0 the upstream change in tawk]]
+  - [[#Ruled out reading tawk.db directly]]
+- [[#5. Image viewing]]
+- [[#6. Voice transcription]]
+  - [[#6.1 Fire and forget]]
+  - [[#6.2 The signal]]
+  - [[#6.3 Choosing how to transcribe]]
+  - [[#6.4 Several languages in one call]]
+  - [[#6.5 Audio format]]
+  - [[#6.6 What is kept]]
+  - [[#6.7 The in-process model one instance, reused]]
+- [[#7. Design]]
+  - [[#7.1 iDesign layers]]
+  - [[#7.2 SOLID]]
+  - [[#7.3 One type per file]]
+  - [[#7.4 Composition over inheritance]]
+  - [[#7.5 Separation of concerns]]
+  - [[#7.6 Other standing rules that apply]]
+- [[#8. Docker]]
+- [[#9. Documents to update]]
+- [[#10. Order of work]]
+- [[#11. Open questions]]
+- [[#12. Decisions made while building]]
+- [[#13. Where the work stands]]
+
 ## 1. Summary
 
 Two features, both built on one upstream change:
@@ -53,7 +83,7 @@ The earlier draft offered this as a way to avoid changing tawk. It does not work
 - `tawk.db` may be encrypted with SQLCipher, and corvus-tawk-mcp has no passphrase.
 - `messages` is keyed by `(account_id, id)`, so a message id alone does not name a row.
 - Media lives in tawk's cache folder (`media.media_dir`, user-settable), and the database in its data folder. Neither is the runtime folder corvus-tawk-mcp knows.
-- It would pass by tawk's rules for locked, hidden and excluded chats, against "tawk is the authority" in `INTENT.md`.
+- It would pass by tawk's rules for locked, hidden and excluded chats, against "tawk is the authority" in [[INTENT]].
 
 ## 5. Image viewing
 
@@ -62,7 +92,7 @@ The earlier draft offered this as a way to avoid changing tawk. It does not work
 - **Limits:** a size limit (default 5 MB) with a clear error above it. No resizing in the first version.
 - **Plumbing:** `ToolResults` gains a way to return content blocks, and the manager returns a small result type (bytes, MIME type) in place of a string.
 - **Safety:** a picture can carry text meant for the model, and it cannot be fenced. The tool description and the server instructions say that what a picture shows is other people's content, the same as message text. The caption still goes through `UntrustedTextFence`.
-- **Not planned:** `analyze_image` with a local vision model. `INTENT.md` puts choosing and calling a model out of scope, and the client's model already sees the picture. It can be added later behind the same engine choice as transcription if someone needs pictures kept away from the client's model service.
+- **Not planned:** `analyze_image` with a local vision model. [[INTENT]] puts choosing and calling a model out of scope, and the client's model already sees the picture. It can be added later behind the same engine choice as transcription if someone needs pictures kept away from the client's model service.
 
 ## 6. Voice transcription
 
@@ -169,7 +199,7 @@ WhatsApp voice notes are Opus in an Ogg container.
 
 Since corvus-tawk-mcp 0.9.0 a finished transcript is also handed to tawk (0.13.0 or later), which keeps it in its own database and shows it under the voice note. What this section says still holds for corvus-tawk-mcp itself: it writes nothing to disk.
 
-`INTENT.md` says corvus-tawk-mcp stores no messages. Transcripts follow that: finished jobs are held in memory only, a bounded number (default 50) for a bounded time (default 30 minutes), so `get_transcript` works, and they are gone on restart. Nothing is written to disk or to the log.
+[[INTENT]] says corvus-tawk-mcp stores no messages. Transcripts follow that: finished jobs are held in memory only, a bounded number (default 50) for a bounded time (default 30 minutes), so `get_transcript` works, and they are gone on restart. Nothing is written to disk or to the log.
 
 ### 6.7 The in-process model: one instance, reused
 
@@ -197,7 +227,7 @@ Since corvus-tawk-mcp 0.9.0 a finished transcript is also handed to tawk (0.13.0
 
 ## 7. Design
 
-The feature follows the rules in `AGENT.md` without exception. This section says how each one applies, so a review can check the code against it.
+The feature follows the rules in [[AGENT]] without exception. This section says how each one applies, so a review can check the code against it.
 
 ### 7.1 iDesign layers
 
@@ -292,9 +322,9 @@ The in-process engine needs no reach to the host's loopback. Its model folder si
 
 ## 9. Documents to update
 
-- `INTENT.md`: scope gains viewing pictures and transcribing voice notes with a transcriber the user runs; "Choosing or calling a model" is narrowed to say the one exception; the folders and files line notes the media folder is read, never written.
-- `SECURITY.md`: pictures and transcripts as untrusted content, the loopback rule, the extra mount, and what `--transcribe-remote on` gives up.
-- `MANUAL.md`, `CONFIGURATION.md`, `README.md`, `AGENT_SETUP.md`: the tools, the flags, the channel event.
+- [[INTENT]]: scope gains viewing pictures and transcribing voice notes with a transcriber the user runs; "Choosing or calling a model" is narrowed to say the one exception; the folders and files line notes the media folder is read, never written.
+- [[SECURITY]]: pictures and transcripts as untrusted content, the loopback rule, the extra mount, and what `--transcribe-remote on` gives up.
+- [[MANUAL]], [[CONFIGURATION]], [[README]], [[AGENT_SETUP]]: the tools, the flags, the channel event.
 - `TawkServerInstructions`: transcription answers later through the channel; do not call again while a job runs.
 
 ## 10. Order of work

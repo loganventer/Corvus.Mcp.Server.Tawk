@@ -1,5 +1,13 @@
 # Intent
 
+## Contents
+
+- [[#Purpose]]
+- [[#Scope]]
+- [[#Out of scope]]
+- [[#Boundary rules]]
+- [[#Relationship to tawk]]
+
 ## Purpose
 
 corvus-tawk-mcp exists so that an AI model working for you, through an MCP client such as Claude Code, can help with WhatsApp the way you already use it in tawk: tell you what you missed, find things in your chats, draft replies, and, only when you say so, act. You stay in control. tawk decides what a client may see and do, every write waits for your approval in tawk, and anything destructive needs a second yes that the model cannot give.

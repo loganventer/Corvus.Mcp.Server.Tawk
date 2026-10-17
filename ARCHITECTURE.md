@@ -1,15 +1,21 @@
 # Architecture
 
-## Table of Contents
+## Contents
 
-- [Overview](#overview)
-- [Layers](#layers)
-- [Component map](#component-map)
-- [Components](#components)
-- [Composition root](#composition-root)
-- [Concurrency](#concurrency)
-- [Design principles](#design-principles)
-- [Adding things](#adding-things)
+- [[#Overview]]
+- [[#Layers]]
+- [[#Component map]]
+- [[#Components]]
+  - [[#Core]]
+  - [[#Resource access]]
+  - [[#Engines]]
+  - [[#Managers]]
+  - [[#Clients]]
+  - [[#Host]]
+- [[#Composition root]]
+- [[#Concurrency]]
+- [[#Design principles]]
+- [[#Adding things]]
 
 ## Overview
 

@@ -1,14 +1,14 @@
 # Contributing
 
-Issues and pull requests are welcome. This page holds the rules the code follows and what a change needs before it is merged. [ARCHITECTURE.md](ARCHITECTURE.md) describes every layer and component, [HOW_IT_WORKS.md](HOW_IT_WORKS.md) shows the flows, and [AGENT.md](AGENT.md) has the longer notes on layout, safety rules and adding a tawk operation. Read AGENT.md before a first change, whether you write the code yourself or a coding agent does.
+Issues and pull requests are welcome. This page holds the rules the code follows and what a change needs before it is merged. [[ARCHITECTURE]] describes every layer and component, [[HOW_IT_WORKS]] shows the flows, and [[AGENT]] has the longer notes on layout, safety rules and adding a tawk operation. Read [[AGENT]] before a first change, whether you write the code yourself or a coding agent does.
 
-## Table of Contents
+## Contents
 
-- [The rules](#the-rules)
-- [Where code goes](#where-code-goes)
-- [Build and test](#build-and-test)
-- [Pull requests](#pull-requests)
-- [Writing](#writing)
+- [[#The rules]]
+- [[#Where code goes]]
+- [[#Build and test]]
+- [[#Pull requests]]
+- [[#Writing]]
 
 ## The rules
 
@@ -51,7 +51,7 @@ The tests need a Unix-like system (they use Unix domain sockets and file modes) 
 - One change per pull request, with a title that says what it does.
 - The build with no warnings and the tests passing, on your own machine, before you open it.
 - A change that alters behaviour comes with a test.
-- Update the documentation the change touches: [MANUAL.md](MANUAL.md) and the tools table in [README.md](README.md) for a tool, [CONFIGURATION.md](CONFIGURATION.md) for a setting, [ARCHITECTURE.md](ARCHITECTURE.md) for a new component or interface.
+- Update the documentation the change touches: [[MANUAL]] and the tools table in [[README]] for a tool, [[CONFIGURATION]] for a setting, [[ARCHITECTURE]] for a new component or interface.
 - tawk's [CONTROL.md](https://github.com/loganventer/Corvus.App.Terminal.Tawk/blob/main/CONTROL.md) defines the protocol. When it and this code disagree, the document wins; a change that needs a new operation starts in tawk.
 
 ## Writing
