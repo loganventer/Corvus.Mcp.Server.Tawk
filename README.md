@@ -177,7 +177,6 @@ Resources: `tawk://chats`, `tawk://chat/{jid}`, `tawk://account/{account}/chats`
 | [INTENT](INTENT.md) | Purpose, scope and boundary rules |
 | [SECURITY](SECURITY.md) | The threat model and how to report a problem |
 | [AGENT](AGENT.md) | Notes for coding agents working on this repository |
-| [AGENT_CORRECTIONS](AGENT_CORRECTIONS.md) | What the owner had to correct an agent on in use, so the next one starts there |
 
 <a id="Licence"></a>
 
