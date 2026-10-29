@@ -53,7 +53,9 @@ options = options with
 if (options.Transport == TransportKind.Stdio)
 {
     // stdout carries the MCP protocol, so every log line goes to stderr.
-    var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { DisableDefaults = false, Args = [] });
+    // The content root is the install folder, not the folder the client starts us in: the default config watcher puts an
+    // inotify watch on every folder under the content root, and under a large tree on /mnt/c that outlasts the client's connect timeout.
+    var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { DisableDefaults = false, Args = [], ContentRootPath = AppContext.BaseDirectory });
     ConfigureLogging(builder.Logging);
     builder.Services.AddTawkMcp(options).WithStdioServerTransport();
     await builder.Build().RunAsync();
@@ -62,7 +64,7 @@ if (options.Transport == TransportKind.Stdio)
 
 var tokens = TawkMcpComposition.CreateTokenStore(options);
 tokens.GetOrCreate();
-var web = WebApplication.CreateBuilder(new WebApplicationOptions { Args = [] });
+var web = WebApplication.CreateBuilder(new WebApplicationOptions { Args = [], ContentRootPath = AppContext.BaseDirectory });
 ConfigureLogging(web.Logging);
 // Kestrel listens only where CORVUS_TAWK_MCP_BIND and CORVUS_TAWK_MCP_PORT say; this replaces any ASPNETCORE_URLS.
 web.WebHost.UseUrls(new UriBuilder(Uri.UriSchemeHttp, IPAddress.Parse(options.Bind).ToString(), options.Port).Uri.ToString().TrimEnd('/'));
