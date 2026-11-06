@@ -96,7 +96,7 @@ CORVUS_TAWK_MCP_TOKEN_FILE="$tmp/token" ./install.sh --prefix "$tmp" --uninstall
 Docker:
 
 ```sh
-docker build -t corvus-tawk-mcp:0.15.10 .
+docker build -t corvus-tawk-mcp:0.16.0 .
 scripts/docker-run.sh
 ```
 

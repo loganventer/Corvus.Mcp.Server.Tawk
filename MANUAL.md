@@ -18,6 +18,7 @@
   - [[#`status_viewers`]]
   - [[#`list_scheduled`]]
   - [[#`list_backgrounds`, `list_themes`, `get_profile`, `get_settings`, `app_status`]]
+  - [[#`list_sounds`]]
 - [Sending tools](#Sending%20tools)
   - [[#`draft_message`]]
   - [[#`send_message`]]
@@ -259,6 +260,12 @@ Messages scheduled in tawk that have not gone out yet, with their due time and i
 
 The colour names `post_status` accepts, tawk's themes for `set_chat_theme`, your own JID and name, tawk's settings with their current values, choices and whether they may be changed from outside, and tawk's version, backend, WhatsApp connection state and whether a call is ringing.
 
+<a id="listsounds"></a>
+
+### `list_sounds`
+
+The notification sounds in tawk's sound folders (the `.wav` and `.ogg` files, by name), for `set_chat_tone`, and the one the app plays. Needs tawk 0.36.0 or later, and the tool says so when tawk is older.
+
 <a id="Sending tools"></a>
 
 ## Sending tools
@@ -341,6 +348,7 @@ These need `access = manage` (or `admin`). Each is shown to you in tawk to appro
 | `download_media` | `messageId` | Has tawk download a message's file in the background |
 | `set_chat` | `chat`, `muted`, `pinned`, `archived`, `locked` | `muted` is `false`, `true` (always) or a number of seconds. `locked` only takes `true`: it hides the chat behind tawk's soft lock, which also hides it from corvus-tawk-mcp |
 | `set_chat_theme` | `chat`, `theme` | A theme id from `list_themes`, or empty for the app theme |
+| `set_chat_tone` | `chat`, `tone` | The chat's own notification sound: a sound from `list_sounds`, `none` for silence, or empty for the app's sound. A file path is refused, so only you can give a chat a file of your own, in tawk. A chat's tone shows in `list_chats` and `get_chat_info` as `silent` or `tone <name>`. Needs tawk 0.36.0 or later |
 | `clear_chat` (two-step) | `chat` | Removes the chat's messages from this computer |
 | `delete_chat` (two-step) | `chat` | Deletes the chat here and on your phone |
 | `export_chat` | `chat`, `withMedia` | Exports the chat to a folder in your downloads folder |

@@ -56,6 +56,15 @@ public sealed class ChatDirectoryFormatter : IChatDirectoryFormatter
             flags.Add("archived");
         }
 
+        if (chat.Tone == ChatTones.Silent)
+        {
+            flags.Add("silent");
+        }
+        else if (!string.IsNullOrEmpty(chat.Tone))
+        {
+            flags.Add("tone " + chat.Tone);
+        }
+
         if (flags.Count > 0)
         {
             line.Append(" (").Append(string.Join(", ", flags)).Append(')');

@@ -46,7 +46,7 @@ public static class TawkMcpComposition
 {
     public static string Version { get; } =
         typeof(TawkMcpComposition).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
-        ?? "0.15.10";
+        ?? "0.16.0";
 
     public static IMcpServerBuilder AddTawkMcp(this IServiceCollection services, TawkMcpOptions options)
     {
@@ -93,6 +93,7 @@ public static class TawkMcpComposition
         services.AddSingleton<IAudioDetailFormatter, AudioDetailFormatter>();
         services.AddSingleton<ITranscriptFormatter, TranscriptFormatter>();
         services.AddSingleton<IChatDirectoryFormatter, ChatDirectoryFormatter>();
+        services.AddSingleton<ISoundListFormatter, SoundListFormatter>();
         services.AddSingleton<IUntrustedTextFence, UntrustedTextFence>();
         services.AddSingleton<ICatchUpPlanner, CatchUpPlanner>();
         services.AddSingleton<IDraftReplyPlanner, DraftReplyPlanner>();
@@ -113,6 +114,7 @@ public static class TawkMcpComposition
         services.AddSingleton<IFileSendingManager, FileSendingManager>();
         services.AddSingleton<IMessageManagementManager, MessageManagementManager>();
         services.AddSingleton<IChatManagementManager, ChatManagementManager>();
+        services.AddSingleton<IChatToneManager, ChatToneManager>();
         services.AddSingleton<IScheduleManagementManager, ScheduleManagementManager>();
         services.AddSingleton<IStatusManager, StatusManager>();
         services.AddSingleton<IProfileManager, ProfileManager>();
@@ -201,6 +203,7 @@ public static class TawkMcpComposition
                 }
             })
             .WithTools<ChatTools>()
+            .WithTools<ChatToneTools>()
             .WithTools<PresenceTools>()
             .WithTools<SummaryTools>()
             .WithTools<ChatListTools>()
