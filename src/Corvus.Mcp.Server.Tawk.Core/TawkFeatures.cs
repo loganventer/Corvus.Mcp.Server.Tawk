@@ -26,4 +26,7 @@ public static class TawkFeatures
 
     /// <summary>tawk can say which chats await a reply: <c>awaiting_replies</c> is there.</summary>
     public const string AwaitingReplies = "awaiting_replies";
+
+    /// <summary>tawk lets an agent give a chat its own notification sound: <c>list_sounds</c> and <c>set_chat_tone</c> are there.</summary>
+    public const string ChatTones = "chat_tones";
 }

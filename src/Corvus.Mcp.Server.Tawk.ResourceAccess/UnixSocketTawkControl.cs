@@ -16,7 +16,7 @@ public sealed class UnixSocketTawkControl : ITawkControl, ITawkApprovals, ITawkC
     {
         "send_message", "send_file", "react", "schedule_message", "mark_read", "confirm",
         "edit_message", "delete_message", "forward_message", "retry_message", "download_media",
-        "set_chat", "set_chat_theme", "clear_chat", "delete_chat", "export_chat", "block", "unblock",
+        "set_chat", "set_chat_theme", "set_chat_tone", "clear_chat", "delete_chat", "export_chat", "block", "unblock",
         "cancel_scheduled", "reschedule", "send_scheduled_now",
         "post_status", "reply_status", "like_status",
         "set_profile", "set_profile_photo", "remove_profile_photo", "set_setting", "reconnect", "decline_call",

@@ -38,6 +38,7 @@ corvus-tawk-mcp talks to tawk over tawk's control socket, described in tawk's [C
 - **Pictures and voice notes**: `view_image` hands a picture to your client's own model, and voice notes are transcribed on your computer with a Whisper model, in the language spoken (worked out among the languages you switched on in tawk), or once for each language an agent asks for. The agent that reads a transcript is told that recognition mishears, to fix what is clearly wrong and to stay as close as it can to what was said (from 0.15.4). With tawk 0.13.0 or later each transcript is handed to tawk, which keeps it and shows it under the voice note.
 - **Moving house**: tawk moves one account to another computer with its own commands (no tool for it, so no agent can start it), and what corvus-tawk-mcp remembers moves with memory sync or an OKF bundle; see the manual.
 - **TL;DR summaries**: when you put a chat in TL;DR mode in tawk (0.14.0 or later), tawk asks your agent for a short summary of each long message there, and `set_summary` hands it back for tawk to show in place of the text. corvus-tawk-mcp calls no model: your client's does.
+- **A sound for each contact**: `list_sounds` and `set_chat_tone` give a contact or group its own notification sound from tawk's sound folders, silence, or the app's sound again. Only a sound's name is accepted, never a file (tawk 0.36.0 or later).
 - **A long chat list, sorted out**: your own labels on chats, chats put aside until a time or until their person writes, and the chats where your last message is still unanswered (tawk 0.20.0 or later).
 - **The owner's chat**: name your own "message yourself" chat in tawk (0.15.0 or later) and what you type there on your phone reaches the agent as your words; it answers you there, and sends to anyone else are put to you there to allow or decline.
 - **Memory for writing like you** (on by default, `--memory off` to drop it): voices tuned per audience with a `check_voice` scorer, contact profiles with a source and confidence on every field, and reply templates. Kept on your computer, in a private SQLite file.
@@ -138,12 +139,12 @@ scripts/docker-run.sh               # builds, runs as you, prints the token and 
 
 | Area | Read | Write |
 | --- | --- | --- |
-| Chats | `list_chats`, `read_messages`, `search_messages`, `unread_summary`, `get_chat_info`, `get_online_status` | `set_chat`, `set_chat_theme`, `clear_chat`, `delete_chat`, `export_chat`, `block`, `unblock` |
+| Chats | `list_chats`, `read_messages`, `search_messages`, `unread_summary`, `get_chat_info`, `get_online_status` | `set_chat`, `set_chat_theme`, `set_chat_tone`, `clear_chat`, `delete_chat`, `export_chat`, `block`, `unblock` |
 | Messages | `view_image` | `draft_message`, `send_message`, `send_file`, `react`, `mark_read`, `edit_message`, `delete_message`, `forward_message`, `retry_message`, `download_media` |
 | Scheduled messages | `list_scheduled` | `schedule_message`, `cancel_scheduled`, `reschedule`, `send_scheduled_now` |
 | Statuses | `list_statuses`, `status_viewers`, `list_backgrounds` | `post_status`, `reply_status`, `like_status` |
 | Profile | `get_profile` | `set_profile`, `set_profile_photo`, `remove_profile_photo` |
-| Settings | `get_settings`, `list_themes` | `set_setting` |
+| Settings | `get_settings`, `list_themes`, `list_sounds` | `set_setting` |
 | tawk itself | `app_status`, `get_version`, `list_accounts` | `describe_session`, `reconnect`, `decline_call` |
 | Voice notes | `transcribe_message`, `get_transcript`, `get_transcription_progress`, `set_transcript` | |
 | TL;DR summaries | | `set_summary` (asked for by tawk, for chats you put in TL;DR mode; changes only what tawk shows), `decline_summary` (the answer whenever no summary is given, for any reason, so a request is answered once and never retried; tawk 0.21.0 or later) |

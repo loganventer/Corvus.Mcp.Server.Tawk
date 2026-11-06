@@ -4,7 +4,7 @@ public sealed record TawkControlOptions
 {
     public string Client { get; init; } = "corvus-tawk-mcp";
 
-    public string Version { get; init; } = "0.15.10";
+    public string Version { get; init; } = "0.16.0";
 
     public string Origin { get; init; } = "mcp";
 

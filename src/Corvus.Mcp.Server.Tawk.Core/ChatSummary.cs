@@ -10,4 +10,5 @@ public sealed record ChatSummary(
     bool Pinned,
     bool Archived,
     long LastTs,
-    string? Preview);
+    string? Preview,
+    string? Tone = null);
