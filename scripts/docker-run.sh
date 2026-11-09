@@ -4,7 +4,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-image="corvus-tawk-mcp:0.16.0"
+image="corvus-tawk-mcp:0.17.0"
 name="corvus-tawk-mcp"
 port="${CORVUS_TAWK_MCP_PORT:-8765}"
 runtime="${XDG_RUNTIME_DIR:-$HOME/.local/state}"

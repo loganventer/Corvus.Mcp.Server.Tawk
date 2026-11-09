@@ -123,15 +123,14 @@ public sealed partial class TranscriptionRunManager : ITranscriptionRunManager
         TranscriptionJob job, string path, TranscriptionPass pass, CancellationToken cancellationToken)
     {
         var request = job.Request;
-        using var limit = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        limit.CancelAfter(_options.Timeout);
+        using var watch = new StallWatch(new PassProgress(_jobs, job.Id, pass.Language), _options.Timeout, cancellationToken);
         try
         {
             var transcript = await _transcriber
                 .TranscribeAsync(
                     new TranscriptionPassRequest(path, pass.Language, request.Task, request.Model, request.Prompt) { Among = request.Among },
-                    new PassProgress(_jobs, job.Id, pass.Language),
-                    limit.Token)
+                    watch,
+                    watch.Token)
                 .ConfigureAwait(false);
             return transcript.DurationS > _options.MaxSeconds
                 ? pass with { Failure = "too long" }

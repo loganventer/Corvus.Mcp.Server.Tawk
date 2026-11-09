@@ -108,7 +108,8 @@ Flags override environment variables, which override the defaults. A flag or a c
 | `--transcribe-auto on\|off` | `CORVUS_TAWK_MCP_TRANSCRIBE_AUTO` | `off` | Transcribe every voice note others send, when tawk's settings have no such switch |
 | `--transcribe-max-languages N` | `CORVUS_TAWK_MCP_TRANSCRIBE_MAX_LANGUAGES` | `3` | The most languages one call may ask for (1 to 10) |
 | `--transcribe-max-seconds N` | `CORVUS_TAWK_MCP_TRANSCRIBE_MAX_SECONDS` | `3600` | The longest recording whose text is handed over |
-| `--transcribe-timeout-s N` | `CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S` | `300` | How long one language may take |
+| `--transcribe-timeout-s N` | `CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S` | `300` | How long one language may go without a step forward. Every piece of a long note, and every step of progress within it, starts the count again, so a long note runs as long as it keeps moving |
+| `--transcribe-chunk-s N` | `CORVUS_TAWK_MCP_TRANSCRIBE_CHUNK_S` | `120` | The longest stretch the model inside hears at once (30 to 3600). A longer note is cut into the fewest even pieces no longer than this, each cut moved to the quietest moment within 5 seconds so words are not split, and the language heard in the first piece is kept for the rest |
 | `--transcribe-concurrency N` | `CORVUS_TAWK_MCP_TRANSCRIBE_CONCURRENCY` | `1` | Jobs running at once (1 to 8) |
 | `--schedule-jitter-s N` | `CORVUS_TAWK_MCP_SCHEDULE_JITTER_S` | `60` | Scheduled messages move by a random amount up to this many seconds either way (0 to 3600, 0 turns it off) |
 | `--backoff-initial-ms N` | `CORVUS_TAWK_MCP_BACKOFF_INITIAL_MS` | `500` | First wait between connection attempts (1 to 600000) |

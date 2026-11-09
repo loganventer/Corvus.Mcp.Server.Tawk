@@ -84,6 +84,7 @@ public static class TawkMcpOptionsBinder
                 "transcribe-max-languages" => options with { TranscribeMaxLanguages = Int(arg, Next(), 1, 10, ref error) },
                 "transcribe-max-seconds" => options with { TranscribeMaxSeconds = Int(arg, Next(), 1, 86_400, ref error) },
                 "transcribe-timeout-s" => options with { TranscribeTimeoutS = Int(arg, Next(), 1, 3600, ref error) },
+                "transcribe-chunk-s" => options with { TranscribeChunkS = Int(arg, Next(), 30, 3600, ref error) },
                 "transcribe-auto" => options with { TranscribeAuto = OnOff(arg, Next(), ref error) },
                 "transcribe-concurrency" => options with { TranscribeConcurrency = Int(arg, Next(), 1, 8, ref error) },
                 "schedule-jitter-s" => options with { ScheduleJitterS = Int(arg, Next(), 0, 3600, ref error) },
@@ -319,6 +320,11 @@ public static class TawkMcpOptionsBinder
         if (env("CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S") is { Length: > 0 } transcribeTimeout)
         {
             options = options with { TranscribeTimeoutS = Int("CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S", transcribeTimeout, 1, 3600, ref error) };
+        }
+
+        if (env("CORVUS_TAWK_MCP_TRANSCRIBE_CHUNK_S") is { Length: > 0 } transcribeChunk)
+        {
+            options = options with { TranscribeChunkS = Int("CORVUS_TAWK_MCP_TRANSCRIBE_CHUNK_S", transcribeChunk, 30, 3600, ref error) };
         }
 
         if (env("CORVUS_TAWK_MCP_TRANSCRIBE_AUTO") is { Length: > 0 } transcribeAuto)
