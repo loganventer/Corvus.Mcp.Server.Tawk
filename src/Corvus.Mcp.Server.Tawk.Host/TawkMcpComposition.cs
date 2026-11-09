@@ -46,7 +46,7 @@ public static class TawkMcpComposition
 {
     public static string Version { get; } =
         typeof(TawkMcpComposition).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
-        ?? "0.16.0";
+        ?? "0.17.0";
 
     public static IMcpServerBuilder AddTawkMcp(this IServiceCollection services, TawkMcpOptions options)
     {
@@ -275,6 +275,7 @@ public static class TawkMcpComposition
         MaxLanguages = options.TranscribeMaxLanguages,
         MaxSeconds = options.TranscribeMaxSeconds,
         Timeout = TimeSpan.FromSeconds(options.TranscribeTimeoutS),
+        ChunkSeconds = options.TranscribeChunkS,
         Concurrency = options.TranscribeConcurrency,
         Automatic = options.TranscribeAuto,
         ModelDirectory = options.TranscribeModelDir
@@ -294,6 +295,8 @@ public static class TawkMcpComposition
         services.AddSingleton<IAudioDecoder, OggOpusDecoder>();
         services.AddSingleton<IWhisperRuntime>(new BundledWhisperRuntime(typeof(TawkMcpComposition).Assembly, transcription));
         services.AddSingleton<ISpokenLanguageRule, SpokenLanguageRule>();
+        services.AddSingleton<IAudioSplitter, QuietPointSplitter>();
+        services.AddSingleton<ITranscriptJoiner, TranscriptJoiner>();
         services.AddSingleton<IWhisperModelHost, WhisperModelHost>();
         services.AddSingleton<EmbeddedTranscriber>();
 

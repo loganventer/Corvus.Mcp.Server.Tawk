@@ -70,7 +70,9 @@ public static class HelpText
           --transcribe-language A,B     default languages, or auto     CORVUS_TAWK_MCP_TRANSCRIBE_LANGUAGE
           --transcribe-max-languages N  most languages in one call, 3  CORVUS_TAWK_MCP_TRANSCRIBE_MAX_LANGUAGES
           --transcribe-max-seconds N    longest recording, 3600        CORVUS_TAWK_MCP_TRANSCRIBE_MAX_SECONDS
-          --transcribe-timeout-s N      longest pass, 300              CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S
+          --transcribe-timeout-s N      longest stall in a pass, 300   CORVUS_TAWK_MCP_TRANSCRIBE_TIMEOUT_S
+          --transcribe-chunk-s N        longest piece heard at once,   CORVUS_TAWK_MCP_TRANSCRIBE_CHUNK_S
+                                        120; longer notes are split at pauses
           --transcribe-concurrency N    jobs at once, 1                CORVUS_TAWK_MCP_TRANSCRIBE_CONCURRENCY
           --schedule-jitter-s N         random +/- shift on schedules  CORVUS_TAWK_MCP_SCHEDULE_JITTER_S (60, 0 = off)
           --backoff-initial-ms N        first retry wait, 500          CORVUS_TAWK_MCP_BACKOFF_INITIAL_MS

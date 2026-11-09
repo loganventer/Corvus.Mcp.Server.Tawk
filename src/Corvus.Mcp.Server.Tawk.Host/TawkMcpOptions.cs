@@ -139,6 +139,9 @@ public sealed record TawkMcpOptions
 
     public int TranscribeTimeoutS { get; init; } = TranscriptionOptions.DefaultTimeoutS;
 
+    /// <summary>Notes longer than this many seconds are heard in pieces of at most this length.</summary>
+    public int TranscribeChunkS { get; init; } = TranscriptionOptions.DefaultChunkSeconds;
+
     /// <summary>Transcribe every voice note another person sends, without being asked. Only for a tawk without the switch: tawk's settings panel wins when it has one.</summary>
     public bool? TranscribeAuto { get; init; }
 

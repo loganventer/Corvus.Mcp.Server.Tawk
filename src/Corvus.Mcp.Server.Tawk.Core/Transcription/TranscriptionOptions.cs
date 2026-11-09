@@ -14,6 +14,13 @@ public sealed record TranscriptionOptions
 
     public const int DefaultTimeoutS = 300;
 
+    /// <summary>
+    /// The longest piece the model inside hears at once. Two minutes is four of Whisper's own 30-second windows:
+    /// even the largest model on a slow processor finishes one well inside <see cref="DefaultTimeoutS"/>, and a
+    /// stretch the model loops on spoils two minutes of a note, not all of it.
+    /// </summary>
+    public const int DefaultChunkSeconds = 120;
+
     public const int DefaultKeptJobs = 50;
 
     public TranscriptionEngine Engine { get; init; } = TranscriptionEngine.Auto;
@@ -38,8 +45,11 @@ public sealed record TranscriptionOptions
     /// <summary>The longest recording accepted, where the engine reports a length.</summary>
     public int MaxSeconds { get; init; } = DefaultMaxSeconds;
 
-    /// <summary>How long one pass may run.</summary>
+    /// <summary>How long one pass may go without a step forward. Each piece of a long note, and each step within it, starts it again.</summary>
     public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(DefaultTimeoutS);
+
+    /// <summary>A voice note longer than this many seconds is heard in pieces no longer than it, by the model inside.</summary>
+    public int ChunkSeconds { get; init; } = DefaultChunkSeconds;
 
     public int Concurrency { get; init; } = 1;
 
