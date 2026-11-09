@@ -299,7 +299,7 @@ claude mcp add corvus-tawk -- ~/.local/bin/mcp/corvus-tawk-mcp --stdio
 claude --dangerously-load-development-channels server:corvus-tawk
 ```
 
-`scripts/corvus-claude` wraps the second line: it pulls a newer corvus-tawk-mcp when there is one, rebuilds it when the checkout moved on, turns the channel events on and starts Claude Code with `corvus-tawk`'s channel and, by default, `corvus-schedule`'s. Claude Code shows a warning first, and on Team and Enterprise plans an admin must enable channels. See "Claude Code channel" in [MANUAL](MANUAL.md).
+`scripts/corvus-claude` wraps the second line: it pulls a newer corvus-tawk-mcp when there is one, rebuilds it when the checkout moved on, turns the channel events on and starts Claude Code with `corvus-tawk`'s channel and, by default, the Huginn plugin's and `corvus-youtube-music`'s. Claude Code shows a warning first, and on Team and Enterprise plans an admin must enable channels. See "Claude Code channel" in [MANUAL](MANUAL.md).
 
 **Letting one instance approve its own sends.** By default every write waits for the person. To change that for chosen chats, the person does both of these, each by hand:
 

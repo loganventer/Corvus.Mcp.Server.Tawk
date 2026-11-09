@@ -59,7 +59,7 @@ There is no fallback: the old names are not read any more.
 | --- | --- |
 | `TAWKMCP_*` (every option: `TAWKMCP_PORT`, `TAWKMCP_SYNC_REPO`, `TAWKMCP_CHANNEL_OWN`, ...) | `CORVUS_TAWK_MCP_*` (`CORVUS_TAWK_MCP_PORT`, `CORVUS_TAWK_MCP_SYNC_REPO`, `CORVUS_TAWK_MCP_CHANNEL_OWN`, ...) |
 | `TAWK_MCP_SRC`, `TAWK_MCP_PULL`, `TAWK_MCP_PULL_TIMEOUT`, `TAWK_MCP_ADMIN`, `TAWK_MCP_SERVER` (claude-tawk) | `CORVUS_TAWK_MCP_SRC`, `CORVUS_TAWK_MCP_PULL`, `CORVUS_TAWK_MCP_PULL_TIMEOUT`, `CORVUS_TAWK_MCP_ADMIN`, `CORVUS_TAWK_MCP_SERVER` (corvus-claude) |
-| (none) | `CORVUS_TAWK_MCP_EXTRA_SERVERS`: more channels corvus-claude loads, default `corvus-schedule`; empty for none |
+| (none) | `CORVUS_TAWK_MCP_EXTRA_SERVERS`: more channels corvus-claude loads, default `plugin:huginn@huginn corvus-youtube-music`; empty for none |
 | `TAWK_CONTROL_SOCKET` | `CORVUS_TAWK_CONTROL_SOCKET` |
 | `TAWKMCP_SYNC_SSH` (compose only) | `CORVUS_TAWK_MCP_SYNC_SSH` |
 
