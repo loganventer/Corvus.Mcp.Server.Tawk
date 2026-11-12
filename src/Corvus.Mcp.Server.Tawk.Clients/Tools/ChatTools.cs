@@ -56,18 +56,17 @@ public sealed class ChatTools(IChatReadingManager reading, IChatManagementManage
         ToolResults.RunAsync(accounts, account, () => reading.ChatInfoAsync(chat, cancellationToken));
 
     [McpServerTool(Name = "set_chat", Destructive = false, ReadOnly = false, Idempotent = true, OpenWorld = false)]
-    [Description("Mute, pin, archive or lock a chat. Locking hides the chat behind tawk's soft lock, which also hides it from corvus-tawk-mcp." + ToolText.NeedsManage)]
+    [Description("Mute, pin or archive a chat. Only the user can make a chat private or public, in tawk." + ToolText.NeedsManage)]
     public Task<CallToolResult> SetChatAsync(
         McpServer? server,
         [Description("The chat's jid or name.")] string chat,
         [Description("false to unmute, true to mute always, or a number of seconds.")] string? muted = null,
         [Description("Pin or unpin.")] bool? pinned = null,
         [Description("Archive or unarchive.")] bool? archived = null,
-        [Description("Only true: lock the chat.")] bool? locked = null,
         [Description(ToolText.Account)] string? account = null,
         IProgress<ProgressNotificationValue>? progress = null,
         CancellationToken cancellationToken = default) =>
-        ToolResults.RunAsync(accounts, account, () => chats.SetChatAsync(chat, muted, pinned, archived, locked, WriteContexts.For(server, progress), cancellationToken));
+        ToolResults.RunAsync(accounts, account, () => chats.SetChatAsync(chat, muted, pinned, archived, WriteContexts.For(server, progress), cancellationToken));
 
     [McpServerTool(Name = "set_chat_theme", Destructive = false, ReadOnly = false, Idempotent = true, OpenWorld = false)]
     [Description("Give a chat its own tawk theme, from list_themes, or an empty theme for the app theme." + ToolText.NeedsManage)]

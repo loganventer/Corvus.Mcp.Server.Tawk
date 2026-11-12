@@ -4,7 +4,7 @@ namespace Corvus.Mcp.Server.Tawk.Managers;
 
 public interface IChatManagementManager
 {
-    Task<string> SetChatAsync(string chat, string? muted, bool? pinned, bool? archived, bool? locked, WriteContext context, CancellationToken cancellationToken);
+    Task<string> SetChatAsync(string chat, string? muted, bool? pinned, bool? archived, WriteContext context, CancellationToken cancellationToken);
 
     Task<string> SetChatThemeAsync(string chat, string theme, WriteContext context, CancellationToken cancellationToken);
 

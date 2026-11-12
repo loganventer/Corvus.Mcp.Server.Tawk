@@ -13,7 +13,7 @@ public sealed class ChatManagementManager(
     IUntrustedTextFence fence) : IChatManagementManager
 {
     public async Task<string> SetChatAsync(
-        string chat, string? muted, bool? pinned, bool? archived, bool? locked, WriteContext context, CancellationToken cancellationToken)
+        string chat, string? muted, bool? pinned, bool? archived, WriteContext context, CancellationToken cancellationToken)
     {
         var args = new JsonObject { ["chat"] = chat };
         if (!string.IsNullOrWhiteSpace(muted))
@@ -29,11 +29,6 @@ public sealed class ChatManagementManager(
         if (archived is { } a)
         {
             args["archived"] = a;
-        }
-
-        if (locked == true)
-        {
-            args["locked"] = true;
         }
 
         var outcome = await RunAsync("set_chat", args, context, cancellationToken).ConfigureAwait(false);

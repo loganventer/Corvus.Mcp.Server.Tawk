@@ -85,7 +85,16 @@ public class ChatToolsTests
             Assert.That((long?)args["muted"], Is.EqualTo(3600));
             Assert.That((bool?)args["pinned"], Is.True);
             Assert.That(args.ContainsKey("archived"), Is.False);
+            Assert.That(args.ContainsKey("locked"), Is.False);
         });
+    }
+
+    [Test]
+    public void Set_chat_has_no_locked_parameter_because_only_the_user_makes_a_chat_private()
+    {
+        var parameters = typeof(ChatTools).GetMethod(nameof(ChatTools.SetChatAsync))!.GetParameters();
+
+        Assert.That(parameters.Select(p => p.Name), Has.None.EqualTo("locked"));
     }
 
     [Test]
