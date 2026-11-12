@@ -93,11 +93,12 @@ export CORVUS_TAWK_MCP_CHANNEL_PRESENCE="${CORVUS_TAWK_MCP_CHANNEL_PRESENCE:-on}
 # CORVUS_TAWK_MCP_SERVER is the name the stdio server was registered under.
 # CORVUS_TAWK_MCP_EXTRA_SERVERS names more channels that ride along, separated by spaces. By default these are the
 # Huginn plugin (plugin:huginn@huginn, which carries huginn-schedule, huginn-planning and both standards servers), so
-# its reminders arrive in the same session, and corvus-youtube-music, so player changes arrive too. A bare name is a
+# its reminders arrive in the same session, corvus-youtube-music, so player changes arrive too, and corvus-outlook, so
+# new mail arrives. A bare name is a
 # stdio server (server:<name>); a name with a prefix, such as plugin:<name>@<marketplace>, is passed as it is. Set it
 # empty to load only Corvus Tawk's channel. A channel named in the arguments already is not added twice.
 servers="server:${CORVUS_TAWK_MCP_SERVER:-corvus-tawk}"
-for name in ${CORVUS_TAWK_MCP_EXTRA_SERVERS-plugin:huginn@huginn corvus-youtube-music}; do
+for name in ${CORVUS_TAWK_MCP_EXTRA_SERVERS-plugin:huginn@huginn corvus-youtube-music corvus-outlook}; do
     case "$name" in *:*) ;; *) name="server:$name" ;; esac
     case " $servers $* " in *" $name "*) ;; *) servers="$servers $name" ;; esac
 done

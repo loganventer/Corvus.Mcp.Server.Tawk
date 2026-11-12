@@ -658,7 +658,7 @@ The stdio instance connects to tawk by itself, next to any HTTP instance you run
 - points `CORVUS_TAWK_MCP_ADMIN_TOKEN_FILE` at tawk's `admin.token`, so the session can approve its own sends where you allowed that. `CORVUS_TAWK_MCP_ADMIN=0` leaves it out
 - turns on the channel events for your own messages, read receipts, plays of voice notes, reactions, edits and deletes, scheduled sends and online status. tawk's own switches still decide what is handed over
 - loads the server registered as `corvus-tawk`; `CORVUS_TAWK_MCP_SERVER` names another, for a registration under a different name
-- loads the Huginn plugin's channels (`plugin:huginn@huginn`, so scheduler reminders arrive in the same session) and `corvus-youtube-music`'s (player changes) too; `CORVUS_TAWK_MCP_EXTRA_SERVERS` lists the extra channels (separated by spaces, default `plugin:huginn@huginn corvus-youtube-music`; a bare name is a stdio server, a prefixed name is passed as it is), and setting it empty loads only `corvus-tawk`. A channel you also pass yourself is not added twice
+- loads the Huginn plugin's channels (`plugin:huginn@huginn`, so scheduler reminders arrive in the same session) `corvus-youtube-music`'s (player changes) and `corvus-outlook`'s (new mail) too; `CORVUS_TAWK_MCP_EXTRA_SERVERS` lists the extra channels (separated by spaces, default `plugin:huginn@huginn corvus-youtube-music corvus-outlook`; a bare name is a stdio server, a prefixed name is passed as it is), and setting it empty loads only `corvus-tawk`. A channel you also pass yourself is not added twice
 
 Claude Code shows a warning about development channels first; choose to continue. Your own messages are not pushed. On Team and Enterprise plans an admin must enable channels.
 
