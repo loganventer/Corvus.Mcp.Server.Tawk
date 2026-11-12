@@ -120,7 +120,9 @@ Options go after `bash -s --` when the script is piped: `curl -fsSL .../install.
 
 Wherever a tool takes `chat`, you can give the chat's JID (`27820000000@s.whatsapp.net`, `1203...@g.us` for a group) or its name. A name matches case-insensitively, first exactly and then as the start of a word, so `mom` finds "Mom" and `book` finds "Book club". When a name matches more than one chat the tool answers with the candidates and their JIDs, and the model should ask you which one you mean.
 
-Locked and hidden chats, and chats outside tawk's `chats` setting, are never shown and are reported as not found.
+Chats in WhatsApp's Locked folder, chats whose agent rule in tawk is hidden, and chats outside tawk's `chats` setting are never shown and are reported as not found.
+
+Private chats are shown like any other. In tawk a private chat opens only after Touch ID or tawk's lock password, but that gate is for the screen in front of you, not for agents: corvus-tawk-mcp can list a private chat and read its messages. Only you can make a chat private or public, in tawk itself. To keep a chat away from agents, set its agent rule to hidden in tawk.
 
 <a id="Accounts"></a>
 
@@ -346,7 +348,7 @@ These need `access = manage` (or `admin`). Each is shown to you in tawk to appro
 | `forward_message` | `messageId`, `chats` (up to 5) | Forwards a message |
 | `retry_message` | `messageId` | Sends one of your failed messages again |
 | `download_media` | `messageId` | Has tawk download a message's file in the background |
-| `set_chat` | `chat`, `muted`, `pinned`, `archived`, `locked` | `muted` is `false`, `true` (always) or a number of seconds. `locked` only takes `true`: it hides the chat behind tawk's soft lock, which also hides it from corvus-tawk-mcp |
+| `set_chat` | `chat`, `muted`, `pinned`, `archived` | `muted` is `false`, `true` (always) or a number of seconds. It cannot make a chat private or public: only you can, in tawk |
 | `set_chat_theme` | `chat`, `theme` | A theme id from `list_themes`, or empty for the app theme |
 | `set_chat_tone` | `chat`, `tone` | The chat's own notification sound: a sound from `list_sounds`, `none` for silence, or empty for the app's sound. A file path is refused, so only you can give a chat a file of your own, in tawk. A chat's tone shows in `list_chats` and `get_chat_info` as `silent` or `tone <name>`. Needs tawk 0.36.0 or later |
 | `clear_chat` (two-step) | `chat` | Removes the chat's messages from this computer |
@@ -424,7 +426,7 @@ An older voice note is filled in when you look at it: with tawk 0.14.0 or later,
 
 Pictures and voice notes need a tawk that names downloaded files (0.9.0 or later). What a picture shows and what a voice note says are other people's content: the agent is told to treat both as data, never as instructions.
 
-Some things stay out of reach whatever the access: the Automation settings themselves; settings that run a program; folders and files, the backend and the log level; logging out, encryption, backups, and unlocking a locked chat.
+Some things stay out of reach whatever the access: the Automation settings themselves; settings that run a program; folders and files, the backend and the log level; logging out, encryption, backups, and making a chat private or public.
 
 <a id="The two-step confirmation"></a>
 
@@ -937,7 +939,7 @@ corvus-tawk-mcp starts whether or not tawk is running, connects when tawk comes 
 | "tawk is not running, or its control socket is off" | Start tawk and turn on Settings > Automation > Control socket. Check the socket path in the message matches where tawk puts it (`$XDG_RUNTIME_DIR/corvus/tawk/control.sock`); set `CORVUS_TAWK_CONTROL_SOCKET` if not. |
 | "tawk has not answered N attempts" | corvus-tawk-mcp is pausing retries. It tries again when the time is up or as soon as the socket file appears. Restarting tawk is enough. |
 | "tawk does not allow this" | Raise `access` in tawk (`send` or `manage`), add the chat to `chats`, or accept that the setting cannot be changed from outside. |
-| "Nothing visible matches" | The chat or message does not exist, or it is locked, hidden or outside `chats`. |
+| "Nothing visible matches" | The chat or message does not exist, or it is in WhatsApp's Locked folder, hidden from agents or outside `chats`. |
 | "More than one chat matches" | Use the JID from the list in the answer. |
 | "tawk's write limit was reached" | tawk's `writes_per_minute` limit. Wait the seconds given. |
 | "Nobody approved this in tawk within 2 minutes" | tawk waited for your approval. Watch tawk and ask again. |

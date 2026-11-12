@@ -41,7 +41,7 @@ sequenceDiagram
 
     S->>C: ConnectOnceAsync
     C->>T: connect to control.sock
-    C->>T: {"id":"1","op":"hello","args":{"client":"corvus-tawk-mcp","version":"0.17.0","protocol":1,"origin":"mcp"}}
+    C->>T: {"id":"1","op":"hello","args":{"client":"corvus-tawk-mcp","version":"0.18.0","protocol":1,"origin":"mcp"}}
     T-->>C: {"id":"1","ok":true,"result":{"protocol":1,"tawk":"0.6.4","access":"send",...}}
     C-->>L: ConnectionStateEvent(Connected)
     C-->>S: hello

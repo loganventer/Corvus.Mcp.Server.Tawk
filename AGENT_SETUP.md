@@ -344,7 +344,7 @@ The token and the memory file are the person's; say where they are and let them 
 | The installer says to run inside WSL | You ran it on the Windows side. Run it inside WSL, where tawk lives |
 | The installer could not register the service | Start `corvus-tawk-mcp` by hand in a spare terminal, or use stdio |
 | A send waits and nothing happens | It is waiting for the person in tawk's Agentic tab. tawk gives up after 2 minutes |
-| A chat is missing | Locked and hidden chats are never shown to agents, and the person may have limited the chats agents may use |
+| A chat is missing | Chats in WhatsApp's Locked folder and chats whose agent rule is hidden are never shown to agents, and the person may have limited the chats agents may use. Private chats are shown |
 
 More in "Troubleshooting" in [MANUAL](MANUAL.md). For anything else, give the person the full error text and point them to `https://github.com/loganventer/Corvus.Mcp.Server.Tawk/issues`.
 

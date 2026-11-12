@@ -72,13 +72,14 @@ Only the latest release gets security fixes.
 | `send_file` is always put to the user in tawk, with the file's name, kind and size, and is never among what an admin token may approve; tawk refuses its own login and database, key and credential files, folders, empty files and files over 100 MB before the user is asked, resolves links first and looks at the file again after the answer; the tool description and the server instructions tell the model to send a file only when the user asks | tawk and corvus-tawk-mcp | A misled model sending a key or a private file to someone |
 | Labelling a chat and putting one aside are approved by the user in tawk, since each changes what their own chat list shows; reading labels, reminders and awaiting replies follows the chats the agent may see | tawk | A misled model hiding chats from the user |
 | `sync_memory` only starts a sync with the repository the user set where corvus-tawk-mcp was started; no tool sets or changes the repository or its key | corvus-tawk-mcp | A misled model sending memory somewhere else |
-| Locked, hidden and excluded chats are never returned | tawk | Leaking chats you have hidden |
+| Chats in WhatsApp's Locked folder, chats with the agent rule hidden, and excluded chats are never returned; private chats are returned, since tawk's Touch ID or password gate guards the screen, not agents | tawk | Leaking chats you have hidden |
+| Only the user can make a chat private or public, in tawk; `set_chat` has no way to, and tawk refuses a `locked` argument | tawk and corvus-tawk-mcp | A misled model hiding a chat from the user or opening one up |
 | Loopback bind by default, bearer token always, constant-time compare | corvus-tawk-mcp | Other users and programs on the network |
 | Origin guard | corvus-tawk-mcp | Web pages in your browser |
 | Same-user check on the socket (`SO_PEERCRED`, `getpeereid`) | tawk | Other users on the computer |
 | Memory in one file (0600, folder 0700), created only when first used, and `--memory off` or `read` | corvus-tawk-mcp | Other users, and memory you do not want |
 | Stored memory is fenced as untrusted when read back, with its source and confidence | corvus-tawk-mcp | Instructions planted in memory |
-| Contacts are looked up through tawk, so hidden, locked and excluded chats cannot be profiled | tawk and corvus-tawk-mcp | Profiling chats you have hidden |
+| Contacts are looked up through tawk, so hidden, Locked-folder and excluded chats cannot be profiled | tawk and corvus-tawk-mcp | Profiling chats you have hidden |
 | Sensitive fields only from you, hidden unless asked for; stated facts beat inferences; inferences lapse | corvus-tawk-mcp | Wrong or intrusive guesses about people |
 | Deleting memory asks you by elicitation | corvus-tawk-mcp | A model wiping what you saved |
 

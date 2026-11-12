@@ -41,7 +41,7 @@ In scope:
 - Storing messages, transcripts or summaries. Finished transcripts and summaries go to tawk, which keeps them; corvus-tawk-mcp holds a transcription job in memory for a short while and nothing on disk. corvus-tawk-mcp keeps no copy of your chats, no cache and no log file. Its memory holds only what you or an agent choose to save about voices, contacts and templates, and averages measured from your own messages, never the messages themselves.
 - Inferring sensitive things about people. Health, beliefs and similar matters can be recorded only as you state them, and personality is kept to coarse bands used for tone.
 - Deciding what a client may do. Access, visible chats and rate limits live in tawk's settings, and corvus-tawk-mcp cannot change them.
-- Unlocking locked chats, logging out, encryption, backups, Automation settings, settings that run programs, and folders and files: tawk keeps these out of reach, and corvus-tawk-mcp offers no way to them.
+- Making a chat private or public, opening WhatsApp's Locked folder, logging out, encryption, backups, Automation settings, settings that run programs, and folders and files: tawk keeps these out of reach, and corvus-tawk-mcp offers no way to them.
 - Confirming anything on the user's behalf. There is no confirm tool.
 - Choosing or calling a model. corvus-tawk-mcp serves MCP; which model reads the results is up to your client.
 
