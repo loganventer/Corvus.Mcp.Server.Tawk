@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Corvus.Mcp.Server.Tawk.ResourceAccess;
 
 namespace Corvus.Mcp.Server.Tawk.Tests.ResourceAccess;
@@ -30,6 +31,23 @@ public class SocketFileWatcherTests
         Directory.CreateDirectory(Path.Combine(_root, "run", "tawk"));
         await Task.Delay(100);
         await File.WriteAllTextAsync(socket, string.Empty);
+
+        await appeared.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.That(appeared.Task.IsCompletedSuccessfully, Is.True);
+    }
+
+    [Test]
+    public async Task Notices_a_real_unix_socket_being_bound()
+    {
+        var socket = Path.Combine(_root, "control.sock");
+        var appeared = new TaskCompletionSource();
+        using var watcher = new SocketFileWatcher();
+        watcher.Watch(socket, () => appeared.TrySetResult());
+        await Task.Delay(100);
+
+        using var listener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+        listener.Bind(new UnixDomainSocketEndPoint(socket));
+        listener.Listen();
 
         await appeared.Task.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.That(appeared.Task.IsCompletedSuccessfully, Is.True);

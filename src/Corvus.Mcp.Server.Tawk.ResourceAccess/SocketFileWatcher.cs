@@ -2,12 +2,16 @@ namespace Corvus.Mcp.Server.Tawk.ResourceAccess;
 
 /// <summary>
 /// Watches the socket's folder for control.sock. When the folder does not exist yet, watches the nearest
-/// existing parent for it to appear and moves down as folders are created.
+/// existing parent for it to appear and moves down as folders are created. On macOS, FSEvents never reports a
+/// Unix socket being created, so there the socket path is also looked at every quarter of a second.
 /// </summary>
 public sealed class SocketFileWatcher : ISocketFileWatcher
 {
+    private static readonly TimeSpan SocketLookInterval = TimeSpan.FromMilliseconds(250);
     private readonly Lock _gate = new();
     private FileSystemWatcher? _watcher;
+    private Timer? _socketLook;
+    private bool _socketSeen;
     private string? _watchedFolder;
     private bool _watchingSocketFolder;
     private string? _socketFolder;
@@ -26,6 +30,12 @@ public sealed class SocketFileWatcher : ISocketFileWatcher
             _socketName = Path.GetFileName(full);
             _onAppeared = onAppeared;
             Arm();
+            if (OperatingSystem.IsMacOS())
+            {
+                _socketSeen = File.Exists(full);
+                _socketLook?.Dispose();
+                _socketLook = new Timer(_ => LookForSocket(), null, SocketLookInterval, SocketLookInterval);
+            }
         }
     }
 
@@ -55,6 +65,8 @@ public sealed class SocketFileWatcher : ISocketFileWatcher
             _disposed = true;
             _watcher?.Dispose();
             _watcher = null;
+            _socketLook?.Dispose();
+            _socketLook = null;
         }
     }
 
@@ -117,6 +129,28 @@ public sealed class SocketFileWatcher : ISocketFileWatcher
         {
             Arm();
         }
+    }
+
+    private void LookForSocket()
+    {
+        Action? appeared = null;
+        lock (_gate)
+        {
+            if (_disposed || _socketFolder is null)
+            {
+                return;
+            }
+
+            var seen = File.Exists(Path.Combine(_socketFolder, _socketName!));
+            if (seen && !_socketSeen)
+            {
+                appeared = _onAppeared;
+            }
+
+            _socketSeen = seen;
+        }
+
+        appeared?.Invoke();
     }
 
     private void OnFolderAppeared()
