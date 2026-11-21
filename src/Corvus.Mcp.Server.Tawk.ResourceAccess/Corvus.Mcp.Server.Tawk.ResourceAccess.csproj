@@ -12,4 +12,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Corvus.Mcp.Server.Tawk.Tests" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\external\Corvus.Mcp.Library.Brokkr\src\Corvus.Mcp.Library.Brokkr.Contracts\Corvus.Mcp.Library.Brokkr.Contracts.csproj" />
+  </ItemGroup>
 </Project>

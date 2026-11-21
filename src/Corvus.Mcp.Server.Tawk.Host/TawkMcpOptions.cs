@@ -1,7 +1,6 @@
 using Corvus.Mcp.Server.Tawk.Clients.Channels;
 using Corvus.Mcp.Server.Tawk.Core;
 using Corvus.Mcp.Server.Tawk.Core.Memory;
-using Corvus.Mcp.Server.Tawk.Core.Sync;
 using Corvus.Mcp.Server.Tawk.Core.Transcription;
 
 namespace Corvus.Mcp.Server.Tawk.Host;
@@ -79,11 +78,11 @@ public sealed record TawkMcpOptions
     /// <summary>A private key file for sync, when SSH should not pick one by itself.</summary>
     public string? SyncKeyFile { get; init; }
 
-    public string SyncBranch { get; init; } = SyncOptions.DefaultBranch;
+    public string SyncBranch { get; init; } = "main";
 
-    public string SyncFile { get; init; } = SyncOptions.DefaultFile;
+    public string SyncFile { get; init; } = "memory.db";
 
-    public int SyncIntervalMinutes { get; init; } = SyncOptions.DefaultIntervalMinutes;
+    public int SyncIntervalMinutes { get; init; } = 120;
 
     /// <summary>The agent is handed the memory workflow once every this many rounds. 0 turns it off.</summary>
     public int WorkflowEvery { get; init; } = WorkflowOptions.DefaultEvery;

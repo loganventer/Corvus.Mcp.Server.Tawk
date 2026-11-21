@@ -1,6 +1,7 @@
 using System.Globalization;
 using Corvus.Mcp.Server.Tawk.Clients.Channels;
-using Corvus.Mcp.Server.Tawk.Engines.Sync;
+using Corvus.Mcp.Library.Brokkr.Contracts.Errors;
+using Corvus.Mcp.Library.Brokkr.Engines;
 using Corvus.Mcp.Server.Tawk.Core.Memory;
 using Corvus.Mcp.Server.Tawk.Core.Transcription;
 using Corvus.Mcp.Server.Tawk.Engines.Transcription;
@@ -360,15 +361,18 @@ public static class TawkMcpOptionsBinder
         return min;
     }
 
+    // Checked with the rules sync itself applies, so a bad address fails at start rather than at the first sync.
     private static string Repository(string name, string value, ref string? error)
     {
-        var address = SyncRepositoryAddress.Normalise(value, out var why);
-        if (address is null)
+        try
         {
-            error ??= $"{name} {why}.";
+            return BrokkrEnginesServiceCollectionExtensions.AddressPolicy().Normalise(value, allowLocalPath: false);
         }
-
-        return address ?? value;
+        catch (SyncException refused)
+        {
+            error ??= $"{name}: {refused.Message}.";
+            return value;
+        }
     }
 
     private static string SyncFile(string name, string value, ref string? error)

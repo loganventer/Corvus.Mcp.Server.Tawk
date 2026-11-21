@@ -1,0 +1,3 @@
+[submodule "external/Corvus.Mcp.Library.Brokkr"]
+	path = external/Corvus.Mcp.Library.Brokkr
+	url = https://github.com/loganventer/Corvus.Mcp.Library.Brokkr.git

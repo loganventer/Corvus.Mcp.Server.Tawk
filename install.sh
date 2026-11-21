@@ -284,9 +284,13 @@ else
     SRC="$(mktemp -d "${TMPDIR:-/tmp}/corvus-tawk-mcp-build.XXXXXX")"
     CLEANUP="$SRC"
     say "downloading corvus-tawk-mcp ($REF) from $REPO_URL"
-    git clone --quiet --depth 1 --branch "$REF" "$REPO_URL" "$SRC"
+    git clone --quiet --depth 1 --recurse-submodules --shallow-submodules --branch "$REF" "$REPO_URL" "$SRC"
     say "building commit $(git -C "$SRC" log -1 --format='%h %s (%cd)' --date=short)"
 fi
+
+# Sync comes from the shared Brokkr library, a git submodule.
+[ -f "$SRC/external/Corvus.Mcp.Library.Brokkr/Corvus.Mcp.Library.Brokkr.slnx" ] \
+    || die "external/Corvus.Mcp.Library.Brokkr is missing: clone with --recurse-submodules, or run git submodule update --init"
 
 VERSION="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$SRC/Directory.Build.props" | head -n 1)"
 VERSION="${VERSION:-latest}"

@@ -6,6 +6,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY global.json nuget.config Directory.Build.props Directory.Packages.props ./
+# Sync comes from the shared Brokkr library, a git submodule: build from a checkout made with --recurse-submodules.
+COPY external/ external/
 COPY src/Corvus.Mcp.Server.Tawk.Core/Corvus.Mcp.Server.Tawk.Core.csproj src/Corvus.Mcp.Server.Tawk.Core/
 COPY src/Corvus.Mcp.Server.Tawk.ResourceAccess/Corvus.Mcp.Server.Tawk.ResourceAccess.csproj src/Corvus.Mcp.Server.Tawk.ResourceAccess/
 COPY src/Corvus.Mcp.Server.Tawk.Engines/Corvus.Mcp.Server.Tawk.Engines.csproj src/Corvus.Mcp.Server.Tawk.Engines/

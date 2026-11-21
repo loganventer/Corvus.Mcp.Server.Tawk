@@ -5,6 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Protocol;
+using Corvus.Mcp.Library.Brokkr.Contracts.Options;
+using Corvus.Mcp.Library.Brokkr.Contracts.Rows;
+using Corvus.Mcp.Library.Brokkr.Engines;
+using Corvus.Mcp.Library.Brokkr.Git;
+using Corvus.Mcp.Library.Brokkr.Hosting;
+using Corvus.Mcp.Library.Brokkr.Managers;
+using Corvus.Mcp.Library.Brokkr.Sqlite;
+using Corvus.Mcp.Library.Brokkr.State;
 using Corvus.Mcp.Server.Tawk.Clients;
 using Corvus.Mcp.Server.Tawk.Clients.Channels;
 using Corvus.Mcp.Server.Tawk.Clients.Prompts;
@@ -18,13 +26,11 @@ using Corvus.Mcp.Server.Tawk.Core;
 using Corvus.Mcp.Server.Tawk.Core.Media;
 using Corvus.Mcp.Server.Tawk.Core.Memory;
 using Corvus.Mcp.Server.Tawk.Core.Okf;
-using Corvus.Mcp.Server.Tawk.Core.Sync;
 using Corvus.Mcp.Server.Tawk.Core.Transcription;
 using Corvus.Mcp.Server.Tawk.Engines;
 using Corvus.Mcp.Server.Tawk.Engines.Knowledge;
 using Corvus.Mcp.Server.Tawk.Engines.Media;
 using Corvus.Mcp.Server.Tawk.Engines.Memory;
-using Corvus.Mcp.Server.Tawk.Engines.Sync;
 using Corvus.Mcp.Server.Tawk.Engines.Transcription;
 using Corvus.Mcp.Server.Tawk.Managers;
 using Corvus.Mcp.Server.Tawk.Managers.Approvals;
@@ -46,7 +52,7 @@ public static class TawkMcpComposition
 {
     public static string Version { get; } =
         typeof(TawkMcpComposition).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
-        ?? "0.18.0";
+        ?? "0.19.0";
 
     public static IMcpServerBuilder AddTawkMcp(this IServiceCollection services, TawkMcpOptions options)
     {
@@ -149,7 +155,7 @@ public static class TawkMcpComposition
         services.AddSingleton<IWorkflowCadence>(cadence);
         if (options.Memory == MemoryMode.Write && options.SyncRepository is { Length: > 0 })
         {
-            services.AddHostedService<MemorySyncService>();
+            services.AddBrokkrInterval();
         }
 
         // A session that is let go takes its resource subscriptions with it.
@@ -235,6 +241,7 @@ public static class TawkMcpComposition
         ArgumentNullException.ThrowIfNull(options);
         var services = new ServiceCollection();
         services.AddSingleton(TimeProvider.System);
+        services.AddLogging();
         AddMemory(services, options, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         return services.BuildServiceProvider();
     }
@@ -393,28 +400,25 @@ public static class TawkMcpComposition
         services.AddSingleton<ITemplateStore, SqliteTemplateStore>();
         services.AddSingleton<ITawkChatSource, TawkChatSource>();
 
-        // Sync. It has no default destination: without a repository set on this machine, nothing syncs. It goes
-        // over SSH with the machine's own key; there are no tokens.
-        // Everything it keeps on this machine sits beside the database.
-        var sync = new SyncOptions
+        // Sync, through the shared Brokkr library. It has no default destination: without a repository set on this machine,
+        // nothing syncs. It goes over SSH with the machine's own key; there are no tokens. Everything it keeps on this machine
+        // sits beside the database. Only an instance that may write memory syncs it.
+        services.AddBrokkrEngines().AddBrokkrSourceThenNewerRule(TawkSyncTables.Rule, TawkSyncTables.Unranked);
+        services.AddBrokkrGit(
+            new GitOptions(KeyFile: options.SyncKeyFile, UserSshCommand: Environment.GetEnvironmentVariable("GIT_SSH_COMMAND")),
+            PushHistory.FastForward);
+        services.AddBrokkrState(new SyncPaths(path + ".sync.json", path + ".sync.lock", path + ".sync.git", Path.GetTempPath()));
+        services.AddBrokkrManager(new SyncOptions(
+            options.SyncRepository, "tawk-mcp", Environment.MachineName, options.SyncBranch, TimeSpan.FromMinutes(options.SyncIntervalMinutes)));
+        services.AddSingleton<TawkSqliteOpener>();
+        if (options.Memory == MemoryMode.Write)
         {
-            Repository = options.SyncRepository,
-            KeyFile = options.SyncKeyFile,
-            Branch = options.SyncBranch,
-            File = options.SyncFile,
-            Interval = TimeSpan.FromMinutes(options.SyncIntervalMinutes),
-        };
-        services.AddSingleton(sync);
-        services.AddSingleton<IMemorySnapshotStore, SqliteMemorySnapshotStore>();
-        services.AddSingleton<IGitRunner>(new ProcessGitRunner(TimeSpan.FromSeconds(100)));
-        services.AddSingleton<IMemoryRemote>(sp => new GitMemoryRemote(
-            sp.GetRequiredService<IGitRunner>(), sync, path + ".sync.git", Environment.GetEnvironmentVariable));
-        services.AddSingleton<ISyncStateStore>(new FileSyncStateStore(path + ".sync.json"));
-        services.AddSingleton<ISyncLock>(new FileSyncLock(path + ".sync.lock"));
-        services.AddSingleton<ISyncScratch, TempSyncScratch>();
-        services.AddSingleton<IMemoryMerger, MemoryMerger>();
-        services.AddSingleton<IMemoryDigest, MemoryDigest>();
-        services.AddSingleton<IMemorySyncManager, MemorySyncManager>();
+            services.AddBrokkrSqliteDataset(
+                new SqliteDatasetSpec("memory", path, options.SyncFile, TawkSyncTables.All, new TombstoneSpec(), []),
+                provider => provider.GetRequiredService<TawkSqliteOpener>(),
+                fixups: _ => [new DefaultVoiceFixup()]);
+            services.AddBrokkrPreSyncHook<PurgeExpiredFacts>();
+        }
 
         // Engines. Each voice rule is its own class; the checker runs whichever are registered here.
         services.AddSingleton<IStyleFeatureExtractor, StyleFeatureExtractor>();
