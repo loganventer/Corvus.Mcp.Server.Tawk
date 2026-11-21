@@ -157,7 +157,7 @@ Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/Corv
 - `ControlSocketLocator` finds the socket (flag, `CORVUS_TAWK_CONTROL_SOCKET`, `$XDG_RUNTIME_DIR`, `~/.local/state`).
 - `TawkChatSource` (`ITawkChatSource`) is what memory needs from tawk: which chat a name means, through `chat_info` so tawk's visibility rules apply, and the text of the user's own recent messages for `learn_voice`.
 - In `Memory`, `SqliteConnectionFactory` owns the database path, creates the file 0600 in a 0700 folder on first use, turns on WAL and runs `SqliteSchemaMigrator`, which applies numbered steps recorded in `PRAGMA user_version`. `ICategoryStore`, `IVoiceStore`, `IContactStore`, `ITemplateStore` and `IOkfStore` are the repositories: each persists one kind of memory with parameterised SQL through `Microsoft.Data.Sqlite`, and no SQL exists outside them. `IOkfStore` holds Open Knowledge Format concepts and links; `SqliteContactStore` keeps each contact's concept in step and serves notes from observation concepts. Every delete writes a row to `sync_tombstone` through `Tombstones`, and every write clears it. `IOkfBundleFiles` reads and writes a bundle folder on disk.
-- In `Sync`, `IMemorySnapshotStore` reads every synced row of a database (the local one, or a downloaded copy, which it first brings up to the current schema), applies a merge in one transaction and makes a consistent copy; `SyncTables` lists the tables with their keys and parents. `IMemoryRemote` is the remote file, implemented by `GitMemoryRemote`: it fetches into a bare repository beside the database, builds each commit there without a working copy, and pushes without force so a push that lost a race is refused. It runs git through `IGitRunner` (`ProcessGitRunner`, which starts the git program without a shell and stops it after a time limit), in the environment `GitSshEnvironment` builds so that neither git nor SSH can stop to ask a question. `SyncRepositoryAddress`, an engine, is the rule for what may be named as the repository: `owner/name` or an SSH address, never a web address. `ISyncStateStore`, `ISyncLock` and `ISyncScratch` keep the last version seen, the per-machine lock and the private temporary copies.
+- In `Sync`, the parts that are memory's own, for the shared [Brokkr](https://github.com/loganventer/Corvus.Mcp.Library.Brokkr) sync library (a git submodule at `external/Corvus.Mcp.Library.Brokkr`): `TawkSyncTables` lists the tables that sync, with their keys, parents and the writer's rank; `TawkSqliteOpener` opens the live database through `SqliteConnectionFactory` and a downloaded copy as a plain file; `DefaultVoiceFixup` keeps one default voice after a merge. Brokkr does the rest: the bare git cache beside the database, commits built without a working copy, pushes without force, the lock, the state file and the scratch copies.
 
 <a id="Engines"></a>
 
@@ -171,7 +171,7 @@ Records mirror tawk's values in [CONTROL.md](https://github.com/loganventer/Corv
 - `ExponentialBackoffPolicy` and `CircuitBreaker` (closed, open, half-open) take an injected random source and `TimeProvider`. `RandomScheduleJitter` also takes a random source, and turns a schedule time into one shifted by whole seconds.
 - In `Memory`, measuring, judging and scoring are separate: `StyleFeatureExtractor` measures a draft, each `IVoiceRule` (forbidden patterns, case, emoji, length, language, address form, required markers, greeting and sign-off, learnt baseline) judges one thing, and `VoiceChecker` runs whichever rules are registered and scores the findings. `VoiceResolver` picks the variant for a category path and overlays its rules. `ContactFieldCatalog` holds `ContactFieldDefinition`s (from `StandardContactFields`) and checks values with one `IFieldValueValidator` per kind of value. `VoiceGuideImporter`, `StyleBaselineCalculator`, `TemplateRenderer` and `MemoryFormatter` do what their names say, and `MemoryWriteGuard` refuses changes in read-only mode.
 - In `Knowledge`, `KnowledgeFormatter` writes concepts and observations for a model, `KnowledgePrecedence` decides which of two versions is kept (stronger source, then newer), and `OkfBundleWriter` and `OkfBundleReader` turn concepts into Markdown files with YAML frontmatter and back. Reading uses YamlDotNet; writing is a small emitter that quotes anything YAML could misread.
-- In `Sync`, `MemoryMerger` holds the merge rules and `MemoryDigest` fingerprints the content. Both are pure: they see snapshots, never a database.
+- Sync's merge rules and digest come from Brokkr's engines. Memory registers one row rule, `SourceThenNewerRule`, under `TawkSyncTables.Rule`: the more trusted writer wins (user, contact, imported, inferred), then the newer change.
 
 <a id="Managers"></a>
 
@@ -185,7 +185,7 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 
 `ApprovalManager` lists this instance's waiting requests and approves one with the admin token, turning tawk's refusals into plain text that says the request still waits for the user.
 
-`KnowledgeManager` records and shows observations and relations, with `KnowledgeSubjects` working out which concept a tool argument means. `OkfBundleManager` exports and imports bundles. `MemorySyncManager` runs one sync cycle: lock, read the remote version, merge, compare digests, push, retry on a lost race.
+`KnowledgeManager` records and shows observations and relations, with `KnowledgeSubjects` working out which concept a tool argument means. `OkfBundleManager` exports and imports bundles. In `Sync`, `PurgeExpiredFacts` is the hook Brokkr runs before each cycle, so lapsed facts are dropped on both sides before they are compared; Brokkr's `ISyncManager` runs the cycle itself.
 
 <a id="Clients"></a>
 
@@ -197,7 +197,7 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 - `TawkPrompts` (`[McpServerPromptType]`) serves `catch_up` and `draft_reply`.
 - `TranscriptHandoffSink` is the event sink that hands each language of a finished transcription job to tawk, and `AutoTranscriptionSink` the one that starts a job for a voice note that arrives or that tawk asks about (`transcript_wanted`), leaving alone a chat the user switched off. `SummaryTools` holds `set_summary` and `decline_summary`.
 - `ChannelEventSink` sends `notifications/claude/channel`, a request for a summary to one session only so that it is written once; `EventStreamHub` keeps the last 200 events for `/events`; `ClientSessionRegistry` and `SessionTracking` remember connected sessions; `ProtocolRevisionFilter` keeps clients on the initialize handshake.
-- `NotificationDispatcher` is the hosted service that runs the live updates manager. `MemorySyncService` is the one that runs a sync cycle at start and then every interval; it is registered only when a repository and a token are set.
+- `NotificationDispatcher` is the hosted service that runs the live updates manager. Brokkr's interval service runs a sync cycle at start and then every interval; it is registered only with `--memory write` and a repository set. `SyncReportText` turns a sync report into the sentence `sync_memory` and `corvus-tawk-mcp sync` show.
 - In `Workflow`, `WorkflowCadence` counts rounds, `WorkflowReminder` is the tool call filter that adds `TawkWorkflow`'s fixed text to a result when it is due, and `ChannelEventSink` counts each message it delivers. `TawkServerInstructions` holds the server instructions.
 
 <a id="Host"></a>
@@ -243,5 +243,5 @@ The memory managers (`CategoryManager`, `VoiceManager`, `ContactProfileManager`,
 - **A new place for live updates to go**: implement `IEventSink` in the clients and register it.
 - **A new voice check**: add a class implementing `IVoiceRule` in `Engines/Memory` and register it in `AddMemory`. `VoiceChecker` does not change.
 - **A new contact field**: add a `ContactFieldDefinition` to `StandardContactFields`. A new kind of value needs a `FieldKind` and an `IFieldValueValidator` registered in `AddMemory`.
-- **A table that should sync**: add it to `SyncTables` with its key and parent, give its store a tombstone on delete and a clear on write, and make sure its rows carry `updated`.
+- **A table that should sync**: add it to `TawkSyncTables` with its key, parent and rank (the schema test checks every column), give its store a tombstone on delete and a clear on write, and make sure its rows carry `updated`.
 - **A schema change**: add a step to `SqliteSchemaMigrator` that ends by setting the next `user_version`. Never edit a step that has shipped.
