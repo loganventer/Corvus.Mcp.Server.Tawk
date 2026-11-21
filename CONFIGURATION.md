@@ -168,6 +168,8 @@ corvus-tawk-mcp needs `git` and `ssh` on the PATH. It never prompts: a key with 
 
 A cycle runs when the server starts and then every `CORVUS_TAWK_MCP_SYNC_INTERVAL_MINUTES`; `corvus-tawk-mcp sync` runs one by hand, and so does the `sync_memory` tool when you ask an agent to sync now. Each cycle looks up the branch's newest commit, fetches it and merges its file into the local database if it changed, and pushes only when this machine holds something the remote does not. Rows are matched by key: the stronger source wins (user, then contact, then imported, then inferred), then the newer change, and a delete on one machine removes the row on the others. Content is compared by a digest of the rows, so two machines with the same memory never push at each other. A push is never forced: if another machine got there first, the repository refuses it, and the cycle merges again and retries, three times at most. Other files in the repository are left as they are.
 
+The sync settings are checked when the server starts: an address that is a web URL, a branch name git could read as an option, or an interval outside 1 minute to 7 days stops it with a message saying which setting is wrong.
+
 Sync runs only with `--memory write`. A lock file beside the database lets one corvus-tawk-mcp per machine sync at a time. A remote written by a newer corvus-tawk-mcp is left alone until this machine is updated. The first machine to sync creates the file.
 
 <a id="Approving its own sends"></a>
