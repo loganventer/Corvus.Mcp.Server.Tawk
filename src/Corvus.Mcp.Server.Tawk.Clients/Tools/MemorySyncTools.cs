@@ -1,13 +1,12 @@
 using System.ComponentModel;
+using Corvus.Mcp.Library.Brokkr.Contracts.Managers;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
-using Corvus.Mcp.Server.Tawk.Core.Sync;
-using Corvus.Mcp.Server.Tawk.Managers.Sync;
 
 namespace Corvus.Mcp.Server.Tawk.Clients.Tools;
 
 [McpServerToolType]
-public sealed class MemorySyncTools(IMemorySyncManager sync)
+public sealed class MemorySyncTools(ISyncManager sync)
 {
     [McpServerTool(Name = "sync_memory", Destructive = false, ReadOnly = false, Idempotent = true, OpenWorld = true)]
     [Description(
@@ -18,6 +17,7 @@ public sealed class MemorySyncTools(IMemorySyncManager sync)
     public async Task<CallToolResult> SyncMemoryAsync(CancellationToken cancellationToken = default)
     {
         var report = await sync.SyncAsync(cancellationToken).ConfigureAwait(false);
-        return report.Outcome == SyncOutcome.Failed ? ToolResults.Error(report.Message) : ToolResults.Text(report.Message);
+        var text = SyncReportText.Describe(report);
+        return report.Outcome == SyncOutcome.Failed ? ToolResults.Error(text) : ToolResults.Text(text);
     }
 }

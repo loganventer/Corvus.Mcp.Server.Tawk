@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Corvus.Mcp.Server.Tawk.Core.Memory;
-using Corvus.Mcp.Server.Tawk.Core.Sync;
 using Corvus.Mcp.Server.Tawk.Managers.Knowledge;
-using Corvus.Mcp.Server.Tawk.Managers.Sync;
+using Corvus.Mcp.Library.Brokkr.Contracts.Managers;
+using Corvus.Mcp.Server.Tawk.Clients;
 
 namespace Corvus.Mcp.Server.Tawk.Host;
 
@@ -29,8 +29,8 @@ public static class MemoryCommand
                             .ImportAsync(options.BundlePath!, cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
                         return 0;
                     default:
-                        var report = await services.GetRequiredService<IMemorySyncManager>().SyncAsync(cancellationToken).ConfigureAwait(false);
-                        await output.WriteLineAsync(report.Message).ConfigureAwait(false);
+                        var report = await services.GetRequiredService<ISyncManager>().SyncAsync(cancellationToken).ConfigureAwait(false);
+                        await output.WriteLineAsync(SyncReportText.Describe(report)).ConfigureAwait(false);
                         return report.Outcome is SyncOutcome.Failed or SyncOutcome.Disabled ? 1 : 0;
                 }
             }
