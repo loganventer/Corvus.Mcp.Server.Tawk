@@ -26,10 +26,10 @@ corvus-tawk-mcp is an MCP server for [tawk](https://github.com/loganventer/Corvu
 Corvus.Mcp.Server.Tawk.slnx
 Directory.Build.props        net10.0, nullable, analysers, warnings as errors, version
 Directory.Packages.props     central package versions
-src/Corvus.Mcp.Server.Tawk.Core            records, events, error codes, shared contracts; Okf/ concepts and links; Sync/ rows, plans, options
-src/Corvus.Mcp.Server.Tawk.ResourceAccess  codec, socket connection, control client, supervisor, watcher, confirmation gate; Memory/ SQLite stores; Sync/ snapshots, the git remote over SSH
-src/Corvus.Mcp.Server.Tawk.Engines         formatters, fence, planners, backoff, circuit breaker, schedule jitter; Memory/ voice rules, field catalog; Knowledge/ OKF bundles; Sync/ merge rules
-src/Corvus.Mcp.Server.Tawk.Managers        use cases, one manager per area, plus IEventSink; Memory/ voices, contacts, templates; Knowledge/; Sync/
+src/Corvus.Mcp.Server.Tawk.Core            records, events, error codes, shared contracts; Okf/ concepts and links
+src/Corvus.Mcp.Server.Tawk.ResourceAccess  codec, socket connection, control client, supervisor, watcher, confirmation gate; Memory/ SQLite stores; Sync/ the synced tables, the opener and the default-voice fix-up for Brokkr
+src/Corvus.Mcp.Server.Tawk.Engines         formatters, fence, planners, backoff, circuit breaker, schedule jitter; Memory/ voice rules, field catalog; Knowledge/ OKF bundles
+src/Corvus.Mcp.Server.Tawk.Managers        use cases, one manager per area, plus IEventSink; Memory/ voices, contacts, templates; Knowledge/; Sync/ the purge Brokkr runs before each sync
 src/Corvus.Mcp.Server.Tawk.Clients         tools, resources, prompts, subscriptions, channel, event stream, dispatcher; Workflow/ the workflow check
 src/Corvus.Mcp.Server.Tawk.Host            composition root, Program, middleware, endpoints (assembly corvus-tawk-mcp)
 tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
@@ -68,6 +68,8 @@ tests/Corvus.Mcp.Server.Tawk.Tests         NUnit tests, Fakes/ holds every fake
 <a id="Build and test"></a>
 
 ## Build and test
+
+Memory sync comes from the shared Brokkr library, a git submodule at `external/Corvus.Mcp.Library.Brokkr`: clone with `--recurse-submodules`, or run `git submodule update --init` in a checkout.
 
 ```sh
 dotnet build Corvus.Mcp.Server.Tawk.slnx -warnaserror

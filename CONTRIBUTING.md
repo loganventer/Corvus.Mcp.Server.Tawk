@@ -43,6 +43,8 @@ Every change keeps to these six. A pull request that breaks one is sent back, ho
 
 ## Build and test
 
+Clone with `--recurse-submodules`: memory sync comes from the shared Brokkr library at `external/Corvus.Mcp.Library.Brokkr`.
+
 ```sh
 dotnet build Corvus.Mcp.Server.Tawk.slnx -warnaserror
 dotnet test Corvus.Mcp.Server.Tawk.slnx
