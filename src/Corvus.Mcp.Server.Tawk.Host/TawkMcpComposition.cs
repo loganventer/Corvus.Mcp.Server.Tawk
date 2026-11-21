@@ -404,12 +404,30 @@ public static class TawkMcpComposition
         // nothing syncs. It goes over SSH with the machine's own key; there are no tokens. Everything it keeps on this machine
         // sits beside the database. Only an instance that may write memory syncs it.
         services.AddBrokkrEngines().AddBrokkrSourceThenNewerRule(TawkSyncTables.Rule, TawkSyncTables.Unranked);
+        var userSsh = Environment.GetEnvironmentVariable("GIT_SSH_COMMAND");
+        var machine = Environment.MachineName;
         services.AddBrokkrGit(
-            new GitOptions(KeyFile: options.SyncKeyFile, UserSshCommand: Environment.GetEnvironmentVariable("GIT_SSH_COMMAND")),
+            git =>
+            {
+                git.KeyFile = options.SyncKeyFile;
+                git.UserSshCommand = userSsh;
+            },
             PushHistory.FastForward);
-        services.AddBrokkrState(new SyncPaths(path + ".sync.json", path + ".sync.lock", path + ".sync.git", Path.GetTempPath()));
-        services.AddBrokkrManager(new SyncOptions(
-            options.SyncRepository, "tawk-mcp", Environment.MachineName, options.SyncBranch, TimeSpan.FromMinutes(options.SyncIntervalMinutes)));
+        services.AddBrokkrState(paths =>
+        {
+            paths.StateFile = path + ".sync.json";
+            paths.LockFile = path + ".sync.lock";
+            paths.CacheFolder = path + ".sync.git";
+            paths.ScratchRoot = Path.GetTempPath();
+        });
+        services.AddBrokkrManager(manager =>
+        {
+            manager.Repository = options.SyncRepository;
+            manager.ProductName = "tawk-mcp";
+            manager.MachineName = machine;
+            manager.Branch = options.SyncBranch;
+            manager.Interval = TimeSpan.FromMinutes(options.SyncIntervalMinutes);
+        });
         services.AddSingleton<TawkSqliteOpener>();
         if (options.Memory == MemoryMode.Write)
         {
