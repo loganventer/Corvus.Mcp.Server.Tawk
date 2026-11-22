@@ -170,6 +170,8 @@ A cycle runs when the server starts and then every `CORVUS_TAWK_MCP_SYNC_INTERVA
 
 The sync settings are checked when the server starts: an address that is a web URL, a branch name git could read as an option, or an interval outside 1 minute to 7 days stops it with a message saying which setting is wrong.
 
+Your instructions file (`instructions.md`) syncs with memory as `config/instructions.md`, so your other machines get the same standing instructions; the bearer token beside it never leaves the machine.
+
 Sync runs only with `--memory write`. A lock file beside the database lets one corvus-tawk-mcp per machine sync at a time. A remote written by a newer corvus-tawk-mcp is left alone until this machine is updated. The first machine to sync creates the file.
 
 <a id="Approving its own sends"></a>
