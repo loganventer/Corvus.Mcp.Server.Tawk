@@ -90,6 +90,9 @@ public sealed record TawkMcpOptions
     /// <summary>A text file of the user's own standing instructions for agents. Defaults to ~/.config/corvus/tawk-mcp/instructions.md.</summary>
     public string? InstructionsFile { get; init; }
 
+    /// <summary>Accepts a local folder as the sync repository. Only tests set it.</summary>
+    public bool SyncAllowLocalRemote { get; init; }
+
     /// <summary>
     /// tawk's admin token file. Set per instance and never by default: with it, this instance may answer its
     /// own waiting sends while tawk's access is admin; without it, every write waits for the user.

@@ -1,3 +1,5 @@
+using Corvus.Mcp.Library.Brokkr.Contracts.Files;
+using Corvus.Mcp.Library.Brokkr.Files;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Nodes;
@@ -427,6 +429,7 @@ public static class TawkMcpComposition
             manager.MachineName = machine;
             manager.Branch = options.SyncBranch;
             manager.Interval = TimeSpan.FromMinutes(options.SyncIntervalMinutes);
+            manager.AllowLocalRemote = options.SyncAllowLocalRemote;
         });
         services.AddSingleton<TawkSqliteOpener>();
         if (options.Memory == MemoryMode.Write)
@@ -436,6 +439,10 @@ public static class TawkMcpComposition
                 provider => provider.GetRequiredService<TawkSqliteOpener>(),
                 fixups: _ => [new DefaultVoiceFixup()]);
             services.AddBrokkrPreSyncHook<PurgeExpiredFacts>();
+
+            // The user's standing instructions follow them to their other machines, as config; the bearer token never does.
+            var instructions = options.InstructionsFile ?? UserInstructionsFile.DefaultPath(Environment.GetEnvironmentVariable, home);
+            services.AddBrokkrFolder("config", new FileSpec(Path.GetDirectoryName(Path.GetFullPath(instructions))!, "config/", [Path.GetFileName(instructions)], ["token"], []));
         }
 
         // Engines. Each voice rule is its own class; the checker runs whichever are registered here.
