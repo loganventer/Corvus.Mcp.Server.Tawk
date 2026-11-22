@@ -35,6 +35,7 @@
     <ProjectReference Include="..\..\external\Corvus.Mcp.Library.Brokkr\src\Corvus.Mcp.Library.Brokkr.Git\Corvus.Mcp.Library.Brokkr.Git.csproj" />
     <ProjectReference Include="..\..\external\Corvus.Mcp.Library.Brokkr\src\Corvus.Mcp.Library.Brokkr.State\Corvus.Mcp.Library.Brokkr.State.csproj" />
     <ProjectReference Include="..\..\external\Corvus.Mcp.Library.Brokkr\src\Corvus.Mcp.Library.Brokkr.Sqlite\Corvus.Mcp.Library.Brokkr.Sqlite.csproj" />
+    <ProjectReference Include="..\..\external\Corvus.Mcp.Library.Brokkr\src\Corvus.Mcp.Library.Brokkr.Files\Corvus.Mcp.Library.Brokkr.Files.csproj" />
     <ProjectReference Include="..\..\external\Corvus.Mcp.Library.Brokkr\src\Corvus.Mcp.Library.Brokkr.Hosting\Corvus.Mcp.Library.Brokkr.Hosting.csproj" />
   </ItemGroup>
 </Project>
